@@ -1,0 +1,61 @@
+{
+    "name": "polirium/core",
+    "description": "Polirium ERP Core, is core of Polirium ERP System, it's include all base function for ERP System",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Nghia Ne",
+            "email": "vingadev@gmail.com"
+        }
+    ],
+    "homepage": "https://nghiane.com",
+    "support": {
+        "issues": "https://nghiane.com",
+        "document": "https://nghiane.com"
+    },
+    "require": {
+        "twig/twig": "^3.7.1",
+        "wireui/wireui": "^1.18.9",
+        "doctrine/dbal": "^3.7.1",
+        "aws/aws-sdk-php": "^3.283.18",
+        "laravel/fortify": "^1.18.1",
+        "laravel/horizon": "^5.21.3",
+        "livewire/livewire": "^3.0.10",
+        "lavary/laravel-menu": "^1.8.4",
+        "intervention/image": "^2.7.2",
+        "openspout/openspout": "^4.19.0",
+        "qh-8/laravel-options": "^2.4.0",
+        "kjmtrue/vietnam-zone": "^1.0.5",
+        "ifsnop/mysqldump-php": "^2.12",
+        "league/flysystem-sftp-v3": "^3.16.0",
+        "pusher/pusher-php-server": "^7.2.3",
+        "spatie/laravel-activitylog": "^4.7.3",
+        "spatie/laravel-permission": "^6.0.0",
+        "spatie/laravel-medialibrary": "^10.14.0",
+        "beyondcode/laravel-websockets": "^1.14.1",
+        "power-components/livewire-powergrid": "^5.1.9",
+        "vigstudio/laravel-tabler-icons": "*@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Polirium\\Core\\Base\\": "base/src",
+            "Polirium\\Core\\UI\\": "ui/src",
+            "Polirium\\Core\\Settings\\": "settings/src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Polirium\\Core\\Base\\Providers\\BaseServiceProvider",
+                "Polirium\\Core\\UI\\Providers\\UIServiceProvider",
+                "Polirium\\Core\\Settings\\Providers\\SettingServiceProvider"
+            ],
+            "aliases": {
+                "Assets": "Polirium\\Core\\UI\\Facades\\Assets",
+                "Settings": "Polirium\\Core\\Settings\\Facades\\Settings"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

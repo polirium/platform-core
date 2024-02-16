@@ -1,0 +1,23 @@
+{
+    "name": "polirium/erpcore-{-name}",
+    "description": "{Name} Module - Module for Vig ERP Core",
+    "authors": [
+        {
+            "name": "Nghia Pham",
+            "email": "vingamagic@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Polirium\\Core\\{Name}\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Polirium\\Core\\{Name}\\Providers\\{Name}ServiceProvider"
+            ]
+        }
+    }
+}
