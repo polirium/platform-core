@@ -5,10 +5,10 @@ namespace Polirium\Core\UI\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Compilers\BladeCompiler;
 use Polirium\Core\Base\Helpers\BaseHelper;
-use Polirium\Core\Base\Supports\PoliriumServiceProvider;
+use Polirium\Core\Support\Providers\PoliriumBaseServiceProvider;
 use Polirium\Core\UI\Support\Assets;
 
-class UIServiceProvider extends PoliriumServiceProvider
+class UIServiceProvider extends PoliriumBaseServiceProvider
 {
     public function boot()
     {

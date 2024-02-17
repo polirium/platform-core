@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions\Fortify;
+namespace Polirium\Core\Base\Actions\Fortify;
 
 use Laravel\Fortify\Rules\Password;
 
@@ -13,6 +13,6 @@ trait PasswordValidationRules
      */
     protected function passwordRules(): array
     {
-        return ['required', 'string', new Password, 'confirmed'];
+        return ['required', 'string', new Password(), 'confirmed'];
     }
 }

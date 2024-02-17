@@ -1,6 +1,6 @@
 <?php
 
-namespace Polirium\Core\Base\Traits;
+namespace Polirium\Core\Support\Traits;
 
 trait LoadAndPublishDataTrait
 {
@@ -112,7 +112,7 @@ trait LoadAndPublishDataTrait
     {
         if ($this->app->runningInConsole()) {
             if (empty($path)) {
-                $path = 'vendor/' . $this->getDashedNamespace();
+                $path = 'vendor/polirium/' . $this->getDashedNamespace();
             }
             $this->publishes([$this->getAssetsPath() => public_path($path)], 'crm-public');
         }

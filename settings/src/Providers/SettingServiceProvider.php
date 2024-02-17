@@ -3,7 +3,6 @@
 namespace Polirium\Core\Settings\Providers;
 
 use Polirium\Core\Base\Helpers\BaseHelper;
-use Polirium\Core\Base\Supports\PoliriumServiceProvider;
 use Polirium\Core\Settings\Contracts\ContextSerializer as ContextSerializerContract;
 use Polirium\Core\Settings\Contracts\KeyGenerator as KeyGeneratorContract;
 use Polirium\Core\Settings\Contracts\Setting as SettingContract;
@@ -16,8 +15,9 @@ use Polirium\Core\Settings\Support\KeyGenerators\Md5KeyGenerator;
 use Polirium\Core\Settings\Support\KeyGenerators\ReadableKeyGenerator;
 use Polirium\Core\Settings\Support\ValueSerializers\JsonValueSerializer;
 use Polirium\Core\Settings\Support\ValueSerializers\ValueSerializer;
+use Polirium\Core\Support\Providers\PoliriumBaseServiceProvider;
 
-class SettingServiceProvider extends PoliriumServiceProvider
+class SettingServiceProvider extends PoliriumBaseServiceProvider
 {
     public function boot()
     {

@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Config;
 use Polirium\Core\Base\Exceptions\Handler;
 use Polirium\Core\Base\Helpers\Assets;
 use Polirium\Core\Base\Helpers\BaseHelper;
-use Polirium\Core\Base\Supports\PoliriumServiceProvider;
+use Polirium\Core\Support\Providers\PoliriumBaseServiceProvider;
 
-class BaseServiceProvider extends PoliriumServiceProvider
+class BaseServiceProvider extends PoliriumBaseServiceProvider
 {
     public function boot()
     {

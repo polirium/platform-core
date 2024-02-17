@@ -38,6 +38,7 @@
     },
     "autoload": {
         "psr-4": {
+            "Polirium\\Core\\Support\\": "support/src",
             "Polirium\\Core\\Base\\": "base/src",
             "Polirium\\Core\\UI\\": "ui/src",
             "Polirium\\Core\\Settings\\": "settings/src"
@@ -46,9 +47,11 @@
     "extra": {
         "laravel": {
             "providers": [
+                "Polirium\\Core\\Support\\Providers\\SupportServiceProvider",
                 "Polirium\\Core\\Base\\Providers\\BaseServiceProvider",
                 "Polirium\\Core\\UI\\Providers\\UIServiceProvider",
                 "Polirium\\Core\\Settings\\Providers\\SettingServiceProvider"
+
             ],
             "aliases": {
                 "Assets": "Polirium\\Core\\UI\\Facades\\Assets",
