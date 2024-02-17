@@ -239,6 +239,3 @@
         </div>
     </div>
 @endsection
-
-@push('scripts')
-@endpush

@@ -1,0 +1,33 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.makeTimes = void 0;
+const makeTimes = ({ time12H, interval, min = 0, max = 24 }) => {
+    const [minHours = 0, minMinutes = 0] = min.toString().split(':');
+    const [maxHours = 0, maxMinutes = 0] = max.toString().split(':');
+    let currentTime = Number(minHours) * 60 + Number(minMinutes);
+    const maxTime = Number(maxHours) * 60 + Number(maxMinutes);
+    const times = [];
+    const timePeriods = ['AM', 'PM'];
+    if (interval <= 0) {
+        interval = 60;
+    }
+    while (currentTime < maxTime) {
+        const hours = Number(Math.floor(currentTime / 60)).toString().padStart(2, '0');
+        const minutes = Number(currentTime % 60).toString().padStart(2, '0');
+        const time = {
+            label: `${hours}:${minutes}`,
+            value: `${hours}:${minutes}`
+        };
+        if (time12H) {
+            let displayHour = Number(hours) % 12;
+            if (displayHour === 0)
+                displayHour = 12;
+            time.label = `${displayHour}:${minutes} ${timePeriods[Math.floor(Number(hours) / 12)]}`;
+        }
+        times.push(time);
+        currentTime += interval;
+    }
+    return times;
+};
+exports.makeTimes = makeTimes;
+//# sourceMappingURL=makeTimes.js.map

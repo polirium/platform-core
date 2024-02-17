@@ -35,18 +35,3 @@ if (! function_exists('get_logo')) {
         return Settings::get('logo', config('core.base.setting.logo'));
     }
 }
-
-if (! function_exists('get_wallpaper_auth')) {
-    function get_wallpaper_auth()
-    {
-        $assets = [
-            Assets::get('core/ui/assets/auth/auth-1.jpg'),
-            Assets::get('core/ui/assets/auth/auth-2.jpg'),
-            'https://picsum.photos/1280/853',
-        ];
-
-        $key = array_rand($assets);
-
-        return $assets[$key];
-    }
-}
