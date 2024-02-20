@@ -7,24 +7,25 @@
                 </a>
             </div>
 
-            <form class="card card-md" action="{{ route('password.update') }}" method="post" autocomplete="off" novalidate>
+            <form class="card card-md" action="{{ route('password.update') }}" method="post">
                 @csrf
                 <div class="card-body">
-                    <h2 class="card-title text-center mb-4">Update password</h2>
-                    <p class="text-secondary mb-4">Enter your email address and your password will be reset and emailed to you.</p>
+                    <h2 class="card-title text-center mb-4">{{ trans('core/base::auth.title_reset_password') }}</h2>
+                    <p class="text-secondary mb-4">{{ trans('core/base::auth.description_reset_password') }}</p>
 
                     @include('core/base::auth.status')
                     <input type="hidden" name="token" value="{{ request()->route('token') }}">
+
                     <div class="mb-3">
-                        <label class="form-label">Email address</label>
-                        <input type="email" name="email" class="form-control" placeholder="Enter email" value="{{ old('email', request()->route('email')) }}">
+                        <label class="form-label">{{ trans('core/base::auth.email') }}</label>
+                        <input type="email" name="email" class="form-control" placeholder="{{ trans('core/base::auth.enter_email') }}" value="{{ old('email', request()->route('email')) }}" autocomplete="email">
                     </div>
 
 
                     <div class="mb-3">
-                        <label class="form-label">Enter Password</label>
+                        <label class="form-label">{{ trans('core/base::auth.new_password') }}</label>
                         <div class="input-group input-group-flat">
-                            <input name="password" type="password" class="form-control" placeholder="{{ trans('core/base::auth.your_password') }}" autocomplete="off">
+                            <input name="password" type="password" class="form-control" placeholder="{{ trans('core/base::auth.your_password') }}">
                             <span class="input-group-text">
                                 <a href="#" onclick="viewPassword(this)" class="link-secondary" title="{{ trans('core/base::auth.show_password') }}">
                                     <x-tabler-icons::eye />
@@ -34,9 +35,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Enter Password</label>
+                        <label class="form-label">{{ trans('core/base::auth.confirm_password') }}</label>
                         <div class="input-group input-group-flat">
-                            <input name="password_confirmation" type="password" class="form-control" placeholder="{{ trans('core/base::auth.your_password') }}" autocomplete="off">
+                            <input name="password_confirmation" type="password" class="form-control" placeholder="{{ trans('core/base::auth.your_password') }}">
                             <span class="input-group-text">
                                 <a href="#" onclick="viewPassword(this)" class="link-secondary" title="{{ trans('core/base::auth.show_password') }}">
                                     <x-tabler-icons::eye />
@@ -47,13 +48,13 @@
 
                     <div class="form-footer">
                         <button type="submit" class="btn btn-primary w-100">
-                            <x-tabler-icons::mail /> Change Password
+                            <x-tabler-icons::send-2 /> {{ trans('core/base::auth.submit_reset_password') }}
                         </button>
                     </div>
                 </div>
             </form>
             <div class="text-center text-secondary mt-3">
-                Forget it, <a href="{{ route('login') }}">send me back</a> to the sign in screen.
+                {!! trans('core/base::auth.link_back_login', ['route' => route('login')]) !!}
             </div>
         </div>
     </div>

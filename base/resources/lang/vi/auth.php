@@ -15,4 +15,9 @@ return [
     'enter_email' => 'Nhập email',
     'send_new_password' => 'Gửi mật khẩu mới',
     'link_back_login' => 'Không tôi đã nhầm, <a href=":route">QUAY TRỞ VỀ</a> màn hình đăng nhập hệ thống.',
+    'title_reset_password' => 'Đặt lại mật khẩu',
+    'description_reset_password' => 'Nhập mật khẩu mới của bạn vào ô phía dưới.',
+    'new_password' => 'Mật khẩu mới',
+    'confirm_password' => 'Xác nhận mật khẩu',
+    'submit_reset_password' => 'Đặt lại mật khẩu',
 ];

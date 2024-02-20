@@ -8,7 +8,7 @@
     <title>{{ get_title() }}</title>
 
     {{ render_css() }}
-
+    @stack('styles')
     <style>
         @import url('https://rsms.me/inter/inter.css');
 
@@ -26,6 +26,23 @@
     @yield('content')
 
     {{ render_js() }}
+
+    <script>
+        function viewPassword(element) {
+            var input = element.parentElement.parentElement.getElementsByTagName('input');
+            for (var i = 0; i < input.length; i++) {
+                if (input[i].type === 'password') {
+                    input[i].type = 'text';
+                    element.innerHTML = `{{ tabler_icon('eye-off') }}`;
+                } else {
+                    input[i].type = 'password';
+                    element.innerHTML = `{{ tabler_icon('eye') }}`;
+                }
+            }
+        }
+    </script>
+
+    @stack('scripts')
 </body>
 
 </html>
