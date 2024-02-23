@@ -1,6 +1,6 @@
 <?php
 
-namespace Polirium\Modules\{Module}\Http\Controllers;
+namespace {Module}\Http\Controllers;
 
 use Polirium\Core\Base\Http\Controllers\BaseController;
 use Illuminate\Http\Request;

@@ -32,7 +32,8 @@
         "lodash.debounce": "^4.0.8",
         "dayjs": "^1.11.10",
         "lodash.kebabcase": "^4.1.1",
-        "qs": "^6.11.2"
+        "qs": "^6.11.2",
+        "flatpickr": "^4.6.13"
     },
     "peerDependencies": {
         "@melloware/coloris": "^0.19.1",

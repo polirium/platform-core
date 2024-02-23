@@ -41,7 +41,8 @@
             "Polirium\\Core\\Support\\": "support/src",
             "Polirium\\Core\\Base\\": "base/src",
             "Polirium\\Core\\UI\\": "ui/src",
-            "Polirium\\Core\\Settings\\": "settings/src"
+            "Polirium\\Core\\Settings\\": "settings/src",
+            "Polirium\\Core\\DevTool\\": "dev-tool/src"
         }
     },
     "extra": {
@@ -50,8 +51,8 @@
                 "Polirium\\Core\\Support\\Providers\\SupportServiceProvider",
                 "Polirium\\Core\\Base\\Providers\\BaseServiceProvider",
                 "Polirium\\Core\\UI\\Providers\\UIServiceProvider",
-                "Polirium\\Core\\Settings\\Providers\\SettingServiceProvider"
-
+                "Polirium\\Core\\Settings\\Providers\\SettingServiceProvider",
+                "Polirium\\Core\\DevTool\\Providers\\DevToolServiceProvider"
             ],
             "aliases": {
                 "Assets": "Polirium\\Core\\UI\\Facades\\Assets",

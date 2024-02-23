@@ -1,5 +1,6 @@
 <x-ui.layouts::app>
     <div class="row row-deck row-cards">
+        @livewire('core/base::user-table')
         <div class="col-sm-6 col-lg-3">
             <div class="card">
                 <div class="card-body">

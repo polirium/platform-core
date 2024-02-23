@@ -8,4 +8,5 @@ use Polirium\Core\Support\Traits\LoadAndPublishDataTrait;
 class PoliriumBaseServiceProvider extends ServiceProvider
 {
     use LoadAndPublishDataTrait;
+
 }

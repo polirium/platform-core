@@ -5,9 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <link rel="icon" type="image/x-icon" href="{{ get_favicon() }}">
+
     <title>{{ get_title() }}</title>
 
     {{ render_css() }}
+    @livewireStyles
     @stack('styles')
     <style>
         @import url('https://rsms.me/inter/inter.css');
@@ -25,6 +29,7 @@
 <body class="@yield('body-class', 'layout-fluid')">
     @yield('content')
 
+    @livewireScripts
     {{ render_js() }}
 
     <script>

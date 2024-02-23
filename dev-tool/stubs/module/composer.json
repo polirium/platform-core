@@ -1,6 +1,6 @@
 {
-    "name": "polirium/erpcore-{-name}",
-    "description": "{Name} Module - Module for Vig ERP Core",
+    "name": "polirium/{-name}",
+    "description": "{Name} Module - Module for Polirium Core",
     "authors": [
         {
             "name": "Nghia Pham",

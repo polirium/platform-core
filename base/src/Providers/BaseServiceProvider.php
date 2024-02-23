@@ -15,7 +15,7 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
     public function boot()
     {
         $this->setNamespace('core/base')
-            ->loadConfigurations(['setting', 'permissions', 'menu'])
+            ->loadConfigurations(['setting'])
             ->loadViews()
             ->loadTranslations()
             ->loadRoutes(['web', 'api', 'auth'])
@@ -23,6 +23,7 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
 
         $this->app->register(FortifyServiceProvider::class);
         $this->app->register(AuthServiceProvider::class);
+        $this->app->register(LivewireServiceProvider::class);
 
         $this->app['events']->listen(RouteMatched::class, function () {
             $this->app->register(MenuServiceProvider::class);
@@ -102,5 +103,11 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
                 ],
             ],
         ]);
+    }
+
+    protected function setConfigurations()
+    {
+        Config::set('auth.providers.users.model', \Polirium\Core\Base\Http\Models\User::class);
+        Config::set('livewire-powergrid.theme', \PowerComponents\LivewirePowerGrid\Themes\Bootstrap5::class);
     }
 }

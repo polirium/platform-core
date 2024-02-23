@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix(get_admin_prefix())
     ->middleware(['web', 'core'])
-    ->namespace('Polirium\Modules\{Module}\Http\Controllers')
+    ->namespace('{Module}\Http\Controllers')
     ->group(function () {
         Route::prefix('{-names}')->name('{-names}.')->group(function () {
               Route::get('', '{Name}Controller@index')->name('index');

@@ -20,8 +20,13 @@ trait LoadAndPublishDataTrait
         if (! is_array($fileNames)) {
             $fileNames = [$fileNames];
         }
+
+        $fileNames = array_merge($fileNames, ['livewire', 'menu', 'permissions']);
+
         foreach ($fileNames as $fileName) {
-            $this->mergeConfigFrom($this->getConfigFilePath($fileName), $this->getDotedNamespace() . '.' . $fileName);
+            if(file_exists($this->getConfigFilePath($fileName))) {
+                $this->mergeConfigFrom($this->getConfigFilePath($fileName), $this->getDotedNamespace() . '.' . $fileName);
+            }
         }
 
         return $this;

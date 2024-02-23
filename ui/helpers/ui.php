@@ -35,3 +35,10 @@ if (! function_exists('get_logo')) {
         return Settings::get('logo', config('core.base.setting.logo'));
     }
 }
+
+if (! function_exists('get_favicon')) {
+    function get_favicon()
+    {
+        return Settings::get('favicon', config('core.base.setting.favicon'));
+    }
+}
