@@ -1,19 +1,19 @@
 <?php
 
-namespace Polirium\Core\Base\Http\Livewire\Datatable;
+namespace Polirium\Core\Base\Http\Livewire\Tables;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Polirium\Core\Base\Http\Models\User;
-use Polirium\Core\Support\Http\Livewire\Datatable\BaseTable;
-use PowerComponents\LivewirePowerGrid\Button;
-use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Exportable;
-use PowerComponents\LivewirePowerGrid\Facades\Filter;
-use PowerComponents\LivewirePowerGrid\Footer;
-use PowerComponents\LivewirePowerGrid\Header;
-use PowerComponents\LivewirePowerGrid\PowerGrid;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
+use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
+use Polirium\LivewireDatatable\Button;
+use Polirium\LivewireDatatable\Column;
+use Polirium\LivewireDatatable\Exportable;
+use Polirium\LivewireDatatable\Facades\Filter;
+use Polirium\LivewireDatatable\Footer;
+use Polirium\LivewireDatatable\Header;
+use Polirium\LivewireDatatable\PowerGrid;
+use Polirium\LivewireDatatable\PowerGridFields;
 
 final class UserTable extends BaseTable
 {
@@ -47,12 +47,6 @@ final class UserTable extends BaseTable
         return PowerGrid::fields()
             ->add('id')
             ->add('username')
-
-           /** Example of custom column using a closure **/
-            ->add('username_lower', fn (User $model) => strtolower(e($model->username)))
-
-            ->add('first_name')
-            ->add('last_name')
             ->add('name')
             ->add('email')
             ->add('super_admin')
@@ -66,19 +60,9 @@ final class UserTable extends BaseTable
             Column::make('Username', 'username')
                 ->sortable()
                 ->searchable(),
-
-            Column::make('First name', 'first_name')
-                ->sortable()
-                ->searchable(),
-
-            Column::make('Last name', 'last_name')
-                ->sortable()
-                ->searchable(),
-
             Column::make('Name', 'name')
                 ->sortable()
                 ->searchable(),
-
             Column::make('Email', 'email')
                 ->sortable()
                 ->searchable(),

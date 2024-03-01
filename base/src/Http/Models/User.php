@@ -3,6 +3,7 @@
 namespace Polirium\Core\Base\Http\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Avatar;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -64,6 +65,11 @@ class User extends Authenticatable
         $logOptions->logOnlyDirty();
 
         return $logOptions;
+    }
+
+    public function getAvatarAttribute()
+    {
+        return Avatar::create($this->name)->setShape('square')->toBase64();
     }
 
 }

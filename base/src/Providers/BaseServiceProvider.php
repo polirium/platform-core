@@ -108,6 +108,6 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
     protected function setConfigurations()
     {
         Config::set('auth.providers.users.model', \Polirium\Core\Base\Http\Models\User::class);
-        Config::set('livewire-powergrid.theme', \PowerComponents\LivewirePowerGrid\Themes\Bootstrap5::class);
+        Config::set('livewire-powergrid.theme', \Polirium\LivewireDatatable\Themes\Bootstrap5::class);
     }
 }

@@ -20,6 +20,7 @@
         "aws/aws-sdk-php": "^3.283.18",
         "laravel/fortify": "^1.18.1",
         "laravel/horizon": "^5.21.3",
+        "laravolt/avatar": "^5.0.0",
         "livewire/livewire": "^3.0.10",
         "lavary/laravel-menu": "^1.8.4",
         "intervention/image": "^2.7.2",
@@ -33,7 +34,7 @@
         "spatie/laravel-permission": "^6.0.0",
         "spatie/laravel-medialibrary": "^10.14.0",
         "beyondcode/laravel-websockets": "^1.14.1",
-        "power-components/livewire-powergrid": "^5.1.9",
+        "polirium/livewire-datatable": "@dev",
         "vigstudio/laravel-tabler-icons": "*@dev"
     },
     "autoload": {

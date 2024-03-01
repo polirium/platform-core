@@ -21,4 +21,8 @@ Route::middleware(['web', 'auth', 'can:core.index'])
         Route::get('/', [DashboadController::class, 'index'])->name('index');
     });
 
+Route::get('/', function () {
+    return view('f');
+});
+
 require __DIR__.'/auth.php';
