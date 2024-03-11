@@ -1,7 +1,7 @@
 @import "config";
 @import "app/highlight";
 @import "app/app";
-@import "livewire-powergrid.css";
+@import "../../../../../packages/livewire-datatable/dist/bootstrap5.css";
 @import "../../../../../../node_modules/flatpickr/dist/flatpickr.min.css";
 
 .card-sponsor {

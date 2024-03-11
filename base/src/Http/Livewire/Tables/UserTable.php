@@ -2,8 +2,9 @@
 
 namespace Polirium\Core\Base\Http\Livewire\Tables;
 
+use CoreSupport;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Blade;
 use Polirium\Core\Base\Http\Models\User;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
 use Polirium\LivewireDatatable\Button;
@@ -47,32 +48,35 @@ final class UserTable extends BaseTable
         return PowerGrid::fields()
             ->add('id')
             ->add('username')
-            ->add('name')
+            ->add('name', function (User $model) {
+                return  Blade::render(<<<HTML
+                    <x-ui.table::column.user name="$model->name" avatar="$model->avatar" email="$model->email" />
+                HTML);
+            })
             ->add('email')
             ->add('super_admin')
-            ->add('created_at_formatted', fn (User $model) => Carbon::parse($model->created_at)->format('d/m/Y H:i:s'));
+            ->add('created_at_formatted', function (User $model) {
+                return CoreSupport::datetime($model->created_at);
+            });
     }
 
     public function columns(): array
     {
         return [
             Column::make('Id', 'id'),
-            Column::make('Username', 'username')
+            Column::make('Name', 'name')
                 ->sortable()
                 ->searchable(),
-            Column::make('Name', 'name')
+            Column::make('Username', 'username')
                 ->sortable()
                 ->searchable(),
             Column::make('Email', 'email')
                 ->sortable()
                 ->searchable(),
-
             Column::make('Super admin', 'super_admin')
                 ->toggleable(),
-
             Column::make('Created at', 'created_at_formatted', 'created_at')
                 ->sortable(),
-
             Column::action('Action'),
         ];
     }

@@ -1,12 +1,12 @@
 <?php
 
 use Polirium\Core\UI\View\Components\{
-    Layouts\Master
+    Button
 };
 
 return [
-    'layout.master' => [
-        'class' => Master::class,
-        'alias' => 'ui.layout.master',
+    'button' => [
+        'class' => Button::class,
+        'alias' => 'ui.button',
     ]
 ];

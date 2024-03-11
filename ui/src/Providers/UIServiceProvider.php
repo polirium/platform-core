@@ -37,10 +37,12 @@ class UIServiceProvider extends PoliriumBaseServiceProvider
         Blade::componentNamespace('Polirium\\Core\\UI\\View\\Components\\Layouts', 'ui.layouts');
         Blade::componentNamespace('Polirium\\Core\\UI\\View\\Components\\Header', 'ui.header');
 
-        // $this->callAfterResolving(BladeCompiler::class, static function (BladeCompiler $blade): void {
-        //     foreach(config('core.ui.components', []) as $alias => $component) {
-        //         $blade->component($component['class'], $component['alias']);
-        //     }
-        // });
+        Blade::anonymousComponentPath(__DIR__ . '/../../resources/views/components/table', 'ui.table');
+
+        $this->callAfterResolving(BladeCompiler::class, static function (BladeCompiler $blade): void {
+            foreach(config('core.ui.components', []) as $alias => $component) {
+                $blade->component($component['class'], $component['alias']);
+            }
+        });
     }
 }

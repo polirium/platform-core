@@ -74,8 +74,8 @@ abstract class BaseMakeCommand extends Command
             '{Name}' => ucfirst(Str::camel($replaceText)),
             '.stub' => '.php',
             '{migrate_date}' => Carbon::now()->format('Y_m_d_His'),
-            '{type}' => 'package',
-            '{types}' => 'packages',
+            '{type}' => 'module',
+            '{types}' => 'modules',
         ];
     }
 
