@@ -5,10 +5,12 @@ namespace Polirium\Core\Base\Http\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Avatar;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Polirium\Core\Base\Http\Models\Traits\HasUuid;
+use Polirium\Modules\Sale\Http\Model\Branch;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -72,4 +74,15 @@ class User extends Authenticatable
         return Avatar::create($this->name)->setShape('square')->toBase64();
     }
 
+        /**
+     * The users that belong to the Branch
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function branches(): BelongsToMany
+    {
+        return $this->belongsToMany(Branch::class, 'user_branches', 'user_id', 'branch_id')
+        ->withTimestamps()
+        ->withPivot(["id", "active"]);
+    }
 }

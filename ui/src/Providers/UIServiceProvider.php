@@ -19,7 +19,6 @@ class UIServiceProvider extends PoliriumBaseServiceProvider
             ->publishAssets();
 
         $this->registerBladeComponents();
-        $this->app->register(WireUiProvider::class);
     }
 
     public function register()
@@ -38,6 +37,8 @@ class UIServiceProvider extends PoliriumBaseServiceProvider
         Blade::componentNamespace('Polirium\\Core\\UI\\View\\Components\\Header', 'ui.header');
 
         Blade::anonymousComponentPath(__DIR__ . '/../../resources/views/components/table', 'ui.table');
+        Blade::anonymousComponentPath(__DIR__ . '/../../resources/views/components/interface', 'ui');
+        Blade::anonymousComponentPath(__DIR__ . '/../../resources/views/components/forms', 'form');
 
         $this->callAfterResolving(BladeCompiler::class, static function (BladeCompiler $blade): void {
             foreach(config('core.ui.components', []) as $alias => $component) {
