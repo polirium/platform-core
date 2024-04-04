@@ -10,13 +10,13 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Polirium\\{Name}\\": "src"
+            "Polirium\\Modules\\{Name}\\": "src"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Polirium\\{Name}\\Providers\\{Name}ServiceProvider"
+                "Polirium\\Modules\\{Name}\\Providers\\{Name}ServiceProvider"
             ]
         }
     }

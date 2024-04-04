@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::prefix(get_admin_prefix())
+Route::prefix(admin_prefix())
     ->middleware(['web', 'core'])
     ->namespace('{Module}\Http\Controllers')
     ->group(function () {
