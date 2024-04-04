@@ -19,7 +19,6 @@ class UIServiceProvider extends PoliriumBaseServiceProvider
             ->publishAssets();
 
         $this->registerBladeComponents();
-        $this->app->register(WireUiProvider::class);
     }
 
     public function register()
