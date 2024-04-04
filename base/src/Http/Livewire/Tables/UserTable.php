@@ -56,7 +56,7 @@ final class UserTable extends BaseTable
             ->add('email')
             ->add('super_admin')
             ->add('created_at_formatted', function (User $model) {
-                return CoreSupport::datetime($model->created_at);
+                return CoreSupport::datetime($model->created_at ?? now());
             });
     }
 
