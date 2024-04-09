@@ -35,11 +35,7 @@
         "spatie/laravel-medialibrary": "^10.14.0",
         "beyondcode/laravel-websockets": "^1.14.1",
         "polirium/livewire-datatable": "@dev",
-        "vigstudio/laravel-tabler-icons": "*@dev",
-
-        "polirium/product": "*@dev",
-        "polirium/sale": "*@dev",
-        "polirium/customer": "*@dev"
+        "vigstudio/laravel-tabler-icons": "*@dev"
     },
     "autoload": {
         "psr-4": {
