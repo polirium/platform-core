@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Polirium\Core\Base\Http\Controllers\BranchController;
+use Polirium\Core\Base\Http\Controllers\BrandController;
 use Polirium\Core\Base\Http\Controllers\DashboadController;
 
 /*
@@ -19,6 +21,22 @@ Route::middleware(['web', 'auth', 'can:core.index'])
     ->name('core.')
     ->group(function () {
         Route::get('/', [DashboadController::class, 'index'])->name('index');
+
+        // Chi nhánh
+        Route::prefix("branches")->name("branches.")
+        ->controller(BranchController::class)
+        ->group(function () {
+            Route::get('', 'index')->name('index');
+        });
+        // End Chi nhánh
+
+        // Thương hiệu
+        Route::prefix("brands")->name("brands.")
+        ->controller(BrandController::class)
+        ->group(function () {
+            Route::get('', 'index')->name('index');
+        });
+        // End Thương hiệu
     });
 
 Route::get('/', function () {

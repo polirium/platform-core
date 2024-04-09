@@ -32,4 +32,28 @@ return [
         'icon' => 'eye',
         'sort' => 0,
     ],
+
+    [
+        'id' => 'core.setting',
+        'name' => trans('Cài đặt'),
+        'route' => null,
+        'icon' => 'settings',
+        'sort' => 0,
+    ],
+    [
+        'id' => 'core.setting-brand',
+        'name' => trans('Thương hiệu'),
+        'parent' => 'core.setting',
+        'route' => 'core.brands.index',
+        'icon' => 'star',
+        'sort' => 0,
+    ],
+    [
+        'id' => 'core.setting-branch',
+        'name' => trans('Chi nhánh'),
+        'parent' => 'core.setting',
+        'route' => 'core.branches.index',
+        'icon' => 'map-pins',
+        'sort' => 1,
+    ],
 ];
