@@ -24,15 +24,29 @@ return [
         'icon' => 'eye',
         'sort' => 0,
     ],
-
+    /**
+     * User Manager Menu
+     */
     [
         'id' => 'core.user',
-        'name' => trans('Quản lý người dùng'),
+        'name' => trans('Nhân viên'),
         'route' => null,
         'icon' => 'eye',
         'sort' => 0,
     ],
+    [
+        'id' => 'core.user.manager',
+        'name' => trans('Quản lý nhân viên'),
+        'parent' => 'core.user',
+        'route' => 'core.users.index',
+        'icon' => 'map-pins',
+        'sort' => 1,
+    ],
 
+
+    /**
+     * Setting Menu
+     */
     [
         'id' => 'core.setting',
         'name' => trans('Cài đặt'),

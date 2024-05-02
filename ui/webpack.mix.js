@@ -35,11 +35,11 @@ jsFiles.forEach(function (file) {
 });
 
 
-cssFiles.forEach(function (file) {
-    mix.copy(productFolder + '/css/' + file + '.min.css', public + '/css/' + file + '.min.css');
-});
+// cssFiles.forEach(function (file) {
+//     mix.copy(productFolder + '/css/' + file + '.min.css', public + '/css/' + file + '.min.css');
+// });
 
-jsFiles.forEach(function (file) {
-    mix.copy(productFolder + '/js/' + file + '.min.js', public + '/js/' + file + '.min.js');
-});
+// jsFiles.forEach(function (file) {
+//     mix.copy(productFolder + '/js/' + file + '.min.js', public + '/js/' + file + '.min.js');
+// });
 
