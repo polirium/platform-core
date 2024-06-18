@@ -1,4 +1,4 @@
 @props(['label' => null, 'active' => false])
-<li class="nav-item">
+<x-ui::tab.nav-item>
     <button type="button" {{ $attributes->class("nav-link " . ($active ? "active" : null)) }} >{{ $label }}</button>
-</li>
+</x-ui::tab.nav-item>

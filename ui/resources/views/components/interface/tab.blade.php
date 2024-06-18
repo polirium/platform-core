@@ -3,9 +3,9 @@
     'footer' => null,
 ])
 
-<div class="card">
+<div {{ $attributes->class("card") }}>
     <div class="card-header">
-        <ul {{ $attributes->class("nav nav-tabs card-header-tabs") }}>
+        <ul {{ $header->attributes->class("nav nav-tabs card-header-tabs w-100") }}>
             {{ $header }}
         </ul>
     </div>
@@ -14,7 +14,7 @@
             {{ $slot }}
         </div>
     </div>
-    <div class="card-footer">
-        {{ $footer }}
-    </div>
+    @if ($footer)
+        <div {{ $footer->class("card-footer") }}>{{ $footer }}</div>
+    @endif
 </div>

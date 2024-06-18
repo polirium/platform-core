@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Base\Http\Models\Traits\HasUuid;
-use Polirium\Modules\Sale\Http\Model\Branch;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
