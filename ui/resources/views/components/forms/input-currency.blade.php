@@ -4,11 +4,12 @@
     'name'      => $attributes->wire('model')->value() ?? $attributes->whereStartsWith('name')->first(),
     'append'    => null,
     'prepend'   => null,
-    'autoNumericOpt' => "{
-        currencySymbol: '₫ ',
-        decimalCharacter: ',',
-        digitGroupSeparator: '.'
-    }"
+    // 'autoNumericOpt' => "{
+    //     currencySymbol: '₫ ',
+    //     decimalCharacter: ',',
+    //     digitGroupSeparator: '.'
+    // }"
+    'autoNumericOpt' => "{}"
 ])
 
 @if ($label)

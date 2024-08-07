@@ -1,5 +1,6 @@
 @props([
     'header' => null,
+    'body'   => null,
     'footer' => null,
     'action' => null,
 ])
@@ -19,7 +20,11 @@
             </div>
         @endif
     @endif
-    <div class="card-body">{{ $slot }}</div>
+    @if ($body)
+        <div {{ $body?->attributes?->class("card-body") }}>{{ $body }}</div>
+    @else
+        <div class="card-body">{{ $slot }}</div>
+    @endif
     @if ($footer)
         <div {{ $footer?->attributes?->class("card-footer") }}>
             {{ $footer }}
