@@ -81,3 +81,20 @@ if (form) {
 
     toggleFormControls(form)
 }
+
+
+//livewire event
+Livewire.on('poli.modal', (data) => {
+    const id = data[0];
+    const event = data[1] == 'hide' ? 'hide' : 'show';
+
+    var modal = new bootstrap.Modal(document.getElementById(id), {
+        keyboard: false
+      });
+
+    if(event == 'show'){
+        modal.show();
+    }else if(event == 'hide'){
+        modal.hide();
+    }
+})

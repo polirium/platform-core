@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Polirium\Core\Base\Http\Controllers\BranchController;
 use Polirium\Core\Base\Http\Controllers\BrandController;
 use Polirium\Core\Base\Http\Controllers\DashboadController;
+use Polirium\Core\Base\Http\Controllers\UsersManagerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,15 @@ Route::middleware(['web', 'auth', 'can:core.index'])
     ->name('core.')
     ->group(function () {
         Route::get('/', [DashboadController::class, 'index'])->name('index');
+
+        /**
+         * User Manager Menu
+         */
+        Route::prefix("users")->name("users.")
+        ->controller(UsersManagerController::class)
+        ->group(function () {
+            Route::get('', 'index')->name('index');
+        });
 
         // Chi nhánh
         Route::prefix("branches")->name("branches.")

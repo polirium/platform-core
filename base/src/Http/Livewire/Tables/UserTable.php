@@ -104,10 +104,10 @@ final class UserTable extends BaseTable
     {
         return [
             Button::add('edit')
-                ->slot('Edit: ' . $row->id)
+                ->slot(trans('Edit'))
                 ->id()
                 ->class('btn btn-success')
-                ->dispatch('edit', ['rowId' => $row->id]),
+                ->dispatch('poli.modal', ['modal-create-user']),
         ];
     }
 

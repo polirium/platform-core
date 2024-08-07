@@ -12,6 +12,8 @@ import * as bootstrap from "bootstrap"
 import * as tabler from "./src/tabler"
 import '../../../../../packages/livewire-datatable/dist/powergrid'
 import 'flatpickr'
+import 'tom-select'
+import 'autonumeric'
 
 globalThis.bootstrap = bootstrap
 globalThis.tabler = tabler
