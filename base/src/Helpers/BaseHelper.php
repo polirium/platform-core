@@ -31,7 +31,7 @@ class BaseHelper
         return [];
     }
 
-    public static function getAdminPrefix(): string
+    public static function getAdminPrefix(): ?string
     {
         $prefix = config('core.base.setting.admin_dir');
 

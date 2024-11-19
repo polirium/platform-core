@@ -37,7 +37,7 @@ if (! function_exists('package_path')) {
 }
 
 if (! function_exists('admin_prefix')) {
-    function admin_prefix(string $path = null): string
+    function admin_prefix(string $path = null): ?string
     {
         return BaseHelper::getAdminPrefix();
     }

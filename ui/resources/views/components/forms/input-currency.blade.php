@@ -15,16 +15,16 @@
 @if ($label)
     <x-form::label :description="$labelDescription">{{ $label }}</x-form::label>
 @endif
-<span
-    x-data="{ value: @entangle($attributes->wire('model')), autonumeric: null }"
+
+<div @class([
+    "input-group" => $prepend || $append,
+])
+    x-data="{ value: @entangle($attributes->wire('model')), autonumeric: undefined }"
     x-init="
         autonumeric = new AutoNumeric($refs.currency, value, {{ $autoNumericOpt }});
     "
 >
-    @if ($prepend || $append)
-        <div class="input-group">
-            {{ $prepend }}
-    @endif
+    {{ $prepend }}
 
     <input {{ $attributes->class([
         "form-control",
@@ -37,10 +37,7 @@
             x-bind="value ?? {}"
             />
 
-    @if ($prepend || $append)
-            {{ $append }}
-        </div>
-    @endif
+    {{ $append }}
+</div>
 
-    @error($name) <div class="invalid-feedback">{{ $errors->first($name) }}</div> @enderror
-</span>
+@error($name) <div class="invalid-feedback">{{ $errors->first($name) }}</div> @enderror

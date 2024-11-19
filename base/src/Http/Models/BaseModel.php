@@ -2,6 +2,7 @@
 
 namespace Polirium\Core\Base\Http\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Polirium\Core\Base\Http\Models\Traits\HasUuid;
 use Spatie\Activitylog\LogOptions;
@@ -19,5 +20,13 @@ class BaseModel extends Model
         $logOptions->logOnlyDirty();
 
         return $logOptions;
+    }
+
+    public function scopeFindByUuidOrId(Builder $query, string $uuid): BaseModel
+    {
+        return $query->where(function ($q) use ($uuid) {
+            $q->where('uuid', $uuid)
+            ->orWhere('id', $uuid);
+        })->firstOrFail();
     }
 }
