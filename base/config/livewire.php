@@ -6,12 +6,33 @@ use Polirium\Core\Base\Http\Livewire\Branch\Modal\ModalCreateBranchTakingAddress
 use Polirium\Core\Base\Http\Livewire\Brand\Datatable\BrandTable;
 use Polirium\Core\Base\Http\Livewire\Brand\Modal\ModalCreateBrandComponent;
 
+/**
+ * Livewire User Components
+ */
+use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalCreateUserComponent;
+use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalDeleteUserComponent;
+
 return [
+    /**
+     * User Manager
+     */
     'user-table' => [
         'class' => \Polirium\Core\Base\Http\Livewire\Tables\UserTable::class,
         'alias' => 'core/base::user-table',
         'description' => 'User Table',
     ],
+    'user.modal.create' => [
+        'class' => ModalCreateUserComponent::class,
+        'alias' => 'core/base::user.modal.create',
+        'description' => 'User Modal Create',
+    ],
+    'user.modal.delete' => [
+        'class' => ModalDeleteUserComponent::class,
+        'alias' => 'core/base::user.modal.delete',
+        'description' => 'User Modal Delete',
+    ],
+
+
     'script-action-ui' => [
         'class' => \Polirium\Core\Base\Http\Livewire\ScriptAction\UIScriptActionComponent::class,
         'alias' => 'core/ui::script-action-ui.script',

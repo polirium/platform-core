@@ -2,8 +2,8 @@
 
 namespace Polirium\Core\Support\Http\Livewire\Tables;
 
-use Polirium\LivewireDatatable\PowerGridComponent;
-use Polirium\LivewireDatatable\Traits\WithExport;
+use PowerComponents\LivewirePowerGrid\PowerGridComponent;
+use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 class BaseTable extends PowerGridComponent
 {

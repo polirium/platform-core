@@ -85,16 +85,15 @@ if (form) {
 
 //livewire event
 Livewire.on('poli.modal', (data) => {
-    const id = data[0];
-    const event = data[1] == 'hide' ? 'hide' : 'show';
+    const d = data[0];
+    const id = d[0];
+    const event = d[1] == 'hide' ? 'hide' : 'show';
 
-    var modal = new bootstrap.Modal(document.getElementById(id), {
-        keyboard: false
-      });
+
 
     if(event == 'show'){
-        modal.show();
+       new bootstrap.Modal(document.getElementById(id)).show();
     }else if(event == 'hide'){
-        modal.hide();
+        bootstrap.Modal.getInstance(document.getElementById(id)).hide();
     }
 })

@@ -42,3 +42,11 @@ if (! function_exists('get_favicon')) {
         return Settings::get('favicon', config('core.base.setting.favicon'));
     }
 }
+
+if (! function_exists('is_html')) {
+    function is_html($string)
+    {
+        // Check if string contains any html tags.
+        return preg_match('/<\s?[^\>]*\/?\s?>/i', $string);
+    }
+}

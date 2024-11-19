@@ -7,27 +7,30 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Blade;
 use Polirium\Core\Base\Http\Models\User;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
-use Polirium\LivewireDatatable\Button;
-use Polirium\LivewireDatatable\Column;
-use Polirium\LivewireDatatable\Exportable;
-use Polirium\LivewireDatatable\Facades\Filter;
-use Polirium\LivewireDatatable\Footer;
-use Polirium\LivewireDatatable\Header;
-use Polirium\LivewireDatatable\PowerGrid;
-use Polirium\LivewireDatatable\PowerGridFields;
+use PowerComponents\LivewirePowerGrid\Button;
+use PowerComponents\LivewirePowerGrid\Column;
+use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
+use PowerComponents\LivewirePowerGrid\Facades\Filter;
+use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
+use PowerComponents\LivewirePowerGrid\Facades\Rule;
+use PowerComponents\LivewirePowerGrid\PowerGridFields;
+use PowerComponents\LivewirePowerGrid\Traits\WithExport;
 
 final class UserTable extends BaseTable
 {
+    use WithExport;
+
+    public string $tableName = 'usersTable';
+
     public function setUp(): array
     {
         $this->showCheckBox();
 
         return [
-            Exportable::make('export')
-                ->striped()
+            PowerGrid::exportable(fileName: 'users')
                 ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
-            Header::make()->showSearchInput(),
-            Footer::make()
+            PowerGrid::header()->showSearchInput(),
+            PowerGrid::footer()
                 ->showPerPage()
                 ->showRecordCount(),
         ];
@@ -108,18 +111,32 @@ final class UserTable extends BaseTable
                 ->id()
                 ->class('btn btn-success')
                 ->dispatch('poli.modal', ['modal-create-user']),
+            Button::add('delete')
+                ->slot(trans('Delete'))
+                ->id()
+                ->class('btn btn-danger')
+                ->attributes([
+                    'onclick' => "Livewire.dispatch('show-modal-delete-user', {id: $row->id});",
+                ]),
         ];
     }
 
-    /*
     public function actionRules($row): array
     {
-       return [
-            // Hide button edit for ID 1
-            Rule::button('edit')
-                ->when(fn($row) => $row->id === 1)
-                ->hide(),
-        ];
+        return [
+            Rule::button('delete')
+                 ->when(fn ($row) => $row->super_admin)
+                 ->hide(),
+            Rule::toggleable('super_admin')
+                 ->when(fn ($row) => $row->id === 1)
+                 ->hide(),
+         ];
     }
-    */
+
+    public function onUpdatedToggleable(string|int $id, string $field, string $value): void
+    {
+        User::find($id)->update([$field => $value]);
+        $this->dispatch('pg:eventRefresh-usersTable');
+    }
+
 }

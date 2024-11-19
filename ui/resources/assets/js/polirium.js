@@ -10,7 +10,7 @@ import "./src/tab"
 import "./src/toast"
 import * as bootstrap from "bootstrap"
 import * as tabler from "./src/tabler"
-import '../../../../../packages/livewire-datatable/dist/powergrid'
+import '../../../../../../vendor/power-components/livewire-powergrid/dist/powergrid'
 import 'flatpickr'
 import 'tom-select'
 import 'autonumeric'

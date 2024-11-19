@@ -18,7 +18,7 @@
         "wireui/wireui": "^1.18.9",
         "doctrine/dbal": "^3.7.1",
         "aws/aws-sdk-php": "^3.283.18",
-        "laravel/fortify": "^1.18.1",
+        "laravel/fortify": "^1.24.5",
         "laravel/horizon": "^5.21.3",
         "laravolt/avatar": "^5.0.0",
         "livewire/livewire": "^3.4.10",
@@ -31,9 +31,8 @@
         "pusher/pusher-php-server": "^7.2.3",
         "spatie/laravel-activitylog": "^4.7.3",
         "spatie/laravel-permission": "^6.0.0",
-        "spatie/laravel-medialibrary": "^10.14.0",
-        "beyondcode/laravel-websockets": "^1.14.1",
-        "polirium/livewire-datatable": "@dev",
+        "spatie/laravel-medialibrary": "^11.10.0",
+        "power-components/livewire-powergrid": "^6.1.4",
         "vigstudio/laravel-tabler-icons": "*@dev"
     },
     "autoload": {

@@ -3,17 +3,17 @@
 namespace Polirium\Core\Base\Http\Livewire\Brand\Datatable;
 
 use Illuminate\Database\Eloquent\Builder;
-use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
-use Polirium\LivewireDatatable\Button;
-use Polirium\LivewireDatatable\Column;
-use Polirium\LivewireDatatable\Detail;
-use Polirium\LivewireDatatable\Exportable;
-use Polirium\LivewireDatatable\Facades\Filter;
-use Polirium\LivewireDatatable\Footer;
-use Polirium\LivewireDatatable\Header;
-use Polirium\LivewireDatatable\PowerGrid;
-use Polirium\LivewireDatatable\PowerGridFields;
 use Polirium\Core\Base\Http\Models\Brand\Brand;
+use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
+use PowerComponents\LivewirePowerGrid\Button;
+use PowerComponents\LivewirePowerGrid\Column;
+use PowerComponents\LivewirePowerGrid\Detail;
+use PowerComponents\LivewirePowerGrid\Exportable;
+use PowerComponents\LivewirePowerGrid\Facades\Filter;
+use PowerComponents\LivewirePowerGrid\Footer;
+use PowerComponents\LivewirePowerGrid\Header;
+use PowerComponents\LivewirePowerGrid\PowerGrid;
+use PowerComponents\LivewirePowerGrid\PowerGridFields;
 
 final class BrandTable extends BaseTable
 {
@@ -22,10 +22,11 @@ final class BrandTable extends BaseTable
     protected function getListeners(): array
     {
         return array_merge(
-            parent::getListeners(), 
+            parent::getListeners(),
             [
-                'refresh-datatable-brands' => '$refresh'
-            ]);
+                'refresh-datatable-brands' => '$refresh',
+            ]
+        );
     }
 
     public function setUp(): array

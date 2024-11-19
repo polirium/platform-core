@@ -1,13 +1,13 @@
 @props([
     'header' => null,
-    'body'   => null,
+    'body' => null,
     'footer' => null,
     'action' => null,
 ])
 
-<div {{ $attributes->class("card") }}>
-    @if ($header)
-        @if (is_string($header))
+<div {{ $attributes->class('card') }}>
+    @isset($header)
+        @if (!is_html($header))
             <div class="card-header">
                 <h3 class="card-title">{{ $header }}</h3>
                 @if ($action)
@@ -15,19 +15,25 @@
                 @endif
             </div>
         @else
-            <div {{ $header?->attributes?->class("card-header") }}>
+            <div {{ $header->attributes->class('card-header') }}>
                 {{ $header }}
+
+                @if ($action)
+                    <div class="card-actions">{{ $action }}</div>
+                @endif
             </div>
         @endif
-    @endif
-    @if ($body)
-        <div {{ $body?->attributes?->class("card-body") }}>{{ $body }}</div>
+    @endisset
+
+    @isset($body)
+        <div {{ $body->attributes->class('card-body') }}>{{ $body }}</div>
     @else
         <div class="card-body">{{ $slot }}</div>
-    @endif
-    @if ($footer)
-        <div {{ $footer?->attributes?->class("card-footer") }}>
+    @endisset
+
+    @isset($footer)
+        <div {{ $footer->attributes->class('card-footer') }}>
             {{ $footer }}
         </div>
-    @endif
+    @endisset
 </div>

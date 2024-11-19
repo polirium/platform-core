@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Base\Http\Models\Traits\HasUuid;
@@ -48,11 +49,13 @@ class User extends Authenticatable
 
         static::creating(function ($user) {
             $user->name = $user->first_name . ' ' . $user->last_name;
+            $user->password = Hash::make($user->password);
         });
 
         static::updating(function ($user) {
             $user->name = $user->first_name . ' ' . $user->last_name;
         });
+
     }
 
     public function isSuperAdmin(): bool
@@ -74,7 +77,7 @@ class User extends Authenticatable
         return Avatar::create($this->name)->setShape('square')->toBase64();
     }
 
-        /**
+    /**
      * The users that belong to the Branch
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -83,6 +86,6 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Branch::class, 'user_branches', 'user_id', 'branch_id')
         ->withTimestamps()
-        ->withPivot(["id", "active"]);
+        ->withPivot(['id', 'active']);
     }
 }
