@@ -33,12 +33,7 @@
         "spatie/laravel-permission": "^6.0.0",
         "spatie/laravel-medialibrary": "^11.10.0",
         "power-components/livewire-powergrid": "^6.1.4",
-        "vigstudio/laravel-tabler-icons": "@dev",
-
-        "polirium/customer": "*@dev",
-        "polirium/company": "*@dev",
-        "polirium/quote": "*@dev",
-        "polirium/contract": "*@dev"
+        "vigstudio/laravel-tabler-icons": "@dev"
     },
     "autoload": {
         "psr-4": {
