@@ -9,24 +9,59 @@ use Polirium\Core\UI\View\PoliriumComponent;
 
 class Button extends PoliriumComponent
 {
-    public string $color = 'primary';
-    public string $class = 'btn ';
-    public string $size = 'md';
-    public string $type = 'button';
+    // public string $color = 'primary';
+    // public string $class = 'btn ';
+    // public string $size = 'md';
+    // public ?string $href = null;
+    // public ?string $icon = null;
+    // public ?string $label = null;
 
     /**
      * Create a new component instance.
      */
     public function __construct(
-        string $color = 'primary',
-        string $size = 'md',
-        string $type = 'button',
-        string $class = '',
+        public string $color = 'primary',
+        public string $size = 'md',
+        public string $class = 'btn ',
+        public ?string $href = null,
+        public ?string $icon = null,
+        public bool $outline = false,
+        public bool $ghost = false,
+        public bool $square = false,
+        public bool $pill = false,
+        public bool $active = false,
+        public string $label = '',
     ) {
-        $this->class .= 'btn-' . $color;
-        $this->class .= ' btn-' . $size;
-        $this->class .= ' ' . $class;
-        $this->type = $type;
+        $style = "";
+        if ($this->outline) {
+            $style = "outline-";
+        }
+
+        if ($this->ghost) {
+            $style = "ghost-";
+        }
+
+        $this->class .= "btn-{$style}{$this->color}";
+
+        $this->class .= ' btn-' . $this->size;
+
+        $this->class .= ' ' . $this->class;
+
+        if ($this->icon && empty($this->label)) {
+            $this->class .= ' btn-icon ';
+        }
+
+        if ($this->active) {
+            $this->class .= ' active';
+        }
+
+        if ($this->square) {
+            $this->class .= ' btn-square ';
+        }
+
+        if ($this->pill) {
+            $this->class .= ' btn-pill ';
+        }
     }
 
     /**
@@ -36,7 +71,18 @@ class Button extends PoliriumComponent
     {
         return view('core/ui::components.button', [
             'class' => $this->class,
-            'type' => $this->type,
+            'icon' => $this->icon,
+            'label' => $this->label,
+            'tag' => $this->checkButtonOrATag(),
         ]);
+    }
+
+    public function checkButtonOrATag(): string
+    {
+        if (! empty($this->href)) {
+            return "a href={$this->href}";
+        }
+
+        return "button";
     }
 }

@@ -1,5 +1,11 @@
-@if ($type == 'button')
-    <button {{ $attributes->merge(['class' => $class]) }}>{{ $slot }}</button>
-@elseif($type == 'link')
-    <a {{ $attributes->merge(['class' => $class]) }}>{{ $slot }}</a>
-@endif
+<{{ $tag }} {{ $attributes->merge(['class' => $class]) }}>
+    @if (! empty($icon))
+        {!! tabler_icon($icon) !!}
+    @endif
+
+    @if (! empty($label))
+        {{ $label }}
+    @else
+        {{ $slot }}
+    @endif
+</{{ $tag }}>
