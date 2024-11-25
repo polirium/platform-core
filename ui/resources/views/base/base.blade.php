@@ -16,7 +16,8 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/autonumeric/4.10.7/autoNumeric.min.js" integrity="sha512-PeXqWg6jrDiMcCruPw4Xr59oeIzqHlD2z7ffueHcWQE7+1DuzPAQz1ywu3gfCHAPXxHE6RejKe2DlhjYTmQgLw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/autonumeric/4.10.7/autoNumeric.min.js" integrity="sha512-PeXqWg6jrDiMcCruPw4Xr59oeIzqHlD2z7ffueHcWQE7+1DuzPAQz1ywu3gfCHAPXxHE6RejKe2DlhjYTmQgLw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/mask@3.x.x/dist/cdn.min.js"></script>
 
     @stack('styles')
 

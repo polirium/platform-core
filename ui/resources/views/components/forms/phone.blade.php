@@ -7,9 +7,6 @@
     'append' => null,
     'prepend' => null,
     'hint' => null,
-    'thousands_separator' => ',',
-    'decimal_separator' => '.',
-    'max_decimal' => 2,
 ])
 
 <x-form::input 
@@ -19,8 +16,8 @@
     type="text"
     x-data="{ value: $wire.entangle('{{ $name }}') }"
     x-model="value"
-    x-mask:dynamic="$money($input, '{{ $decimal_separator }}', '{{ $thousands_separator }}', {{ $max_decimal }})"
-    x-on:input.change="$wire.{{ $name }} = value.replaceAll('{{ $thousands_separator }}', '')"
+    x-mask="999 9999 9999"
+    x-on:input.change="$wire.{{ $name }} = value.replaceAll(' ', '')"
 >
     <x-slot name="append">
         {{ $append }}
