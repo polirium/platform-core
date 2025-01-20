@@ -1,10 +1,12 @@
 @props([
-    "id"      => null,
-    "header"  => null,
-    "footer"  => null,
+    'id'      => null,
+    'header'  => null,
+    'footer'  => null,
+    'keyboard'  => 'true',
+    'backdrop'  => 'normal',
 ])
 
-<div class="modal modal-blur fade" id="{{ $id }}" tabindex="-1" style="display: none;" aria-modal="true" role="dialog" wire:ignore.self>
+<div class="modal modal-blur fade" id="{{ $id }}" tabindex="-1" style="display: none;" aria-modal="true" role="dialog" wire:ignore.self data-bs-backdrop="{{ $backdrop }}" data-bs-keyboard="{{ $keyboard }}">
   <div {{ $attributes->class("modal-dialog") }} role="document">
       <div class="modal-content">
         @if (is_string($header))

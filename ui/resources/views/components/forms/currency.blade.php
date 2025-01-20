@@ -1,5 +1,3 @@
-{{-- https://alpinejs.dev/plugins/mask --}}
-
 @props([
     'label' => null,
     'description' => null,
@@ -8,24 +6,36 @@
     'prepend' => null,
     'hint' => null,
     'thousands_separator' => ',',
-    'decimal_separator' => '.',
-    'max_decimal' => 2,
+    // 'decimal_separator' => '.',
+    // 'max_decimal' => 2,
 ])
 
-<x-form::input 
+@php
+    $ref = 'input_' . str_replace('.', '_', $name);
+@endphp
+
+<x-form::input
     :label="$label"
     :description="$description"
     :hint="$hint"
     type="text"
-    x-data="{ value: $wire.entangle('{{ $name }}') }"
-    x-model="value"
-    x-mask:dynamic="$money($input, '{{ $decimal_separator }}', '{{ $thousands_separator }}', {{ $max_decimal }})"
-    x-on:input.change="$wire.{{ $name }} = value.replaceAll('{{ $thousands_separator }}', '')"
+    {{ $attributes }}
+    x-ref="{{ $ref }}"
+    x-init="
+        $($refs.{{ $ref }}).inputmask({ alias : 'currency' })
+        .change(function (e) {
+            $wire.set('{{ $name }}', Inputmask.unmask($refs.{{ $ref }}.value, { alias : 'currency' }));
+        });
+    "
 >
-    <x-slot name="append">
-        {{ $append }}
-    </x-slot>
-    <x-slot name="prepend">
-        {{ $prepend }}
-    </x-slot>
+    @if ($append)
+        <x-slot name="append">
+            {{ $append }}
+        </x-slot>
+    @endif
+    @if ($prepend)
+        <x-slot name="prepend">
+            {{ $prepend }}
+        </x-slot>
+    @endif
 </x-form::input>

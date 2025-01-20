@@ -12,7 +12,7 @@
 @endif
 
 @if ($prepend || $append)
-    <div class="input-group">
+    <div {{ $prepend?->attributes->class(['input-group']) }} {{ $append?->attributes->class(['input-group']) }}>
         {{ $prepend }}
 @endif
 
@@ -20,7 +20,7 @@
         "form-control",
         'is-invalid'    => $errors->has($name),
         'is-valid'      => !$errors->has($name),
-    ]) }}></textarea>
+    ]) }}>{{ $slot }}</textarea>
 
 @if ($prepend || $append)
         {{ $append }}

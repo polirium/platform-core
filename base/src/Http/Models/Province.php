@@ -8,4 +8,9 @@ use Polirium\Core\Base\Http\Models\BaseModel;
 class Province extends ModelsProvince
 {
     protected $table = "provinces";
+
+    protected $fillable = [
+        'name',
+        'gso_id',
+    ];
 }

@@ -12,7 +12,7 @@
 @endif
 
 @if ($prepend || $append)
-    <div class="input-group">
+    <div {{ $prepend?->attributes->class(['input-group']) }} {{ $append?->attributes->class(['input-group']) }}>
         {{ $prepend }}
 @endif
 

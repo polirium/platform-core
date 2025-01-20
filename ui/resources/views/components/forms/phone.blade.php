@@ -1,5 +1,3 @@
-{{-- https://alpinejs.dev/plugins/mask --}}
-
 @props([
     'label' => null,
     'description' => null,
@@ -9,20 +7,33 @@
     'hint' => null,
 ])
 
+@php
+    $ref = 'input_' . str_replace('.', '_', $name);
+@endphp
+
 <x-form::input 
     :label="$label"
     :description="$description"
     :hint="$hint"
     type="text"
-    x-data="{ value: $wire.entangle('{{ $name }}') }"
-    x-model="value"
-    x-mask="999 9999 9999"
-    x-on:input.change="$wire.{{ $name }} = value.replaceAll(' ', '')"
+    {{ $attributes }}
+    x-ref="{{ $ref }}"
+    x-init="
+        const phone = $($refs.{{ $ref }}).inputmask({ mask : '(99) 999-999-999' })
+        .change(function (e) {
+            $wire.set('{{ $name }}', Inputmask.unmask($refs.{{ $ref }}.value, { mask : '(99) 999-999-999' }));
+        });
+    "
 >
-    <x-slot name="append">
-        {{ $append }}
-    </x-slot>
-    <x-slot name="prepend">
-        {{ $prepend }}
-    </x-slot>
+    @if ($prepend)
+        <x-slot name="prepend">
+            {{ $prepend }}
+        </x-slot>
+    @endif
+
+    @if ($append)
+        <x-slot name="append">
+            {{ $append }}
+        </x-slot>
+    @endif
 </x-form::input>

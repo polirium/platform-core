@@ -14,28 +14,33 @@
     <x-form::label :description="$description">{{ $label }}</x-form::label>
 @endif
 @if ($prepend || $append)
-    <div class="input-group">
+    <div {{ $prepend?->attributes->class(['input-group']) }} {{ $append?->attributes->class(['input-group']) }}>
         {{ $prepend }}
 @endif
 
 <select {{ $attributes->class([
     "form-control",
     'is-invalid'    => $errors->has($name),
-    'is-valid'      => !$errors->has($name),
+    'is-valid'      => ! $errors->has($name),
 ]) }}
     @if ($tomselect)
         x-ref="input_tomselect"
-        x-data="{
+        x-data="tomselect()"
+        {{-- x-data="{
             items: $wire.entangle('{{ $name }}'),
             tomselect: new TomSelect($refs.input_tomselect, {{ $tomselectOpt }}),
         }"
-        x-init="tomselect;"
+        x-init="tomselect;" --}}
     @endif
 >
-    @if (count($options) > 0)
+    @if (count((array)$options) > 0)
         <option value="">-- {{ trans('Không') }} --</option>
-        @foreach ($options as $key => $item)
-            <option value="{{ isset($item['id']) ? $item['id'] : $key }}">{{ isset($item['name']) ? $item['name'] : $item }}</option>
+        @foreach ((array)$options as $key => $item)
+            @if (is_array($item))
+                <option value="{{ isset($item['id']) ? $item['id'] : $key }}" {{ isset($item['selected']) ? 'selected' : '' }}>{{ isset($item['name']) ? $item['name'] : $item }}</option>
+            @else
+                <option value="{{ $key }}">{{ $item }}</option>
+            @endif
         @endforeach
     @else
         {{ $slot }}
@@ -52,3 +57,24 @@
 @endif
 
 @error($name) <div class="invalid-feedback">{{ $errors->first($name) }}</div> @enderror
+
+@if ($tomselect)
+    @once
+        @push('styles')
+            <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+        @endpush
+        @push('scripts')
+            <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+            <script>
+                document.addEventListener('alpine:init', () => {
+                    Alpine.data('tomselect', () => ({
+                        full_select: null,
+                        init(){
+                            this.full_select = new TomSelect(this.$refs.input_tomselect, {{ $tomselectOpt }});
+                        }
+                    }))
+                })
+            </script>
+        @endpush
+    @endonce
+@endif
