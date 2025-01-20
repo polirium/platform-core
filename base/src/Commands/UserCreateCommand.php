@@ -4,7 +4,6 @@ namespace Polirium\Core\Base\Commands;
 
 use Exception;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Hash;
 use Polirium\Core\Base\Commands\Traits\ValidateCommandInput;
 use Polirium\Core\Base\Http\Models\User;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -24,7 +23,7 @@ class UserCreateCommand extends Command
             $user->last_name = $this->askWithValidate('Enter last name', 'required|min:2|max:60');
             $user->email = $this->askWithValidate('Enter email address', 'required|email|unique:users,email');
             $user->username = $this->askWithValidate('Enter username', 'required|min:4|max:60|unique:users,username');
-            $user->password = Hash::make($this->askWithValidate('Enter password', 'required|min:6|max:60', true));
+            $user->password = $this->askWithValidate('Enter password', 'required|min:6|max:60', true);
             $user->super_admin = 1;
             $user->email_verified_at = now();
             $user->save();

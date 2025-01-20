@@ -2,7 +2,6 @@
 
 namespace Polirium\Core\Base\Http\Livewire\Users\Modal;
 
-use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Polirium\Core\Base\Http\Models\User;
@@ -45,10 +44,10 @@ class ModalCreateUserComponent extends Component
     public function save()
     {
         $this->validate();
-        User::create([
+        $user = User::create([
             'username' => $this->user['username'],
             'email' => $this->user['email'],
-            'password' => Hash::make($this->user['password']),
+            'password' => $this->user['password'],
             'phone' => $this->user['phone'],
             'first_name' => $this->user['first_name'],
             'last_name' => $this->user['last_name'],

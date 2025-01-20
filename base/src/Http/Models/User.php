@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Base\Http\Models\Traits\HasUuid;
@@ -49,7 +48,7 @@ class User extends Authenticatable
 
         static::creating(function ($user) {
             $user->name = $user->first_name . ' ' . $user->last_name;
-            $user->password = Hash::make($user->password);
+            $user->password = $user->password;
         });
 
         static::updating(function ($user) {
