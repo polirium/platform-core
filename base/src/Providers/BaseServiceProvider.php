@@ -35,6 +35,7 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
         $this->commands([
             \Polirium\Core\Base\Commands\InstallCommand::class,
             \Polirium\Core\Base\Commands\UserCreateCommand::class,
+            \Polirium\Core\Base\Commands\ImportCountriesCommand::class,
         ]);
     }
 

@@ -1,35 +1,47 @@
-{{-- Chưa có làm :v --}}
+{{-- Chưa xong --}}
 
 @props([
-    'label'             => null,
-    'description' => null,
-    'name'      => $attributes->wire('model')->value() ?? $attributes->whereStartsWith('name')->first(),
-    'append'    => null,
-    'prepend'   => null,
-    'hint'   => null,
+    'name' => $attributes->wire('model')->value() ?? $attributes->whereStartsWith('name')->first(),
+    'format' => 'd/m/Y',
+    'min' => null,
+    'max' => null,
+    'no_calendar' => false,
+    'enable_time' => false,
 ])
 
-@if ($label)
-    <x-form::label :description="$description">{{ $label }}</x-form::label>
-@endif
+<x-form::input
+    type="text"
+    {{ $attributes->whereDoesntStartWith('wire:model') }}
+    x-data="datepicker($wire.entangle('{{ $name }}'))"
+    x-ref="input_datepicker"
+    x-model="value"
+/>
 
-@if ($prepend || $append)
-    <div class="input-group">
-        {{ $prepend }}
-@endif
-
-    <input {{ $attributes->class([
-        "form-control",
-        'is-invalid'    => $errors->has($name),
-        'is-valid'      => !$errors->has($name),
-    ]) }} />
-
-@if ($prepend || $append)
-        {{ $append }}
-    </div>
-@endif
-@if ($hint)
-    <small class="form-hint">{{ $hint }}</small>
-@endif
-
-@error($name) <div class="invalid-feedback">{{ $errors->first($name) }}</div> @enderror
+@once
+    @push('scripts')
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('datepicker', (model) => ({
+                    value: model,
+                    init(){
+                        console.log(this.value);
+                        this.pickr = flatpickr(this.$refs.input_datepicker, {
+                            dateFormat: '{{ $format }}',
+                            onChange: (selectedDates, dateStr, instance) => {
+                                @this.set('{{ $name }}', flatpickr.formatDate(selectedDates[0], 'Y-m-d'));
+                            }
+                        })
+                        this.$watch('value', function(newValue){
+                            this.pickr.setDate(newValue);
+                        }.bind(this));
+                    },
+                    reset(){
+                        this.value = null;
+                    }
+                }))
+            })
+        </script>
+    @endpush
+@endonce

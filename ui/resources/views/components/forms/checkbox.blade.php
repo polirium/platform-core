@@ -1,6 +1,7 @@
 @props([
     'label' => null,
     'name'  => $attributes->wire('model')->value() ?? $attributes->whereStartsWith('name')->first(),
+    'hint'  => null,
 ])
 
 <label class="form-check">
@@ -14,6 +15,10 @@
     />
     @if ($label)
         <span class="form-check-label">{{ $label }}</span>
+    @endif
+
+    @if ($hint)
+        <small class="form-hint">{{ $hint }}</small>
     @endif
 </label>
 

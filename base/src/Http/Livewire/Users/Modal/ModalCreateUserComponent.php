@@ -22,7 +22,7 @@ class ModalCreateUserComponent extends Component
         return [
             'user.username' => 'required|unique:users,username',
             'user.email' => 'required|email|unique:users,email',
-            'user.password' => 'required|min:6',
+            'user.password' => 'required|min:6|confirmed',
             'user.password_confirmation' => 'required|min:6',
             'user.phone' => 'required',
             'user.first_name' => 'required',

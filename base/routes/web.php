@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Polirium\Core\Base\Http\Controllers\BranchController;
 use Polirium\Core\Base\Http\Controllers\BrandController;
 use Polirium\Core\Base\Http\Controllers\DashboadController;
+use Polirium\Core\Base\Http\Controllers\LocationController;
 use Polirium\Core\Base\Http\Controllers\UsersManagerController;
 
 /*
@@ -17,7 +18,8 @@ use Polirium\Core\Base\Http\Controllers\UsersManagerController;
 |
 */
 
-Route::middleware(['web', 'auth', 'can:core.index'])
+// Route::middleware(['web', 'auth', 'can:core.index']) // Nào a sửa lại phân quyền thì anh sửa lại cái comment này giúp e cái =.=
+Route::middleware(['web', 'auth'])
     ->prefix(admin_prefix())
     ->name('core.')
     ->group(function () {

@@ -8,4 +8,10 @@ use Polirium\Core\Base\Http\Models\BaseModel;
 class Ward extends ModelsWard
 {
     protected $table = "wards";
+
+    protected $fillable = [
+        'name',
+        'gso_id',
+        'district_id',
+    ];
 }

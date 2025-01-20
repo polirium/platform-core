@@ -41,9 +41,9 @@ class Button extends PoliriumComponent
             $style = "ghost-";
         }
 
-        $this->class .= "btn-{$style}{$this->color}";
+        $this->class .= " btn-{$style}{$this->color} ";
 
-        $this->class .= ' btn-' . $this->size;
+        $this->class .= " btn-{$this->size} ";
 
         $this->class .= ' ' . $this->class;
 
