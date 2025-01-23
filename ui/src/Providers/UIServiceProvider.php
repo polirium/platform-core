@@ -10,7 +10,7 @@ use Polirium\Core\UI\Support\Assets;
 
 class UIServiceProvider extends PoliriumBaseServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
         $this->setNamespace('core/ui')
             ->loadConfigurations(['assets', 'components'])
@@ -21,14 +21,13 @@ class UIServiceProvider extends PoliriumBaseServiceProvider
         $this->registerBladeComponents();
     }
 
-    public function register()
+    public function register(): void
     {
         BaseHelper::autoload(__DIR__ . '/../../helpers');
 
         $this->app->singleton('polirium:assets', function () {
             return new Assets();
         });
-
     }
 
     protected function registerBladeComponents(): void
@@ -41,7 +40,7 @@ class UIServiceProvider extends PoliriumBaseServiceProvider
         Blade::anonymousComponentPath(__DIR__ . '/../../resources/views/components/forms', 'form');
 
         $this->callAfterResolving(BladeCompiler::class, static function (BladeCompiler $blade): void {
-            foreach(config('core.ui.components', []) as $alias => $component) {
+            foreach (config('core.ui.components', []) as $alias => $component) {
                 $blade->component($component['class'], $component['alias']);
             }
         });

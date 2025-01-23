@@ -130,18 +130,18 @@ if (! function_exists('number_to_text')) {
             }
 
             if (($i % 3 == 0) && ($i > 0)) {
-                $textnumber = $TextLuythua[$i / 3].' '.$textnumber;
+                $textnumber = $TextLuythua[$i / 3] . ' ' . $textnumber;
             }
 
             if ($i % 3 == 2) {
-                $textnumber = 'trăm '.$textnumber;
+                $textnumber = 'trăm ' . $textnumber;
             }
 
             if ($i % 3 == 1) {
-                $textnumber = 'mươi '.$textnumber;
+                $textnumber = 'mươi ' . $textnumber;
             }
 
-            $textnumber = $Text[$so].' '.$textnumber;
+            $textnumber = $Text[$so] . ' ' . $textnumber;
         }
 
         //Phai de cac ham replace theo dung thu tu nhu the nay
@@ -153,10 +153,9 @@ if (! function_exists('number_to_text')) {
         $textnumber = str_replace('mươi một', 'mươi mốt', $textnumber);
         $textnumber = str_replace('mười năm', 'mười lăm', $textnumber);
 
-        return ucfirst($textnumber.' đồng');
+        return ucfirst($textnumber . ' đồng');
     }
 }
-
 
 if (! function_exists('get_provinces')) {
     function get_provinces()

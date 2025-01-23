@@ -124,9 +124,6 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
             return;
         }
 
-        // Kiểm tra và merge composer dependencies
-        $this->mergeModulesDependencies($modulePath);
-
         $modules = array_diff(scandir($modulePath), ['.', '..']);
 
         // Đăng ký autoload trước khi register providers
@@ -189,50 +186,4 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
         }
     }
 
-    protected function mergeModulesDependencies($modulePath)
-    {
-        $modules = array_diff(scandir($modulePath), ['.', '..']);
-        $rootComposerFile = base_path('composer.json');
-
-        if (! file_exists($rootComposerFile)) {
-            return;
-        }
-
-        $rootComposer = json_decode(file_get_contents($rootComposerFile), true);
-        $requiresChanged = false;
-
-        foreach ($modules as $module) {
-            $moduleDir = $modulePath . '/' . $module;
-            $moduleComposerFile = $moduleDir . '/composer.json';
-
-            if (is_dir($moduleDir) && file_exists($moduleComposerFile)) {
-                $moduleComposer = json_decode(file_get_contents($moduleComposerFile), true);
-
-                if (isset($moduleComposer['require'])) {
-                    foreach ($moduleComposer['require'] as $package => $version) {
-                        // Chỉ thêm nếu package chưa tồn tại hoặc version khác
-                        if (! isset($rootComposer['require'][$package])
-                            || $rootComposer['require'][$package] !== $version
-                        ) {
-                            $rootComposer['require'][$package] = $version;
-                            $requiresChanged = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Nếu có thay đổi, cập nhật composer.json
-        if ($requiresChanged) {
-            file_put_contents(
-                $rootComposerFile,
-                json_encode($rootComposer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-            );
-
-            // Thông báo cho developer biết cần chạy composer update
-            if (app()->runningInConsole()) {
-                $this->warn('Module dependencies have been merged into root composer.json. Please run "composer update"');
-            }
-        }
-    }
 }
