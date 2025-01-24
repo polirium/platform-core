@@ -2,10 +2,10 @@
 
 namespace Polirium\Core\UI\Http\Livewire;
 
-class InlineTextComponent extends BaseInline
+class CurrencyComponent extends BaseInline
 {
     public function render()
     {
-        return view('core/ui::inline.text');
+        return view('core/ui::inline.currency');
     }
 }

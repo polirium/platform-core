@@ -30,13 +30,15 @@
                         <x-form::input wire:model="user.username" :label="trans('Username')" />
                     </div>
 
-                    <div class="mb-3">
-                        <x-form::input wire:model="user.password" :label="trans('Password')" />
-                    </div>
+                    @if (! $user_id)
+                        <div class="mb-3">
+                            <x-form::input wire:model="user.password" :label="trans('Password')" />
+                        </div>
 
-                    <div class="mb-3">
-                        <x-form::input wire:model="user.password_confirmation" :label="trans('Password confirmation')" />
-                    </div>
+                        <div class="mb-3">
+                            <x-form::input wire:model="user.password_confirmation" :label="trans('Password confirmation')" />
+                        </div>
+                    @endif
                 </div>
 
             </div>
@@ -45,11 +47,11 @@
                 <x-form::input wire:model="user.note" :label="trans('Note')" />
             </div>
 
-            {{-- <div class="mb-3">
-                <x-form::select wire:model="user.role_id" :label="trans('Role')" :options="$list['roles']" tomselect />
+            <div class="mb-3">
+                <x-form::select wire:model="role_ids" :label="trans('Role')" :options="$list['roles']" tomselect multiple />
             </div>
 
-            <div class="mb-3">
+            {{-- <div class="mb-3">
                 <x-form::select wire:model="user.status" :label="trans('Status')" :options="$list['statuses']" tomselect />
             </div> --}}
 

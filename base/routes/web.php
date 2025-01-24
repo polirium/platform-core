@@ -5,6 +5,7 @@ use Polirium\Core\Base\Http\Controllers\BranchController;
 use Polirium\Core\Base\Http\Controllers\BrandController;
 use Polirium\Core\Base\Http\Controllers\DashboadController;
 use Polirium\Core\Base\Http\Controllers\LocationController;
+use Polirium\Core\Base\Http\Controllers\RoleManagerController;
 use Polirium\Core\Base\Http\Controllers\UsersManagerController;
 
 /*
@@ -30,6 +31,15 @@ Route::middleware(['web', 'auth'])
          */
         Route::prefix("users")->name("users.")
         ->controller(UsersManagerController::class)
+        ->group(function () {
+            Route::get('', 'index')->name('index');
+        });
+
+        /**
+         * Role Permission Menu
+         */
+        Route::prefix("role")->name("roles.")
+        ->controller(RoleManagerController::class)
         ->group(function () {
             Route::get('', 'index')->name('index');
         });

@@ -70,4 +70,12 @@ return [
         'icon' => 'map-pins',
         'sort' => 1,
     ],
+    [
+        'id' => 'core.setting-role',
+        'name' => trans('Quản lý vai trò'),
+        'parent' => 'core.setting',
+        'route' => 'core.roles.index',
+        'icon' => 'user-check',
+        'sort' => 2,
+    ],
 ];

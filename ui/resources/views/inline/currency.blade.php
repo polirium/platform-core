@@ -1,7 +1,7 @@
 <div>
     @if ($open_inline)
         <form wire:submit.prevent="save">
-            <x-form::input :type="$type" wire:model="value">
+            <x-form::input type="number" wire:model="value">
                 <x-slot name="append">
                     <x-ui.button type="submit" color="success" icon="device-floppy" />
                     <x-ui.button type="button" color="danger" icon="x" wire:click="toggleInline" />
@@ -10,7 +10,7 @@
         </form>
     @else
         <span wire:click="toggleInline" class="cursor-pointer text-primary">
-            <b>{!! ! empty($text_display) ? $text_display : 'null' !!}</b>
+            <b>{!! core_number_format($text_display) !!}</b>
         </span>
     @endif
 </div>

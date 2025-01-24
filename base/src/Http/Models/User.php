@@ -13,6 +13,7 @@ use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Base\Http\Models\Traits\HasUuid;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -21,6 +22,7 @@ class User extends Authenticatable
     use Notifiable;
     use LogsActivity;
     use HasUuid;
+    use HasRoles;
 
     protected $fillable = [
         'username',
@@ -29,6 +31,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
         'super_admin',
     ];
 

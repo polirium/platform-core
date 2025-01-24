@@ -39,3 +39,9 @@
         </x-slot>
     @endif
 </x-form::input>
+
+{{-- @once
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.9/dist/jquery.inputmask.min.js"></script>
+    @endpush
+@endonce --}}
