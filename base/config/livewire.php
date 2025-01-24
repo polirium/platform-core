@@ -11,6 +11,7 @@ use Polirium\Core\Base\Http\Livewire\Brand\Modal\ModalCreateBrandComponent;
  */
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalCreateUserComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalDeleteUserComponent;
+use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalEditUserComponent;
 
 return [
     /**
@@ -25,6 +26,11 @@ return [
         'class' => ModalCreateUserComponent::class,
         'alias' => 'core/base::user.modal.create',
         'description' => 'User Modal Create',
+    ],
+    'user.modal.edit' => [
+        'class' => ModalEditUserComponent::class,
+        'alias' => 'core/base::user.modal.edit',
+        'description' => 'User Modal Edit',
     ],
     'user.modal.delete' => [
         'class' => ModalDeleteUserComponent::class,
