@@ -5,6 +5,8 @@ use Polirium\Core\Base\Http\Livewire\Branch\Modal\ModalCreateBranchComponent;
 use Polirium\Core\Base\Http\Livewire\Branch\Modal\ModalCreateBranchTakingAddressComponent;
 use Polirium\Core\Base\Http\Livewire\Brand\Datatable\BrandTable;
 use Polirium\Core\Base\Http\Livewire\Brand\Modal\ModalCreateBrandComponent;
+use Polirium\Core\Base\Http\Livewire\Roles\Datatable\RoleTable;
+use Polirium\Core\Base\Http\Livewire\Roles\Modal\ModalCreateRoleComponent;
 
 /**
  * Livewire User Components
@@ -69,4 +71,17 @@ return [
         'description' => 'Modal create brand',
     ],
     // End Thương hiệu
+
+    // Phân quyền
+    'role-table' => [
+        'class' => RoleTable::class,
+        'alias' => 'core/base::role-table',
+        'description' => 'Role Table',
+    ],
+    'modal-create-role' => [
+        'class' => ModalCreateRoleComponent::class,
+        'alias' => 'core/base::roles.modal.modal-create-role',
+        'description' => 'Modal create role',
+    ],
+    // End Phân quyền
 ];

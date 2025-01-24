@@ -1,12 +1,12 @@
 <div>
     @if ($open_inline)
         <form wire:submit.prevent="save">
-            <x-form::input :type="$type" wire:model="value">
+            <x-form::select wire:model="value" tomselect :options="$options">
                 <x-slot name="append">
                     <x-ui.button type="submit" color="success" icon="device-floppy" />
                     <x-ui.button type="button" color="danger" icon="x" wire:click="toggleInline" />
                 </x-slot>
-            </x-form::input>
+            </x-form::select>
         </form>
     @else
         <span wire:click="toggleInline" class="cursor-pointer text-primary">
