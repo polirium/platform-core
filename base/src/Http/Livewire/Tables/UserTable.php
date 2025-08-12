@@ -110,7 +110,7 @@ final class UserTable extends BaseTable
                 ->slot(trans('Edit'))
                 ->id()
                 ->class('btn btn-success')
-                ->dispatch('show-modal-create-user', ['id' => $row->id]),
+                ->dispatch('show-modal-edit-user', ['userId' => $row->id]),
             Button::add('delete')
                 ->slot(trans('Delete'))
                 ->id()
