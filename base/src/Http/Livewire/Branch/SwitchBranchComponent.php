@@ -13,7 +13,7 @@ class SwitchBranchComponent extends Component
 
     public function mount()
     {
-        $this->branches = Branch::select(['id', 'name'])->get();
+        $this->branches = Branch::select(['id', 'name'])->pluck('name', 'id')->all();
         $this->branch_id = user_branch();
     }
 

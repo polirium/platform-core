@@ -3,6 +3,7 @@
 use Polirium\Core\Base\Http\Livewire\Branch\Datatable\BranchTable;
 use Polirium\Core\Base\Http\Livewire\Branch\Modal\ModalCreateBranchComponent;
 use Polirium\Core\Base\Http\Livewire\Branch\Modal\ModalCreateBranchTakingAddressComponent;
+use Polirium\Core\Base\Http\Livewire\Branch\SwitchBranchComponent;
 use Polirium\Core\Base\Http\Livewire\Brand\Datatable\BrandTable;
 use Polirium\Core\Base\Http\Livewire\Brand\Modal\ModalCreateBrandComponent;
 use Polirium\Core\Base\Http\Livewire\Roles\Datatable\RoleTable;
@@ -46,6 +47,11 @@ return [
         'class' => BranchTable::class,
         'alias' => 'core/base::branch-table',
         'description' => 'Branch Table',
+    ],
+    'switch-branch' => [
+        'class' => SwitchBranchComponent::class,
+        'alias' => 'switch-branch',
+        'description' => 'Switch Branch',
     ],
     'branch-modal-create' => [
         'class' => ModalCreateBranchComponent::class,

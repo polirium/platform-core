@@ -34,7 +34,7 @@ class ModalCreateBranchComponent extends Component
 
     public function mount()
     {
-        $this->list["provinces"] = Province::select(["id", "name"])->get();
+        $this->list["provinces"] = Province::select(["id", "name"])->pluck('name', 'id')->all();
         $this->list["districts"] = [];
         $this->list["wards"] = [];
         $this->resetInput();
@@ -49,7 +49,7 @@ class ModalCreateBranchComponent extends Component
     {
         if ($key == "province_id") {
             if ($value) {
-                $this->list["districts"] = District::select(["id", "name"])->where("province_id", $value)->get();
+                $this->list["districts"] = District::select(["id", "name"])->where("province_id", $value)->pluck('name', 'id')->all();
                 $this->list["wards"] = [];
             } else {
                 $this->list["districts"] = [];
@@ -60,7 +60,7 @@ class ModalCreateBranchComponent extends Component
             $this->branch->ward_id = null;
         } elseif ($key == "district_id") {
             if ($value) {
-                $this->list["wards"] = Ward::select(["id", "name"])->where("district_id", $value)->get();
+                $this->list["wards"] = Ward::select(["id", "name"])->where("district_id", $value)->pluck('name', 'id')->all();
             } else {
                 $this->list["wards"] = [];
             }

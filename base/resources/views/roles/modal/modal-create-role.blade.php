@@ -39,7 +39,7 @@
                                             >
                                                 <div class="row align-items-center">
                                                     <div class="col text-truncate">
-                                                        <a href="javascript:void(0);" class="text-reset d-block">{{ trans($flags[$subElements]['name']) }}</a>
+                                                        <a href="javascript:void(0);" class="text-reset d-block text-wrap">{{ trans($flags[$subElements]['name']) }}</a>
                                                     </div>
                                                 </div>
                                             </div>

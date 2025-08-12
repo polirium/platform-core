@@ -7,16 +7,15 @@ use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Detail;
-use PowerComponents\LivewirePowerGrid\Exportable;
+use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
-use PowerComponents\LivewirePowerGrid\Footer;
-use PowerComponents\LivewirePowerGrid\Header;
-use PowerComponents\LivewirePowerGrid\PowerGrid;
+use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 
 final class BranchTable extends BaseTable
 {
+    public string $tableName = 'table-branches';
+
     public $tab = 1;
 
     protected function getListeners(): array
@@ -31,17 +30,19 @@ final class BranchTable extends BaseTable
 
     public function setUp(): array
     {
-        // $this->showCheckBox();
-
         return [
-            Exportable::make('export')->striped()->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
-            Header::make()->includeViewOnTop('core/base::branch.datatable.header')->showSearchInput(),
-            Footer::make()->showPerPage()->showRecordCount(),
-
-            Detail::make()
-            ->view('core/base::branch.datatable.detail')
-            ->showCollapseIcon()
-            ->collapseOthers(),
+            PowerGrid::exportable('export')->striped()->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
+            PowerGrid::header()
+                ->includeViewOnTop('core/base::branch.datatable.header')
+                ->showSearchInput()
+                ->showToggleColumns(),
+            PowerGrid::footer()
+                ->showPerPage()
+                ->showRecordCount(),
+            PowerGrid::detail()
+                ->view('core/base::branch.datatable.detail')
+                ->showCollapseIcon()
+                ->collapseOthers(),
         ];
     }
 

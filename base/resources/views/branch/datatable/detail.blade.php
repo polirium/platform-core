@@ -86,23 +86,23 @@
             {{ $addresses->links() }}
         </x-ui::tab.item>
 
-        <x-slot name="footer">
-            @if ($tab == 1)
-                <button @class([
-                    "btn",
-                    "btn-danger" => !$row->status,
-                    "btn-success" => $row->status,
-                ]) wire:click="toggleActive({{ $id }}, '{{ $row->status ? 0 : 1 }}')">
-                    {{ tabler_icon("lock") }}
-                    @if ($row->status)
-                        {{ trans('Hoạt động') }}
-                    @else
-                        {{ trans('Ngưng hoạt động') }}
-                    @endif
-                </button>
-            @elseif ($tab == 3)
-                <button class="btn btn-success" wire:click="$dispatch('show-modal-create-branch-taking-address', { branch_id: {{ $id }} })">{{ trans('Thêm địa chỉ') }}</button>
-            @endif
-        </x-slot>
+        <br>
+
+        @if ($tab == 1)
+            <button @class([
+                "btn",
+                "btn-danger" => !$row->status,
+                "btn-success" => $row->status,
+            ]) wire:click="toggleActive({{ $id }}, '{{ $row->status ? 0 : 1 }}')">
+                {{ tabler_icon("lock") }}
+                @if ($row->status)
+                    {{ trans('Hoạt động') }}
+                @else
+                    {{ trans('Ngưng hoạt động') }}
+                @endif
+            </button>
+        @elseif ($tab == 3)
+            <button class="btn btn-success" wire:click="$dispatch('show-modal-create-branch-taking-address', { branch_id: {{ $id }} })">{{ trans('Thêm địa chỉ') }}</button>
+        @endif
     </x-ui::tab>
 </div>
