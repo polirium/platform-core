@@ -53,7 +53,7 @@ class ModalEditUserComponent extends Component
             'password_confirmation' => '',
         ];
 
-        $this->dispatch('poli.modal', ['modal-edit-user']);
+        $this->dispatch('poli.modal', ['modal-edit-user', 'show']);
     }
 
     public function save()

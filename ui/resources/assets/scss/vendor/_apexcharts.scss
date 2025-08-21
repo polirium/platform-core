@@ -22,9 +22,8 @@
   padding: 0 .5rem 0 !important;
 }
 
-.apexcharts-tooltip-marker {
-  width: 10px !important;
-  height: 10px !important;
+.apexcharts-tooltip-marker:before {
+  font-size: 16px !important;
 }
 
 .apexcharts-text {
@@ -39,6 +38,11 @@
   color: inherit !important;
 }
 
-.apexcharts-radialbar-area {
-  stroke: var(--#{$prefix}border-color-dark) !important;
+.apexcharts-radialbar-track .apexcharts-radialbar-area {
+  stroke: var(--#{$prefix}border-color) !important;
+}
+
+.apexcharts-svg,
+.apexcharts-canvas {
+  border-radius: inherit;
 }

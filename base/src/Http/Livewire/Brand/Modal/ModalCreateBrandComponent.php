@@ -2,8 +2,8 @@
 
 namespace Polirium\Core\Base\Http\Livewire\Brand\Modal;
 
-use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Component;
 use Polirium\Core\Base\Http\Models\Brand\Brand;
 
 class ModalCreateBrandComponent extends Component
@@ -17,9 +17,9 @@ class ModalCreateBrandComponent extends Component
     protected function rules()
     {
         return [
-            "brand.name"    => "required|unique:brands,name,{$this->brand_id},id",
-            "brand.user_id" => "required|numeric|integer",
-            "brand.note"    => "nullable|string|max:255",
+            'brand.name' => "required|unique:brands,name,{$this->brand_id},id",
+            'brand.user_id' => 'required|numeric|integer',
+            'brand.note' => 'nullable|string|max:255',
         ];
     }
 
@@ -40,7 +40,7 @@ class ModalCreateBrandComponent extends Component
 
     public function resetInput()
     {
-        $this->reset("brand");
+        $this->reset('brand');
         $this->brand = new Brand();
     }
 
@@ -54,7 +54,7 @@ class ModalCreateBrandComponent extends Component
             $this->resetInput();
             $this->brand->user_id = auth()->id();
         }
-        $this->dispatch("modal", "modal-create-brand");
+        $this->dispatch('poli.modal', ['modal-create-brand', 'show']);
     }
 
     public function save()
@@ -64,7 +64,7 @@ class ModalCreateBrandComponent extends Component
         $this->brand->save();
 
         $this->dispatch('refresh-datatable-brands');
-        $this->dispatch("modal", "modal-create-brand", "hide");
+        $this->dispatch('poli.modal', ['modal-create-brand', 'hide']);
         $this->resetInput();
     }
 }

@@ -2,12 +2,12 @@
 
 namespace Polirium\Core\Base\Http\Livewire\Roles\Modal;
 
-use Livewire\Component;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Permission;
 use Livewire\Attributes\On;
+use Livewire\Component;
 use Polirium\Core\Base\Http\Models\Role;
 use Polirium\Core\Base\Traits\GetPermission;
+use Spatie\Permission\Models\Permission;
 
 class ModalCreateRoleComponent extends Component
 {
@@ -31,7 +31,7 @@ class ModalCreateRoleComponent extends Component
     #[On('show-modal-create-role')]
     public function showModal(string|int|null $id = null)
     {
-        if(! empty($id)) {
+        if (! empty($id)) {
             $role = Role::findOrFail($id);
             $this->request['id'] = $role->id;
             $this->request['name'] = $role->name;
@@ -39,15 +39,15 @@ class ModalCreateRoleComponent extends Component
         } else {
             $this->reset('request');
         }
-        $this->dispatch('modal', 'modal-create-role');
+        $this->dispatch('poli.modal', ['modal-create-role', 'show']);
     }
 
-    public function addPermission($flag) : void
+    public function addPermission($flag): void
     {
         $this->request['permissions'][] = $flag;
     }
 
-    public function removePermission($flag) : void
+    public function removePermission($flag): void
     {
         unset($this->request['permissions'][array_search($flag, $this->request['permissions'])]);
     }
@@ -80,6 +80,6 @@ class ModalCreateRoleComponent extends Component
         $this->reset('request', 'modal');
         $this->dispatch('alert', trans('Hoàn thành tác vụ'), 'success');
         $this->dispatch('role-manager-table-refresh');
-        $this->dispatch('modal', 'modal-create-role', 'hide');
+        $this->dispatch('poli.modal', ['modal-create-role', 'hide']);
     }
 }

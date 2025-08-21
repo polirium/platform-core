@@ -2,12 +2,12 @@
 
 namespace Polirium\Core\Base\Http\Livewire\Branch\Modal;
 
-use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Component;
+use Polirium\Core\Base\Http\Models\Branch\BranchTakingAddress;
 use Polirium\Core\Base\Http\Models\District;
 use Polirium\Core\Base\Http\Models\Province;
 use Polirium\Core\Base\Http\Models\Ward;
-use Polirium\Core\Base\Http\Models\Branch\BranchTakingAddress;
 
 class ModalCreateBranchTakingAddressComponent extends Component
 {
@@ -20,21 +20,21 @@ class ModalCreateBranchTakingAddressComponent extends Component
     protected function rules()
     {
         return [
-            "branch.branch_id"      => "required|numeric|integer",
-            "branch.address"        => "nullable|string|max:255",
-            "branch.province_id"    => "nullable|numeric|integer",
-            "branch.district_id"    => "nullable|numeric|integer",
-            "branch.ward_id"        => "nullable|numeric|integer",
-            "branch.phone"          => "nullable|string|max:255",
-            "branch.user_id"        => "required|numeric|integer",
+            'branch.branch_id' => 'required|numeric|integer',
+            'branch.address' => 'nullable|string|max:255',
+            'branch.province_id' => 'nullable|numeric|integer',
+            'branch.district_id' => 'nullable|numeric|integer',
+            'branch.ward_id' => 'nullable|numeric|integer',
+            'branch.phone' => 'nullable|string|max:255',
+            'branch.user_id' => 'required|numeric|integer',
         ];
     }
 
     public function mount()
     {
-        $this->list["provinces"] = Province::select(["id", "name"])->pluck('name', 'id')->all();
-        $this->list["districts"] = [];
-        $this->list["wards"] = [];
+        $this->list['provinces'] = Province::select(['id', 'name'])->pluck('name', 'id')->all();
+        $this->list['districts'] = [];
+        $this->list['wards'] = [];
         $this->resetInput();
     }
 
@@ -45,22 +45,22 @@ class ModalCreateBranchTakingAddressComponent extends Component
 
     public function updatedBranch($value, $key)
     {
-        if ($key == "province_id") {
+        if ($key == 'province_id') {
             if ($value) {
-                $this->list["districts"] = District::select(["id", "name"])->where("province_id", $value)->pluck('name', 'id')->all();
-                $this->list["wards"] = [];
+                $this->list['districts'] = District::select(['id', 'name'])->where('province_id', $value)->pluck('name', 'id')->all();
+                $this->list['wards'] = [];
             } else {
-                $this->list["districts"] = [];
-                $this->list["wards"] = [];
+                $this->list['districts'] = [];
+                $this->list['wards'] = [];
             }
 
             $this->branch->district_id = null;
             $this->branch->ward_id = null;
-        } elseif ($key == "district_id") {
+        } elseif ($key == 'district_id') {
             if ($value) {
-                $this->list["wards"] = Ward::select(["id", "name"])->where("district_id", $value)->pluck('name', 'id')->all();
+                $this->list['wards'] = Ward::select(['id', 'name'])->where('district_id', $value)->pluck('name', 'id')->all();
             } else {
-                $this->list["wards"] = [];
+                $this->list['wards'] = [];
             }
 
             $this->branch->ward_id = null;
@@ -74,7 +74,7 @@ class ModalCreateBranchTakingAddressComponent extends Component
 
     public function resetInput()
     {
-        $this->reset("branch");
+        $this->reset('branch');
         $this->branch = new BranchTakingAddress();
     }
 
@@ -89,8 +89,8 @@ class ModalCreateBranchTakingAddressComponent extends Component
             $district_id = $this->branch->district_id;
             $ward_id = $this->branch->ward_id;
 
-            $this->updatedBranch($this->branch->province_id, "province_id");
-            $this->updatedBranch($district_id, "district_id");
+            $this->updatedBranch($this->branch->province_id, 'province_id');
+            $this->updatedBranch($district_id, 'district_id');
 
             $this->branch->district_id = $district_id;
             $this->branch->ward_id = $ward_id;
@@ -99,7 +99,7 @@ class ModalCreateBranchTakingAddressComponent extends Component
         }
 
         $this->branch->branch_id = $branch_id;
-        $this->dispatch("modal", "modal-create-branch-taking-address");
+        $this->dispatch('poli.modal', ['modal-create-branch-taking-address', 'show']);
     }
 
     public function save()
@@ -111,7 +111,7 @@ class ModalCreateBranchTakingAddressComponent extends Component
         $this->branch->save();
 
         $this->dispatch('refresh-datatable-branches');
-        $this->dispatch("modal", "modal-create-branch-taking-address", "hide");
+        $this->dispatch('poli.modal', ['modal-create-branch-taking-address', 'hide']);
         $this->resetInput();
     }
 }

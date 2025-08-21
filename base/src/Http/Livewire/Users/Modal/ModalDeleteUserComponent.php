@@ -28,7 +28,7 @@ class ModalDeleteUserComponent extends Component
     public function showModal($id)
     {
         $this->id = $id;
-        $this->dispatch('poli.modal', ['modal-delete-user']);
+        $this->dispatch('poli.modal', ['modal-delete-user', 'show']);
     }
 
     public function save()

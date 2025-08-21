@@ -15,6 +15,7 @@ const cssFiles = [
     'polirium-core',
     'polirium-flags',
     'polirium-payments',
+    'polirium-social',
     'polirium-vendors',
     'app',
 ];
@@ -34,12 +35,14 @@ jsFiles.forEach(function (file) {
     mix.js(assets + '/js/' + file + '.js', productFolder + '/js/' + file + '.min.js');
 });
 
+mix.copyDirectory(assets + '/libs', productFolder + '/libs');
 
-// cssFiles.forEach(function (file) {
-//     mix.copy(productFolder + '/css/' + file + '.min.css', public + '/css/' + file + '.min.css');
-// });
+cssFiles.forEach(function (file) {
+    mix.copy(productFolder + '/css/' + file + '.min.css', public + '/css/' + file + '.min.css');
+});
 
-// jsFiles.forEach(function (file) {
-//     mix.copy(productFolder + '/js/' + file + '.min.js', public + '/js/' + file + '.min.js');
-// });
+jsFiles.forEach(function (file) {
+    mix.copy(productFolder + '/js/' + file + '.min.js', public + '/js/' + file + '.min.js');
+});
 
+mix.copyDirectory(assets + '/libs', public + '/libs');

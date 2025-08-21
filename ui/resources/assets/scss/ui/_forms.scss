@@ -24,7 +24,7 @@ Form label
 .form-label-description {
   float: right;
   font-weight: var(--#{$prefix}font-weight-normal);
-  color: var(--#{$prefix}secondary);
+  color: $form-secondary-color;
 }
 
 /**
@@ -32,7 +32,7 @@ Form hint
  */
 .form-hint {
   display: block;
-  color: var(--#{$prefix}secondary);
+  color: $form-secondary-color;
 
   &:last-child {
     margin-bottom: 0;
@@ -50,6 +50,7 @@ Form hint
   .form-control + &,
   .form-select + & {
     margin-top: .5rem;
+    color: $form-secondary-color;
   }
 }
 
@@ -74,7 +75,7 @@ Form control
 
   &:disabled,
   &.disabled {
-    color: var(--#{$prefix}secondary);
+    color: $form-secondary-color;
     user-select: none;
   }
 
@@ -129,6 +130,10 @@ Form control
   border-radius: var(--#{$prefix}border-radius);
 }
 
+fieldset:empty {
+  display: none;
+}
+
 /**
 Form help
  */
@@ -140,7 +145,7 @@ Form help
   width: 1.125rem;
   height: 1.125rem;
   font-size: .75rem;
-  color: var(--#{$prefix}secondary);
+  color: $form-secondary-color;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
@@ -222,4 +227,15 @@ Upload files
 .form-file-button {
   margin-left: 0;
   border-left: 0;
+}
+
+/**
+Floating inputs
+ */
+// Fix for the bug in twbs/bootstrap v5.3.3. Issue #39080. Should be fixed in v5.3.4
+label[for="floating-input"] {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

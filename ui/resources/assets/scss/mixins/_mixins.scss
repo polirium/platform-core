@@ -1,11 +1,11 @@
 @mixin subheader($include-color: true, $include-line-height: true) {
-  font-size: $h6-font-size;
+  font-size: $h5-font-size;
   font-weight: var(--#{$prefix}font-weight-bold);
   text-transform: uppercase;
   letter-spacing: .04em;
 
   @if $include-line-height {
-    line-height: $h6-line-height;
+    line-height: $h5-line-height;
   }
 
   @if ($include-color) {
@@ -15,7 +15,7 @@
 
 @mixin scrollbar($color: var(--#{$prefix}body-color-rgb)) {
   #{if(&, "&", "*")} {
-    scrollbar-color: rgba(var(--#{$prefix}scrollbar-color, var(--#{$prefix}body-color-rgb)), .16) transparent;
+    scrollbar-color: rgba(var(--#{$prefix}scrollbar-color, var(--#{$prefix}body-color-rgb)), .16);
   }
 
   #{if(&, "&", "*")}::-webkit-scrollbar {
@@ -60,9 +60,9 @@
 
 @mixin focus-ring($show-border: false) {
   outline: 0;
-  box-shadow: 0 0 $focus-ring-blur $focus-ring-width rgba(var(--tblr-primary-rgb), 0.25);
+  box-shadow: 0 0 $focus-ring-blur $focus-ring-width rgba(var(--#{$prefix}primary-rgb), 0.25);
 
   @if($show-border) {
-    border-color: rgba(var(--tblr-primary-rgb), 0.25);
+    border-color: rgba(var(--#{$prefix}primary-rgb), 0.25);
   }
 }

@@ -47,9 +47,9 @@ class ModalCreateUserComponent extends Component
         ];
     }
 
-    public function mount() : void
+    public function mount(): void
     {
-        $this->list['roles'] = Role::select(["id", "name"])->pluck('name', 'id')->all();
+        $this->list['roles'] = Role::select(['id', 'name'])->pluck('name', 'id')->all();
     }
 
     public function render()
@@ -68,7 +68,7 @@ class ModalCreateUserComponent extends Component
             $this->user = $user?->toArray();
             $this->role_ids = $user?->roles->pluck('id')->toArray() ?: [];
         }
-        $this->dispatch('modal', 'modal-create-user');
+        $this->dispatch('poli.modal', ['modal-create-user', 'show']);
     }
 
     public function save()
@@ -85,7 +85,7 @@ class ModalCreateUserComponent extends Component
                 'last_name' => $this->user['last_name'],
             ]);
         } else {
-            $user = new User;
+            $user = new User();
             $user->username = $this->user['username'];
             $user->email = $this->user['email'];
             $user->password = $this->user['password'];

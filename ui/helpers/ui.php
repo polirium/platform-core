@@ -1,6 +1,7 @@
 <?php
 
 use Polirium\Core\Settings\Facades\Settings;
+use Polirium\Core\UI\Facades\Assets;
 
 /**
  * |--------------------------------------------------------------------------
@@ -19,6 +20,26 @@ if (! function_exists('render_js')) {
     function render_js()
     {
         return Assets::renderJs();
+    }
+}
+
+/**
+ * Load CSS asset tùy chọn theo tên
+ */
+if (! function_exists('load_css')) {
+    function load_css(string|array $names)
+    {
+        return Assets::loadCss($names);
+    }
+}
+
+/**
+ * Load JS asset tùy chọn theo tên
+ */
+if (! function_exists('load_js')) {
+    function load_js(string|array $names)
+    {
+        return Assets::loadJs($names);
     }
 }
 
