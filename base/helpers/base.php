@@ -177,3 +177,59 @@ if (! function_exists('get_wards')) {
         return LocationHelper::getWards($district_id);
     }
 }
+
+if (! function_exists('user_branch')) {
+    /**
+     * Get or set the current user's selected branch
+     *
+     * @param int|null $branch_id
+     * @return int|null
+     */
+    function user_branch(int $branch_id = null): ?int
+    {
+        if (! auth()->check()) {
+            return null;
+        }
+
+        $user = auth()->user();
+        $sessionKey = 'user_branch_' . $user->id;
+
+        // If setting a branch
+        if ($branch_id !== null) {
+            // Verify the user has access to this branch
+            $hasAccess = $user->branches()->where('branch_id', $branch_id)->exists();
+
+            if ($hasAccess) {
+                session([$sessionKey => $branch_id]);
+
+                return $branch_id;
+            }
+
+            return null;
+        }
+
+        // If getting the current branch
+        $currentBranch = session($sessionKey);
+
+        // If no branch is set in session, get the user's first active branch
+        if (! $currentBranch) {
+            $firstBranch = $user->branches()
+                ->wherePivot('active', 1)
+                ->first();
+
+            if ($firstBranch) {
+                $currentBranch = $firstBranch->id;
+                session([$sessionKey => $currentBranch]);
+            } else {
+                // If no active branch, try to get any branch the user has access to
+                $anyBranch = $user->branches()->first();
+                if ($anyBranch) {
+                    $currentBranch = $anyBranch->id;
+                    session([$sessionKey => $currentBranch]);
+                }
+            }
+        }
+
+        return $currentBranch;
+    }
+}

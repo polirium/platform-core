@@ -3,7 +3,7 @@ const Coloris = (() => {
   * Copyright (c) 2021-2024 Momo Bassit.
   * Licensed under the MIT License (MIT)
   * https://github.com/mdbassit/Coloris
-  * Version: 0.24.0
+  * Version: 0.25.0
   * NPM: https://github.com/melloware/coloris-npm
   */
 
@@ -99,7 +99,7 @@ const Coloris = (() => {
             }
 
             // Set the theme and color scheme
-            picker.className = "clr-picker clr-" + settings.theme + " clr-" + settings.themeMode;
+            picker.className = `clr-picker clr-${settings.theme} clr-${settings.themeMode}`;
 
             // Update the color picker's position if inline mode is in use
             if (settings.inline) {
@@ -138,9 +138,9 @@ const Coloris = (() => {
               options.swatches.forEach((swatch, i) => {
                 const button = document.createElement('button');
 
-                button.setAttribute('type', "button");
-                button.setAttribute('id', "clr-swatch-" + i);
-                button.setAttribute('aria-labelledby', "clr-swatch-label clr-swatch-" + i);
+                button.setAttribute('type', `button`);
+                button.setAttribute('id', `clr-swatch-${i}`);
+                button.setAttribute('aria-labelledby', `clr-swatch-label clr-swatch-${i}`);
                 button.style.color = swatch;
                 button.textContent = swatch;
 
@@ -368,7 +368,7 @@ const Coloris = (() => {
       }
 
       // Trigger an "open" event
-      currentEl.dispatchEvent(new Event('open', { bubbles: true }));
+      currentEl.dispatchEvent(new Event('open', { bubbles: false }));
     }
 
     /**
@@ -435,8 +435,8 @@ const Coloris = (() => {
 
         picker.classList.toggle('clr-left', reposition.left);
         picker.classList.toggle('clr-top', reposition.top);
-        picker.style.left = left + "px";
-        picker.style.top = top + "px";
+        picker.style.left = `${left}px`;
+        picker.style.top = `${top}px`;
         offset.x += picker.offsetLeft;
         offset.y += picker.offsetTop;
       }
@@ -536,7 +536,7 @@ const Coloris = (() => {
         }
 
         // Trigger a "close" event
-        prevEl.dispatchEvent(new Event('close', { bubbles: true }));
+        prevEl.dispatchEvent(new Event('close', { bubbles: false }));
 
         if (settings.focusInput) {
           prevEl.focus({ preventScroll: true });
@@ -560,14 +560,14 @@ const Coloris = (() => {
 
       // Update the UI
       hueSlider.value = hsva.h;
-      picker.style.color = "hsl(" + hsva.h + ", 100%, 50%)";
-      hueMarker.style.left = hsva.h / 360 * 100 + "%";
+      picker.style.color = `hsl(${hsva.h}, 100%, 50%)`;
+      hueMarker.style.left = `${hsva.h / 360 * 100}%`;
 
-      colorMarker.style.left = colorAreaDims.width * hsva.s / 100 + "px";
-      colorMarker.style.top = colorAreaDims.height - colorAreaDims.height * hsva.v / 100 + "px";
+      colorMarker.style.left = `${colorAreaDims.width * hsva.s / 100}px`;
+      colorMarker.style.top = `${colorAreaDims.height - colorAreaDims.height * hsva.v / 100}px`;
 
       alphaSlider.value = hsva.a * 100;
-      alphaMarker.style.left = hsva.a * 100 + "%";
+      alphaMarker.style.left = `${hsva.a * 100}%`;
     }
 
     /**
@@ -694,8 +694,8 @@ const Coloris = (() => {
       y = y < 0 ? 0 : y > colorAreaDims.height ? colorAreaDims.height : y;
 
       // Set the position
-      colorMarker.style.left = x + "px";
-      colorMarker.style.top = y + "px";
+      colorMarker.style.left = `${x}px`;
+      colorMarker.style.top = `${y}px`;
 
       // Update the color
       setColorAtPosition(x, y);
@@ -755,7 +755,7 @@ const Coloris = (() => {
       }
 
       // Select the current format in the format switcher
-      document.querySelector(".clr-format [value=\"" + format + "\"]").checked = true;
+      document.querySelector(`.clr-format [value="${format}"]`).checked = true;
     }
 
     /**
@@ -766,8 +766,8 @@ const Coloris = (() => {
       const x = colorMarker.style.left.replace('px', '') * 1;
       const y = colorMarker.style.top.replace('px', '') * 1;
 
-      picker.style.color = "hsl(" + hue + ", 100%, 50%)";
-      hueMarker.style.left = hue / 360 * 100 + "%";
+      picker.style.color = `hsl(${hue}, 100%, 50%)`;
+      hueMarker.style.left = `${hue / 360 * 100}%`;
 
       setColorAtPosition(x, y);
     }
@@ -778,7 +778,7 @@ const Coloris = (() => {
     function setAlpha() {
       const alpha = alphaSlider.value / 100;
 
-      alphaMarker.style.left = alpha * 100 + "%";
+      alphaMarker.style.left = `${alpha * 100}%`;
       updateColor({ a: alpha });
       pickColor();
     }
@@ -946,9 +946,9 @@ const Coloris = (() => {
      */
     function RGBAToStr(rgba) {
       if (!settings.alpha || rgba.a === 1 && !settings.forceAlpha) {
-        return "rgb(" + rgba.r + ", " + rgba.g + ", " + rgba.b + ")";
+        return `rgb(${rgba.r}, ${rgba.g}, ${rgba.b})`;
       } else {
-        return "rgba(" + rgba.r + ", " + rgba.g + ", " + rgba.b + ", " + rgba.a + ")";
+        return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
       }
     }
 
@@ -959,9 +959,9 @@ const Coloris = (() => {
      */
     function HSLAToStr(hsla) {
       if (!settings.alpha || hsla.a === 1 && !settings.forceAlpha) {
-        return "hsl(" + hsla.h + ", " + hsla.s + "%, " + hsla.l + "%)";
+        return `hsl(${hsla.h}, ${hsla.s}%, ${hsla.l}%)`;
       } else {
-        return "hsla(" + hsla.h + ", " + hsla.s + "%, " + hsla.l + "%, " + hsla.a + ")";
+        return `hsla(${hsla.h}, ${hsla.s}%, ${hsla.l}%, ${hsla.a})`;
       }
     }
 
@@ -976,22 +976,22 @@ const Coloris = (() => {
       picker.setAttribute('id', 'clr-picker');
       picker.className = 'clr-picker';
       picker.innerHTML =
-      "<input id=\"clr-color-value\" name=\"clr-color-value\" class=\"clr-color\" type=\"text\" value=\"\" spellcheck=\"false\" aria-label=\"" + settings.a11y.input + "\">" + ("<div id=\"clr-color-area\" class=\"clr-gradient\" role=\"application\" aria-label=\"" +
-      settings.a11y.instruction + "\">") +
+      `<input id="clr-color-value" name="clr-color-value" class="clr-color" type="text" value="" spellcheck="false" aria-label="${settings.a11y.input}">` +
+      `<div id="clr-color-area" class="clr-gradient" role="application" aria-label="${settings.a11y.instruction}">` +
       '<div id="clr-color-marker" class="clr-marker" tabindex="0"></div>' +
       '</div>' +
-      '<div class="clr-hue">' + ("<input id=\"clr-hue-slider\" name=\"clr-hue-slider\" type=\"range\" min=\"0\" max=\"360\" step=\"1\" aria-label=\"" +
-      settings.a11y.hueSlider + "\">") +
+      '<div class="clr-hue">' +
+      `<input id="clr-hue-slider" name="clr-hue-slider" type="range" min="0" max="360" step="1" aria-label="${settings.a11y.hueSlider}">` +
       '<div id="clr-hue-marker"></div>' +
       '</div>' +
-      '<div class="clr-alpha">' + ("<input id=\"clr-alpha-slider\" name=\"clr-alpha-slider\" type=\"range\" min=\"0\" max=\"100\" step=\"1\" aria-label=\"" +
-      settings.a11y.alphaSlider + "\">") +
+      '<div class="clr-alpha">' +
+      `<input id="clr-alpha-slider" name="clr-alpha-slider" type="range" min="0" max="100" step="1" aria-label="${settings.a11y.alphaSlider}">` +
       '<div id="clr-alpha-marker"></div>' +
       '<span></span>' +
       '</div>' +
       '<div id="clr-format" class="clr-format">' +
-      '<fieldset class="clr-segmented">' + ("<legend>" +
-      settings.a11y.format + "</legend>") +
+      '<fieldset class="clr-segmented">' +
+      `<legend>${settings.a11y.format}</legend>` +
       '<input id="clr-f1" type="radio" name="clr-format" value="hex">' +
       '<label for="clr-f1">Hex</label>' +
       '<input id="clr-f2" type="radio" name="clr-format" value="rgb">' +
@@ -1001,13 +1001,13 @@ const Coloris = (() => {
       '<span></span>' +
       '</fieldset>' +
       '</div>' +
-      '<div id="clr-swatches" class="clr-swatches"></div>' + ("<button type=\"button\" id=\"clr-clear\" class=\"clr-clear\" aria-label=\"" +
-      settings.a11y.clear + "\">" + settings.clearLabel + "</button>") +
-      '<div id="clr-color-preview" class="clr-preview">' + ("<button type=\"button\" id=\"clr-close\" class=\"clr-close\" aria-label=\"" +
-      settings.a11y.close + "\">" + settings.closeLabel + "</button>") +
-      '</div>' + ("<span id=\"clr-open-label\" hidden>" +
-      settings.a11y.open + "</span>") + ("<span id=\"clr-swatch-label\" hidden>" +
-      settings.a11y.swatch + "</span>");
+      '<div id="clr-swatches" class="clr-swatches"></div>' +
+      `<button type="button" id="clr-clear" class="clr-clear" aria-label="${settings.a11y.clear}">${settings.clearLabel}</button>` +
+      '<div id="clr-color-preview" class="clr-preview">' +
+      `<button type="button" id="clr-close" class="clr-close" aria-label="${settings.a11y.close}">${settings.closeLabel}</button>` +
+      '</div>' +
+      `<span id="clr-open-label" hidden>${settings.a11y.open}</span>` +
+      `<span id="clr-swatch-label" hidden>${settings.a11y.swatch}</span>`;
 
       // Append the color picker to the DOM
       document.body.appendChild(picker);
@@ -1109,6 +1109,12 @@ const Coloris = (() => {
 
         if (key === 'Escape') {
           closePicker(true);
+          return;
+
+          // Close the color picker and keep the selected color on press on Enter
+        } else if (key === 'Enter' && target.tagName !== 'BUTTON') {
+          closePicker();
+          return;
 
           // Display focus rings when using the keyboard
         } else if (navKeys.includes(key)) {

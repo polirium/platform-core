@@ -112,10 +112,9 @@ Table sort
   display: block;
   width: 100%;
   text-align: inherit;
-  @include transition(color $transition-time);
-
-  margin: (-$table-th-padding-y) (-$table-th-padding-x);
+  margin: calc(-1 * $table-th-padding-y) calc(-1 * $table-th-padding-x);
   padding: $table-th-padding-y $table-th-padding-x;
+  @include transition(color $transition-time);
 
   &:hover,
   &.asc,
@@ -154,8 +153,24 @@ Table sort
 //
 .table-selectable {
   tbody tr {
+    .on-checked {
+      display: none;
+    }
+
+    .on-unchecked {
+      display: initial;
+    }
+
     &:has(.table-selectable-check:checked) {
       background-color: $table-active-bg;
+
+      .on-checked {
+        display: initial;
+      }
+
+      .on-unchecked {
+        display: none;
+      }
     }
   }
 }

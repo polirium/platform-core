@@ -49,9 +49,10 @@ declare namespace Coloris {
    * A function that is called whenever a new color is picked.
    * 
    * @param color The newly selected color, as a CSS color string.
+   * @param currentEl The current HTML element to which the Coloris colorpicker is attached, if any. 
    * @since 0.18.0
    */
-  type OnChangeCallback = (color: string) => void;
+  type OnChangeCallback = (color: string, currentEl: HTMLElement | undefined) => void;
 
   interface Accessibility {
     /**
@@ -150,7 +151,7 @@ declare namespace Coloris {
    */
   interface ColorisVirtualInstanceOptions { 
     /**
-     * CSS selector for the parent.
+     * CSS selector for the parent or a DOM element or a list of DOM elements.
      *
      * The default behavior is to append the color picker's dialog to the end of the document's
      * body. but it is possible to append it to a custom parent instead. This is especially useful
@@ -160,7 +161,7 @@ declare namespace Coloris {
      *
      * @default null
      */
-    parent?: null | string| HTMLElement| HTMLElement[];
+    parent?: null | string| HTMLElement | HTMLElement[];
       
     /**
      * The color theme to use for the color picker. More themes might be added
