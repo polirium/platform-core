@@ -96,4 +96,11 @@ return [
         'description' => 'Modal create role',
     ],
     // End Phân quyền
+
+    // Dashboard
+    'dashboard' => [
+        'class' => \Polirium\Core\Base\Http\Livewire\Dashboard\DashboardComponent::class,
+        'alias' => 'core/base::dashboard.dashboard',
+        'description' => 'Dashboard Statistics',
+    ],
 ];

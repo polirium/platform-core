@@ -7,16 +7,16 @@ use Polirium\Core\Base\Http\Models\Brand\Brand;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
 use PowerComponents\LivewirePowerGrid\Button;
 use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Detail;
-use PowerComponents\LivewirePowerGrid\Exportable;
+use PowerComponents\LivewirePowerGrid\Components\SetUp\Detail;
+use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
 use PowerComponents\LivewirePowerGrid\Facades\Filter;
-use PowerComponents\LivewirePowerGrid\Footer;
-use PowerComponents\LivewirePowerGrid\Header;
-use PowerComponents\LivewirePowerGrid\PowerGrid;
+use PowerComponents\LivewirePowerGrid\Components\SetUp\Footer;
+use PowerComponents\LivewirePowerGrid\Components\SetUp\Header;
 use PowerComponents\LivewirePowerGrid\PowerGridFields;
 
 final class BrandTable extends BaseTable
 {
+    public string $tableName = 'brand-table';
     public $tab = 1;
 
     protected function getListeners(): array
@@ -34,9 +34,9 @@ final class BrandTable extends BaseTable
         // $this->showCheckBox();
 
         return [
-            Exportable::make('export')->striped()->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
-            Header::make()->includeViewOnTop('core/base::brand.datatable.header')->showSearchInput(),
-            Footer::make()->showPerPage()->showRecordCount(),
+            (new Exportable('export'))->striped()->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
+            (new Header())->includeViewOnTop('core/base::brand.datatable.header')->showSearchInput(),
+            (new Footer())->showPerPage()->showRecordCount(),
 
             // Detail::make()
             // ->view('core/base::brand.datatable.detail')
@@ -58,7 +58,7 @@ final class BrandTable extends BaseTable
 
     public function fields(): PowerGridFields
     {
-        return PowerGrid::fields();
+        return new PowerGridFields();
     }
 
     public function columns(): array

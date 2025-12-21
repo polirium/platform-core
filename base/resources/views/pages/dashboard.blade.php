@@ -1,6 +1,3 @@
 <x-ui.layouts::app>
-    <div class="row row-deck row-cards">
-        {{-- <x-ui.button lable="text" /> --}}
-
-    </div>
+    @livewire('core/base::dashboard.dashboard')
 </x-ui.layouts::app>
