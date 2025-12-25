@@ -6,8 +6,6 @@
     'prepend' => null,
     'hint' => null,
     'thousands_separator' => ',',
-    // 'decimal_separator' => '.',
-    // 'max_decimal' => 2,
 ])
 
 @php
@@ -22,9 +20,18 @@
     {{ $attributes }}
     x-ref="{{ $ref }}"
     x-init="
-        $($refs.{{ $ref }}).inputmask({ alias : 'currency' })
-        .change(function (e) {
-            $wire.set('{{ $name }}', Inputmask.unmask($refs.{{ $ref }}.value, { alias : 'currency' }));
+        $($refs.{{ $ref }}).inputmask({
+            alias : 'numeric',
+            groupSeparator: '{{ $thousands_separator }}',
+            autoGroup: true,
+            digits: 0,
+            digitsOptional: false,
+            rightAlign: false,
+            removeMaskOnSubmit: true
+        })
+        .on('change', function (e) {
+            var val = Inputmask.unmask($refs.{{ $ref }}.value, { alias : 'numeric', digits: 0 });
+            $wire.set('{{ $name }}', val ? parseInt(val) : 0);
         });
     "
 >
@@ -39,9 +46,3 @@
         </x-slot>
     @endif
 </x-form::input>
-
-{{-- @once
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.9/dist/jquery.inputmask.min.js"></script>
-    @endpush
-@endonce --}}

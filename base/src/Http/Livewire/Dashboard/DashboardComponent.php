@@ -96,7 +96,7 @@ class DashboardComponent extends Component
             ->when($branchId, fn($q) => $q->where('branch_id', $branchId))
             ->where('status', 'success')
             ->whereBetween('created_at', [$start, $end])
-            ->get(['type_payment', 'value_payment']);
+            ->get(['type_payment']);
 
         $cash = 0;
         $card = 0;
@@ -104,24 +104,23 @@ class DashboardComponent extends Component
 
         foreach ($payments as $payment) {
             $types = $payment->type_payment ?? [];
-            $value = $payment->value_payment ?? 0;
 
-            // Nếu chỉ có 1 phương thức
-            if (count($types) == 1) {
-                if (in_array('cash', $types)) {
-                    $cash += $value;
-                } elseif (in_array('card', $types)) {
-                    $card += $value;
-                } elseif (in_array('bank', $types)) {
-                    $bank += $value;
+            foreach ($types as $type) {
+                // New format: array of objects with 'method' and 'value' keys
+                if (is_array($type) && isset($type['method']) && isset($type['value'])) {
+                    $method = $type['method'];
+                    $value = $type['value'] ?? 0;
+
+                    match($method) {
+                        'cash' => $cash += $value,
+                        'card' => $card += $value,
+                        'bank' => $bank += $value,
+                        default => null,
+                    };
+                } elseif (is_string($type)) {
+                    // Old format fallback: array of strings like ['cash', 'bank']
+                    // Can't determine individual values, skip
                 }
-            } else {
-                // Nếu có nhiều phương thức, chia đều (cần logic chính xác hơn nếu lưu chi tiết từng phương thức)
-                $count = count($types);
-                $perMethod = $count > 0 ? $value / $count : 0;
-                if (in_array('cash', $types)) $cash += $perMethod;
-                if (in_array('card', $types)) $card += $perMethod;
-                if (in_array('bank', $types)) $bank += $perMethod;
             }
         }
 

@@ -9,9 +9,14 @@
     <x-form::label :description="$description">{{ $label }}</x-form::label>
 @endif
 
-<span class="position-relative" x-data="{ show: 0 }">
-    <input {{ $attributes->class("form-control") }} @click="show = 1" @click.away="show = 0" />
-    <div class="list-group list-group-flush bg-light position-absolute w-100" x-show="show">
+<span class="position-relative" x-data="{ show: false }">
+    <input {{ $attributes->class("form-control") }}
+        @focus="show = true"
+        @input="show = true"
+        @click="show = true"
+        @blur="setTimeout(() => show = false, 200)"
+    />
+    <div class="list-group list-group-flush bg-light position-absolute w-100" style="z-index: 1050;" x-show="show" x-cloak>
         {{ $slot }}
     </div>
 </span>

@@ -37,7 +37,12 @@
         <option value="">-- {{ trans('Không') }} --</option>
         @foreach ((array)$options as $key => $item)
             @if (is_array($item))
-                <option value="{{ isset($item['id']) ? $item['id'] : $key }}" {{ isset($item['selected']) ? 'selected' : '' }}>{{ isset($item['name']) ? $item['name'] : $item }}</option>
+                @php
+                    $optionValue = $item['id'] ?? $key;
+                    $optionName = $item['name'] ?? (is_string($item) ? $item : ($item['label'] ?? $optionValue));
+                    $optionSelected = isset($item['selected']) && $item['selected'];
+                @endphp
+                <option value="{{ $optionValue }}" {{ $optionSelected ? 'selected' : '' }}>{{ $optionName }}</option>
             @else
                 <option value="{{ $key }}">{{ $item }}</option>
             @endif

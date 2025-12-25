@@ -14,7 +14,7 @@
         x-bind:checked="checked"
     />
     @if ($label)
-        <span class="form-check-label">{{ $label }}</span>
+        <span class="form-check-label ms-2">{{ $label }}</span>
     @endif
 
     @if ($hint)
@@ -23,3 +23,4 @@
 </label>
 
 @error($name) <div class="invalid-feedback">{{ $errors->first($name) }}</div> @enderror
+
