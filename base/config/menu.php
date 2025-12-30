@@ -55,12 +55,20 @@ return [
         'sort' => 0,
     ],
     [
+        'id' => 'core.setting-general',
+        'name' => trans('Cài đặt chung'),
+        'parent' => 'core.setting',
+        'route' => 'core.settings.index',
+        'icon' => 'settings-2',
+        'sort' => 0,
+    ],
+    [
         'id' => 'core.setting-brand',
         'name' => trans('Thương hiệu'),
         'parent' => 'core.setting',
         'route' => 'core.brands.index',
         'icon' => 'star',
-        'sort' => 0,
+        'sort' => 1,
     ],
     [
         'id' => 'core.setting-branch',
@@ -68,7 +76,7 @@ return [
         'parent' => 'core.setting',
         'route' => 'core.branches.index',
         'icon' => 'map-pins',
-        'sort' => 1,
+        'sort' => 2,
     ],
     [
         'id' => 'core.setting-role',
@@ -76,6 +84,6 @@ return [
         'parent' => 'core.setting',
         'route' => 'core.roles.index',
         'icon' => 'user-check',
-        'sort' => 2,
+        'sort' => 3,
     ],
 ];

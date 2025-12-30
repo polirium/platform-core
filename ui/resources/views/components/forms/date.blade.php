@@ -19,23 +19,28 @@
 
 @once
     @push('scripts')
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" onerror="this.onerror=null;this.remove()">
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr" onerror="this.onerror=null;this.remove()"></script>
         <script>
             document.addEventListener('alpine:init', () => {
                 Alpine.data('datepicker', (model) => ({
                     value: model,
                     init(){
                         console.log(this.value);
-                        this.pickr = flatpickr(this.$refs.input_datepicker, {
-                            dateFormat: '{{ $format }}',
-                            onChange: (selectedDates, dateStr, instance) => {
-                                @this.set('{{ $name }}', flatpickr.formatDate(selectedDates[0], 'Y-m-d'));
-                            }
-                        })
-                        this.$watch('value', function(newValue){
-                            this.pickr.setDate(newValue);
-                        }.bind(this));
+                        // Check if flatpickr is available
+                        if (typeof flatpickr !== 'undefined') {
+                            this.pickr = flatpickr(this.$refs.input_datepicker, {
+                                dateFormat: '{{ $format }}',
+                                onChange: (selectedDates, dateStr, instance) => {
+                                    @this.set('{{ $name }}', flatpickr.formatDate(selectedDates[0], 'Y-m-d'));
+                                }
+                            })
+                            this.$watch('value', function(newValue){
+                                this.pickr.setDate(newValue);
+                            }.bind(this));
+                        } else {
+                            console.warn('Flatpickr not loaded, using regular input');
+                        }
                     },
                     reset(){
                         this.value = null;

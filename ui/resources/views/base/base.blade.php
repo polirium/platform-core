@@ -13,20 +13,35 @@
     {{ render_css() }}
     @livewireStyles
 
-    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.9/dist/jquery.inputmask.min.js"></script>
+    <script>
+        // Fallback jQuery if CDN fails
+        window.jQuery || document.write('<script src="{{ asset('vendor/jquery/jquery.min.js') }}"><\/script>');
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous" onerror="this.onerror=null;this.src='{{ asset('vendor/jquery/jquery.min.js') }}'"></script>
+    <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.9/dist/jquery.inputmask.min.js" onerror="this.onerror=null;this.remove()"></script>
 
     @stack('styles')
 
     <style>
-        @import url('https://rsms.me/inter/inter.css');
-
+        /* Fallback fonts if Inter fails to load */
         :root {
-            --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+            --tblr-font-sans-serif: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
         }
 
         body {
-            font-feature-settings: "cv03", "cv04", "cv11";
+            font-family: var(--tblr-font-sans-serif);
+        }
+
+        /* Try to load Inter font with fallback */
+        @font-face {
+            font-family: 'Inter';
+            src: url('https://rsms.me/inter/font-files/Inter-Regular.woff2?v=3.19') format('woff2');
+            font-display: swap;
+        }
+        
+        /* Use Inter if available, fallback to system fonts */
+        body {
+            font-family: 'Inter', var(--tblr-font-sans-serif);
         }
     </style>
 </head>

@@ -24,6 +24,7 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
         $this->app->register(FortifyServiceProvider::class);
         $this->app->register(AuthServiceProvider::class);
         $this->app->register(LivewireServiceProvider::class);
+        $this->app->register(EventServiceProvider::class);
 
         $this->app['events']->listen(RouteMatched::class, function () {
             $this->app->register(MenuServiceProvider::class);

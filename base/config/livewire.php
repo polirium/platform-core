@@ -12,28 +12,25 @@ use Polirium\Core\Base\Http\Livewire\Roles\Modal\ModalCreateRoleComponent;
 /**
  * Livewire User Components
  */
+use Polirium\Core\Base\Http\Livewire\Users\Datatable\UserTable;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalCreateUserComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalDeleteUserComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalEditUserComponent;
+use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalUserComponent;
 
 return [
     /**
      * User Manager
      */
     'user-table' => [
-        'class' => \Polirium\Core\Base\Http\Livewire\Tables\UserTable::class,
+        'class' => UserTable::class,
         'alias' => 'core/base::user-table',
         'description' => 'User Table',
     ],
-    'user.modal.create' => [
-        'class' => ModalCreateUserComponent::class,
-        'alias' => 'core/base::user.modal.create',
-        'description' => 'User Modal Create',
-    ],
-    'user.modal.edit' => [
-        'class' => ModalEditUserComponent::class,
-        'alias' => 'core/base::user.modal.edit',
-        'description' => 'User Modal Edit',
+    'user.modal' => [
+        'class' => ModalUserComponent::class,
+        'alias' => 'core/base::user.modal',
+        'description' => 'User Modal (Create/Edit)',
     ],
     'user.modal.delete' => [
         'class' => ModalDeleteUserComponent::class,

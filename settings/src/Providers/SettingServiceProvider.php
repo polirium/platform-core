@@ -13,6 +13,7 @@ use Polirium\Core\Settings\Support\ContextSerializers\ContextSerializer;
 use Polirium\Core\Settings\Support\ContextSerializers\DotNotationContextSerializer;
 use Polirium\Core\Settings\Support\KeyGenerators\Md5KeyGenerator;
 use Polirium\Core\Settings\Support\KeyGenerators\ReadableKeyGenerator;
+use Polirium\Core\Settings\Support\SettingRegistry;
 use Polirium\Core\Settings\Support\ValueSerializers\JsonValueSerializer;
 use Polirium\Core\Settings\Support\ValueSerializers\ValueSerializer;
 use Polirium\Core\Support\Providers\PoliriumBaseServiceProvider;
@@ -22,8 +23,12 @@ class SettingServiceProvider extends PoliriumBaseServiceProvider
     public function boot()
     {
         $this->setNamespace('core/settings')
-            ->loadConfigurations(['config'])
-            ->loadMigrations();
+            ->loadConfigurations(['config', 'livewire'])
+            ->loadMigrations()
+            ->loadRoutes(['web'])
+            ->loadViews();
+
+        $this->registerDefaultSettings();
     }
 
     public function provides()
@@ -32,6 +37,7 @@ class SettingServiceProvider extends PoliriumBaseServiceProvider
             Settings::class,
             'SettingsFactory',
             'polirium:settings',
+            'polirium:setting-registry',
         ];
     }
 
@@ -45,6 +51,7 @@ class SettingServiceProvider extends PoliriumBaseServiceProvider
 
         $this->registerContracts();
         $this->registerSettings();
+        $this->registerSettingRegistry();
     }
 
     protected function registerContracts()
@@ -121,6 +128,48 @@ class SettingServiceProvider extends PoliriumBaseServiceProvider
         $this->app->singleton('polirium:settings', function ($app) {
             return $app[Settings::class];
         });
+    }
+
+    protected function registerSettingRegistry()
+    {
+        $this->app->singleton('polirium:setting-registry', function () {
+            return new SettingRegistry();
+        });
+    }
+
+    protected function registerDefaultSettings()
+    {
+        $registry = app('polirium:setting-registry');
+
+        $registry->group('general', [
+                'title' => 'General Settings',
+                'icon' => 'settings',
+                'description' => 'Basic site configuration',
+            ])
+            ->add('title', [
+                'type' => 'text',
+                'label' => 'Site Title',
+                'description' => 'The title of your website',
+                'default' => config('core.base.setting.title'),
+                'required' => true,
+                'validation' => ['required', 'string', 'max:255'],
+            ])
+            ->add('logo', [
+                'type' => 'file',
+                'label' => 'Logo',
+                'description' => 'Upload your site logo',
+                'default' => config('core.base.setting.logo'),
+                'validation' => ['nullable', 'image', 'max:2048'],
+                'attributes' => ['accept' => 'image/*'],
+            ])
+            ->add('favicon', [
+                'type' => 'file',
+                'label' => 'Favicon',
+                'description' => 'Upload your site favicon',
+                'default' => config('core.base.setting.favicon'),
+                'validation' => ['nullable', 'image', 'max:1024'],
+                'attributes' => ['accept' => 'image/*'],
+            ]);
     }
 
 }

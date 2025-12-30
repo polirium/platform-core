@@ -11,8 +11,7 @@
 
             @livewire('core/base::user-table')
 
-            @livewire('core/base::user.modal.create')
-            @livewire('core/base::user.modal.edit')
+            @livewire('core/base::user.modal')
             @livewire('core/base::user.modal.delete')
         </x-ui::card>
     </div>

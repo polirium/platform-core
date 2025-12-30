@@ -66,16 +66,21 @@
 @if ($tomselect)
     @once
         @push('styles')
-            <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+            <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet" onerror="this.onerror=null;this.remove()">
         @endpush
         @push('scripts')
-            <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js" onerror="this.onerror=null;this.remove()"></script>
             <script>
                 document.addEventListener('alpine:init', () => {
                     Alpine.data('tomselect', () => ({
                         full_select: null,
                         init(){
-                            this.full_select = new TomSelect(this.$refs.input_tomselect, {{ $tomselectOpt }});
+                            // Check if TomSelect is available
+                            if (typeof TomSelect !== 'undefined') {
+                                this.full_select = new TomSelect(this.$refs.input_tomselect, {{ $tomselectOpt }});
+                            } else {
+                                console.warn('TomSelect not loaded, using regular select');
+                            }
                         }
                     }))
                 })
