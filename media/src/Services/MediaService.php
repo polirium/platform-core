@@ -77,7 +77,7 @@ class MediaService implements MediaServiceInterface
         $media = new Media();
         $media->model_type = 'Polirium\Core\Media\Models\Media';
         $media->model_id = 0;
-        $media->uuid = \Illuminate\Support\Str::uuid()->toString();
+        $media->uuid = Str::uuid()->toString();
         $media->collection_name = $collection;
         $media->name = $name;
         $media->file_name = $filename;

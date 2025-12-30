@@ -154,7 +154,9 @@ class Media extends BaseMedia
     public function getUrl(string $conversionName = ''): string
     {
         $path = $this->getPath($conversionName);
-        return Storage::disk($this->disk)->url($path);
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+        $storage = Storage::disk($this->disk);
+        return $storage->url($path);
     }
 
     /**
@@ -188,7 +190,9 @@ class Media extends BaseMedia
         $path = $this->getPath($conversionName);
 
         if (Storage::disk($this->disk)->exists($path)) {
-            return Storage::disk($this->disk)->temporaryUrl(
+            /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+            $storage = Storage::disk($this->disk);
+            return $storage->temporaryUrl(
                 $path,
                 $expiration ?? now()->addHour(),
                 $options
@@ -209,7 +213,9 @@ class Media extends BaseMedia
         $path = $this->getPath($conversion);
         $filename = $conversion ? "{$this->file_name}_{$conversion}.{$this->extension}" : $this->file_name;
 
-        return Storage::disk($this->disk)->download($path, $filename);
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $storage */
+        $storage = Storage::disk($this->disk);
+        return $storage->download($path, $filename);
     }
 
     /**
