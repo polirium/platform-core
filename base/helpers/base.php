@@ -87,73 +87,23 @@ if (! function_exists('roman_numerals')) {
 }
 
 if (! function_exists('number_to_text')) {
-    function number_to_text($number)
+    /**
+     * Convert number to text representation.
+     *
+     * @param float|int $number The number to convert
+     * @param string|null $locale Locale code (vi, en). Defaults to app locale
+     * @param string|null $currency Currency code (VND, USD). Defaults to provider default
+     * @return string Text representation
+     *
+     * @example
+     * number_to_text(1500000);              // 'Một triệu năm trăm nghìn đồng' (default vi)
+     * number_to_text(1500000, 'en');        // 'One million five hundred thousand dollars'
+     * number_to_text(1500000, 'vi', 'USD'); // 'Một triệu năm trăm nghìn đô la Mỹ'
+     */
+    function number_to_text(float|int $number, ?string $locale = null, ?string $currency = null): string
     {
-        $amount = round($number);
-        if ($amount <= 0) {
-            return $textnumber = 'Tiền phải là dạng số lớn hơn 0';
-        }
-        $Text = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
-        $TextLuythua = ['', 'nghìn', 'triệu', 'tỷ', 'ngān tỷ', 'triệu tỷ', 'tỷ tỷ'];
-        $textnumber = '';
-        $negative = 'âm ';
-        $decimal = ' phẩy ';
-        $length = strlen($amount);
-
-        for ($i = 0; $i < $length; $i++) {
-            $unread[$i] = 0;
-        }
-
-        for ($i = 0; $i < $length; $i++) {
-            $so = substr($amount, $length - $i - 1, 1);
-
-            if (($so == 0) && ($i % 3 == 0) && ($unread[$i] == 0)) {
-                for ($j = $i + 1; $j < $length; $j++) {
-                    $so1 = substr($amount, $length - $j - 1, 1);
-                    if ($so1 != 0) {
-                        break;
-                    }
-                }
-
-                if (intval(($j - $i) / 3) > 0) {
-                    for ($k = $i; $k < intval(($j - $i) / 3) * 3 + $i; $k++) {
-                        $unread[$k] = 1;
-                    }
-                }
-            }
-        }
-
-        for ($i = 0; $i < $length; $i++) {
-            $so = substr($amount, $length - $i - 1, 1);
-            if ($unread[$i] == 1) {
-                continue;
-            }
-
-            if (($i % 3 == 0) && ($i > 0)) {
-                $textnumber = $TextLuythua[$i / 3] . ' ' . $textnumber;
-            }
-
-            if ($i % 3 == 2) {
-                $textnumber = 'trăm ' . $textnumber;
-            }
-
-            if ($i % 3 == 1) {
-                $textnumber = 'mươi ' . $textnumber;
-            }
-
-            $textnumber = $Text[$so] . ' ' . $textnumber;
-        }
-
-        //Phai de cac ham replace theo dung thu tu nhu the nay
-        $textnumber = str_replace('không mươi', 'lẻ', $textnumber);
-        $textnumber = str_replace('lẻ không', '', $textnumber);
-        $textnumber = str_replace('mươi không', 'mươi', $textnumber);
-        $textnumber = str_replace('một mươi', 'mười', $textnumber);
-        $textnumber = str_replace('mươi năm', 'mươi lăm', $textnumber);
-        $textnumber = str_replace('mươi một', 'mươi mốt', $textnumber);
-        $textnumber = str_replace('mười năm', 'mười lăm', $textnumber);
-
-        return ucfirst($textnumber . ' đồng');
+        $service = new \Polirium\Core\Base\Service\NumberToText\NumberToTextService();
+        return $service->convert($number, $locale, $currency);
     }
 }
 
@@ -233,3 +183,37 @@ if (! function_exists('user_branch')) {
         return $currentBranch;
     }
 }
+
+if (! function_exists('admin_notification')) {
+    /**
+     * Register a listener for admin bar notifications.
+     * Call this in your ServiceProvider's boot() method.
+     *
+     * @param callable $callback A callback that receives RenderingAdminBarNotification event
+     *                          and can call $event->addNotification([...])
+     * @return void
+     *
+     * Example usage in a ServiceProvider:
+     *
+     * admin_notification(function ($event) {
+     *     $pendingOrders = Order::where('status', 'pending')->count();
+     *     if ($pendingOrders > 0) {
+     *         $event->addNotification([
+     *             'title' => 'Đơn hàng chờ xử lý',
+     *             'description' => "Có {$pendingOrders} đơn hàng cần xử lý",
+     *             'actionUrl' => route('orders.index'),
+     *             'isNew' => true,
+     *             'dotColor' => 'red',
+     *         ]);
+     *     }
+     * });
+     */
+    function admin_notification(callable $callback): void
+    {
+        app('events')->listen(
+            \Polirium\Core\Base\Events\RenderingAdminBarNotification::class,
+            $callback
+        );
+    }
+}
+

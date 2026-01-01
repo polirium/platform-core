@@ -7,6 +7,7 @@ use Polirium\Core\Base\Http\Controllers\DashboadController;
 use Polirium\Core\Base\Http\Controllers\LocationController;
 use Polirium\Core\Base\Http\Controllers\RoleManagerController;
 use Polirium\Core\Base\Http\Controllers\UsersManagerController;
+use Polirium\Core\Base\Http\Controllers\UserProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -59,6 +60,16 @@ Route::middleware(['web', 'auth'])
             Route::get('', 'index')->name('index');
         });
         // End Thương hiệu
+
+        // User Profile & Settings
+        Route::prefix("user")->name("user.")
+        ->controller(UserProfileController::class)
+        ->group(function () {
+            Route::get('/profile', 'profile')->name('profile.view');
+            Route::post('/profile', 'updateProfile')->name('profile.update');
+            Route::get('/settings', 'settings')->name('settings');
+        });
+        // End User Profile & Settings
     });
 
 Route::get('/', function () {
