@@ -14,15 +14,15 @@ Form label
 
   &.required {
     &:after {
-      content: "*";
-      margin-left: .25rem;
+      content: '*';
+      margin-inline-start: 0.25rem;
       color: $red;
     }
   }
 }
 
 .form-label-description {
-  float: right;
+  float: inline-end;
   font-weight: var(--#{$prefix}font-weight-normal);
   color: $form-secondary-color;
 }
@@ -39,17 +39,17 @@ Form hint
   }
 
   & + .form-control {
-    margin-top: .25rem;
+    margin-top: 0.25rem;
   }
 
   .form-label + & {
-    margin-top: -.25rem;
+    margin-top: -0.25rem;
   }
 
   .input-group + &,
   .form-control + &,
   .form-select + & {
-    margin-top: .5rem;
+    margin-top: 0.5rem;
     color: $form-secondary-color;
   }
 }
@@ -90,18 +90,18 @@ Form control
 }
 
 .form-control-dark {
-  background-color: rgba($black, .1);
+  background-color: rgba($black, 0.1);
   color: $white;
   border-color: transparent;
 
   &:focus {
-    background-color: rgba($black, .1);
+    background-color: rgba($black, 0.1);
     box-shadow: none;
-    border-color: rgba($white, .24);
+    border-color: rgba($white, 0.24);
   }
 
   &::placeholder {
-    color: rgba($white, .6);
+    color: rgba($white, 0.6);
   }
 }
 
@@ -139,12 +139,12 @@ Form help
  */
 .form-help {
   display: inline-flex;
-  font-weight: var(--#{$prefix}font-weight-bold);
+  font-weight: var(--#{$prefix}font-weight-semibold);
   align-items: center;
   justify-content: center;
   width: 1.125rem;
   height: 1.125rem;
-  font-size: .75rem;
+  font-size: 0.75rem;
   color: $form-secondary-color;
   text-align: center;
   text-decoration: none;
@@ -160,8 +160,6 @@ Form help
     background: var(--#{$prefix}primary);
   }
 }
-
-
 
 /**
 Input group
@@ -198,42 +196,44 @@ Input group
     }
 
     &:not(:last-child) {
-      border-right: 0;
+      border-inline-end: 0;
     }
 
     &:not(:first-child) {
-      border-left: 0;
+      border-inline-start: 0;
     }
   }
 
   .input-group-text {
     background: $form-check-input-bg;
+    z-index: 10;
     @include transition($input-transition);
 
     &:first-child {
-      padding-right: 0;
+      padding-inline-end: 0;
+      border-inline-end: 0;
     }
 
     &:last-child {
-      padding-left: 0;
+      padding-inline-start: 0;
+      border-inline-start: 0;
     }
   }
 }
-
 
 /**
 Upload files
  */
 .form-file-button {
-  margin-left: 0;
-  border-left: 0;
+  margin-inline-start: 0;
+  border-inline-start: 0;
 }
 
 /**
 Floating inputs
  */
 // Fix for the bug in twbs/bootstrap v5.3.3. Issue #39080. Should be fixed in v5.3.4
-label[for="floating-input"] {
+label[for='floating-input'] {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;

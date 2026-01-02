@@ -8,14 +8,17 @@ use Livewire\WithFileUploads;
 use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Base\Http\Models\Role;
 use Polirium\Core\Base\Http\Models\User;
+use Polirium\Core\Base\Traits\GetPermission;
 
 class ModalUserComponent extends Component
 {
     use WithFileUploads;
+    use GetPermission;
 
     public array $list = [];
     public array $role_ids = [];
     public array $branch_ids = [];
+    public array $permission_ids = [];  // Direct permissions
     public ?int $user_id = null;
     public bool $isEdit = false;
     public string $modalTitle = '';
@@ -65,9 +68,17 @@ class ModalUserComponent extends Component
         $this->list['roles'] = Role::select(['id', 'name'])->pluck('name', 'id')->all();
         $this->list['branches'] = Branch::select(['id', 'name'])->pluck('name', 'id')->all();
         $this->list['statuses'] = [
-            'active' => 'Active',
-            'inactive' => 'Inactive',
+            'active' => __('Hoạt động'),
+            'inactive' => __('Không hoạt động'),
         ];
+
+        // Load available permissions for direct assignment
+        $permissions = $this->getAvailablePermissions();
+        $this->list['permissions'] = collect($permissions)->mapWithKeys(function ($perm) {
+            return [$perm['flag'] => trans($perm['name'])];
+        })->all();
+        $this->list['permission_tree'] = $this->getPermissionTree($permissions);
+        $this->list['permission_flags'] = $permissions;
     }
 
     public function render()
@@ -95,8 +106,11 @@ class ModalUserComponent extends Component
     #[On('show-modal-create-user')]
     public function showCreateModal()
     {
-        $this->resetForm();
+        $this->authorize('users.create');
+
+        $this->reset(['user', 'role_ids', 'branch_ids', 'avatar_file']);
         $this->isEdit = false;
+        $this->user_id = null;
         $this->modalTitle = __('Create User');
         $this->dispatch('poli.modal', ['modal-user', 'show']);
     }
@@ -104,6 +118,8 @@ class ModalUserComponent extends Component
     #[On('show-modal-edit-user')]
     public function showEditModal($id = null)
     {
+        $this->authorize('users.edit');
+
         // Handle both array and direct parameter formats
         if (is_array($id) && isset($id['id'])) {
             $userId = $id['id'];
@@ -130,7 +146,7 @@ class ModalUserComponent extends Component
             $this->user['last_name'] = $user->last_name ?? '';
             $this->user['status'] = $user->status ?? 'active';
             $this->user['super_admin'] = (bool) $user->super_admin;
-            $this->user['avatar'] = $user->avatar ?? '';
+            $this->user['avatar'] = $user->avatar_path ?? '';  // Use raw path, not accessor
             $this->user['email_verified_at'] = $user->email_verified_at;
             $this->user['password'] = '';
             $this->user['password_confirmation'] = '';
@@ -138,6 +154,9 @@ class ModalUserComponent extends Component
             // Set roles and branches
             $this->role_ids = $user->roles->pluck('id')->toArray();
             $this->branch_ids = $user->branches->pluck('id')->toArray();
+
+            // Load direct permissions (not from roles)
+            $this->permission_ids = $user->getDirectPermissions()->pluck('name')->toArray();
 
             // Debug log - check if data is actually set
             \Log::info('Edit User Data Set:', [
@@ -204,6 +223,13 @@ class ModalUserComponent extends Component
             $user->branches()->detach();
         }
 
+        // Sync direct permissions (additional to role permissions)
+        if (count($this->permission_ids) > 0) {
+            $user->syncPermissions($this->permission_ids);
+        } else {
+            $user->syncPermissions([]);
+        }
+
         $this->dispatch('pg:eventRefresh-usersTable');
         $this->dispatch('poli.modal', ['modal-user', 'hide']);
         $this->resetForm();
@@ -213,7 +239,7 @@ class ModalUserComponent extends Component
 
     private function resetForm()
     {
-        $this->reset('user', 'role_ids', 'branch_ids', 'user_id', 'avatar_file', 'isEdit');
+        $this->reset('user', 'role_ids', 'branch_ids', 'permission_ids', 'user_id', 'avatar_file', 'isEdit');
         $this->user = [
             'username' => '',
             'email' => '',
@@ -227,5 +253,6 @@ class ModalUserComponent extends Component
         ];
         $this->role_ids = [];
         $this->branch_ids = [];
+        $this->permission_ids = [];
     }
 }

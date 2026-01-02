@@ -3,153 +3,165 @@
         <x-ui::modal id="modal-user" header="{{ $modalTitle }}" class="modal-xl">
 
             <div class="row g-4">
-                <!-- Profile Picture Section -->
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                {{ tabler_icon('user-circle') }}
-                                {{ __('Profile Picture') }}
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <div class="avatar avatar-xl" style="width: 80px; height: 80px;">
-                                        @if ($avatar_file)
-                                            <img src="{{ $avatar_file->temporaryUrl() }}" alt="Preview" class="avatar-img rounded-circle">
-                                        @elseif ($isEdit && isset($user['avatar']) && $user['avatar'])
-                                            <img src="{{ asset('storage/' . $user['avatar']) }}" alt="Current Avatar" class="avatar-img rounded-circle">
-                                        @else
-                                            <div class="avatar-img rounded-circle bg-secondary d-flex align-items-center justify-content-center">
-                                                {{ tabler_icon('user', ['class' => 'icon-lg text-white']) }}
-                                            </div>
-                                        @endif
-                                    </div>
+                <!-- Left Column: Avatar -->
+                <div class="col-lg-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <!-- Clickable Avatar Upload -->
+                            <div class="position-relative d-inline-block mb-3" style="cursor: pointer;" onclick="document.getElementById('avatar-input').click()">
+                                <div class="avatar avatar-xxl rounded-circle" style="width: 150px; height: 150px;">
+                                    @if ($avatar_file)
+                                        <img src="{{ $avatar_file->temporaryUrl() }}" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                    @elseif ($isEdit && !empty($user['avatar']) && str_starts_with($user['avatar'], 'avatars/'))
+                                        <img src="{{ asset('storage/' . $user['avatar']) }}" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                                    @else
+                                        <span class="avatar avatar-xxl rounded-circle bg-primary-lt" style="width: 150px; height: 150px;">
+                                            <i class="ti ti-user" style="font-size: 4rem;"></i>
+                                        </span>
+                                    @endif
                                 </div>
-                                <div class="col">
-                                    <div class="mb-2">
-                                        <label class="form-label">{{ __('Upload New Picture') }}</label>
-                                        <input type="file" class="form-control" wire:model="avatar_file" accept="image/*">
-                                        <div class="form-hint">{{ __('Recommended: Square image, max 2MB') }}</div>
-                                    </div>
-                                    @error('avatar_file')
-                                        <div class="text-danger small">{{ $message }}</div>
-                                    @enderror
-                                    <div wire:loading wire:target="avatar_file" class="text-muted small">
-                                        {{ tabler_icon('loader-2', ['class' => 'icon-spin']) }} {{ __('Uploading...') }}
-                                    </div>
+                                <!-- Upload overlay -->
+                                <div class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle p-2" style="transform: translate(25%, 25%);">
+                                    <i class="ti ti-camera" style="font-size: 1.2rem;"></i>
                                 </div>
                             </div>
+                            <!-- Hidden file input -->
+                            <input type="file" id="avatar-input" class="d-none" wire:model="avatar_file" accept="image/*">
+
+                            <div class="text-muted small">{{ __('Bấm để đổi ảnh') }}</div>
+                            <div class="text-muted small">{{ __('Tối đa 2MB') }}</div>
+
+                            @error('avatar_file')
+                                <div class="text-danger small mt-2">{{ $message }}</div>
+                            @enderror
+
+                            <div wire:loading wire:target="avatar_file" class="text-primary small mt-2">
+                                <i class="ti ti-loader-2 icon-spin"></i> {{ __('Đang tải...') }}
+                            </div>
+
+                            <!-- Super Admin Toggle -->
+                            <hr class="my-3">
+                            <label class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" wire:model="user.super_admin">
+                                <span class="form-check-label">
+                                    <i class="ti ti-shield-check me-1"></i>
+                                    {{ __('Super Admin') }}
+                                </span>
+                            </label>
+                            <div class="text-muted small">{{ __('Quyền cao nhất') }}</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Personal Information -->
-                <div class="col-lg-6">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                {{ tabler_icon('user') }}
-                                {{ __('Personal Information') }}
-                            </h3>
+                <!-- Right Column: Form Fields -->
+                <div class="col-lg-9">
+                    <div class="row g-3">
+                        <!-- Row 1: Name fields -->
+                        <div class="col-md-6">
+                            <x-form::input wire:model="user.first_name" :label="__('Họ')" :placeholder="__('Nhập họ...')" required />
                         </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <x-form::input wire:model="user.first_name" :label="__('First Name')" required />
-                            </div>
-                            <div class="mb-3">
-                                <x-form::input wire:model="user.last_name" :label="__('Last Name')" required />
-                            </div>
-                            <div class="mb-3">
-                                <x-form::input wire:model="user.phone" :label="__('Phone Number')" type="tel" />
-                            </div>
-                            <div class="mb-3">
-                                <x-form::select wire:model="user.status" :label="__('Account Status')" :options="$list['statuses']" required />
-                            </div>
+                        <div class="col-md-6">
+                            <x-form::input wire:model="user.last_name" :label="__('Tên')" :placeholder="__('Nhập tên...')" required />
                         </div>
-                    </div>
-                </div>
 
-                <!-- Account Settings -->
-                <div class="col-lg-6">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                {{ tabler_icon('settings') }}
-                                {{ __('Account Settings') }}
-                            </h3>
-                            @if ($isEdit && isset($user['email_verified_at']) && $user['email_verified_at'])
-                                <div class="card-actions">
-                                    <span class="badge bg-success">{{ tabler_icon('check') }} {{ __('Email Verified') }}</span>
-                                </div>
-                            @elseif ($isEdit)
-                                <div class="card-actions">
-                                    <span class="badge bg-warning">{{ tabler_icon('alert-triangle') }} {{ __('Email Not Verified') }}</span>
-                                </div>
-                            @endif
+                        <!-- Row 2: Username & Email -->
+                        <div class="col-md-6">
+                            <x-form::input wire:model="user.username" :label="__('Username')" :placeholder="__('Nhập username...')" required />
                         </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <x-form::input wire:model="user.email" :label="__('Email Address')" type="email" required />
-                            </div>
-                            <div class="mb-3">
-                                <x-form::input wire:model="user.username" :label="__('Username')" required />
-                            </div>
-
-                            @if (!$isEdit)
-                                <div class="mb-3">
-                                    <x-form::input wire:model="user.password" :label="__('Password')" type="password" required />
-                                </div>
-                                <div class="mb-3">
-                                    <x-form::input wire:model="user.password_confirmation" :label="__('Confirm Password')" type="password" required />
-                                </div>
-                            @else
-                                <div class="mb-3">
-                                    <x-form::input wire:model="user.password" :label="__('New Password')" type="password" />
-                                    <div class="form-hint">{{ __('Leave empty to keep current password') }}</div>
-                                </div>
-                                <div class="mb-3">
-                                    <x-form::input wire:model="user.password_confirmation" :label="__('Confirm New Password')" type="password" />
-                                </div>
-                            @endif
-
-                            <div class="mb-3">
-                                <label class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" wire:model="user.super_admin">
-                                    <span class="form-check-label">
-                                        {{ tabler_icon('shield-check') }}
-                                        {{ __('Super Administrator') }}
+                        <div class="col-md-6">
+                            <div class="position-relative">
+                                <x-form::input wire:model="user.email" :label="__('Email')" :placeholder="__('email@example.com')" type="email" required />
+                                @if ($isEdit && isset($user['email_verified_at']) && $user['email_verified_at'])
+                                    <span class="position-absolute badge bg-success" style="top: 0; right: 0;">
+                                        <i class="ti ti-check"></i> {{ __('Đã xác thực') }}
                                     </span>
-                                </label>
-                                <div class="form-hint">{{ __('Grants full system access') }}</div>
+                                @endif
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Permissions & Access -->
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                {{ tabler_icon('lock') }}
-                                {{ __('Permissions & Access') }}
-                            </h3>
+                        <!-- Row 3: Phone & Status -->
+                        <div class="col-md-6">
+                            <x-form::input wire:model="user.phone" :label="__('Số điện thoại')" :placeholder="__('0912 345 678')" type="tel" />
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        <x-form::select wire:model="role_ids" :label="__('User Roles')" :options="$list['roles']" tomselect multiple />
-                                        <div class="form-hint">{{ __('Select one or more roles for this user') }}</div>
+                        <div class="col-md-6">
+                            <x-form::select wire:model="user.status" :label="__('Trạng thái')" :placeholder="__('Chọn trạng thái...')" :options="$list['statuses']" required />
+                        </div>
+
+                        <!-- Row 4: Password -->
+                        @if (!$isEdit)
+                            <div class="col-md-6">
+                                <x-form::input wire:model="user.password" :label="__('Mật khẩu')" :placeholder="__('Nhập mật khẩu...')" type="password" required />
+                            </div>
+                            <div class="col-md-6">
+                                <x-form::input wire:model="user.password_confirmation" :label="__('Xác nhận mật khẩu')" :placeholder="__('Nhập lại mật khẩu...')" type="password" required />
+                            </div>
+                        @else
+                            <div class="col-md-6">
+                                <x-form::input wire:model="user.password" :label="__('Mật khẩu mới')" :placeholder="__('Nhập mật khẩu mới...')" type="password" />
+                                <div class="form-hint">{{ __('Để trống nếu giữ nguyên') }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <x-form::input wire:model="user.password_confirmation" :label="__('Xác nhận mật khẩu')" :placeholder="__('Nhập lại mật khẩu...')" type="password" />
+                            </div>
+                        @endif
+
+                        <!-- Row 5: Roles & Branches -->
+                        <div class="col-md-6">
+                            <x-form::select wire:model="role_ids" :label="__('Vai trò')" :placeholder="__('Chọn vai trò...')" :options="$list['roles']" tomselect multiple />
+                        </div>
+                        <div class="col-md-6">
+                            <x-form::select wire:model="branch_ids" :label="__('Chi nhánh')" :options="$list['branches']" tomselect multiple />
+                        </div>
+
+                        <!-- Row 6: Direct Permissions -->
+                        <div class="col-12">
+                            <div class="card border">
+                                <div class="card-header py-2">
+                                    <h4 class="card-title mb-0">
+                                        <i class="ti ti-lock me-2"></i>
+                                        {{ __('Quyền bổ sung') }}
+                                        @if(count($permission_ids) > 0)
+                                            <span class="badge text-bg-primary ms-2">{{ count($permission_ids) }}</span>
+                                        @endif
+                                    </h4>
+                                    <div class="small mt-2 ms-4 ps-2">
+                                        {{ __('Cấp thêm quyền ngoài vai trò') }}
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
-                                    <div class="mb-3">
-                                        <x-form::select wire:model="branch_ids" :label="__('Branch Access')" :options="$list['branches']" tomselect multiple />
-                                        <div class="form-hint">{{ __('Select branches this user can access') }}</div>
-                                    </div>
+                                <div class="card-body" style="max-height: 250px; overflow-y: auto;">
+                                    @if (isset($list['permission_tree']) && isset($list['permission_flags']))
+                                        <div class="row g-2">
+                                            @foreach ($list['permission_tree']['root'] ?? [] as $element)
+                                                <div class="col-md-4">
+                                                    <div class="border rounded p-2 mb-2">
+                                                        <div class="fw-bold text-primary small mb-1">
+                                                            <i class="ti ti-folder me-1"></i>
+                                                            {{ trans($list['permission_flags'][$element]['name'] ?? $element) }}
+                                                        </div>
+                                                        @if (isset($list['permission_tree'][$element]))
+                                                            @foreach ($list['permission_tree'][$element] as $subElement)
+                                                                <label class="form-check mb-0">
+                                                                    <input
+                                                                        class="form-check-input"
+                                                                        type="checkbox"
+                                                                        value="{{ $list['permission_flags'][$subElement]['flag'] ?? $subElement }}"
+                                                                        wire:model.live="permission_ids"
+                                                                    >
+                                                                    <span class="form-check-label small">
+                                                                        {{ trans($list['permission_flags'][$subElement]['name'] ?? $subElement) }}
+                                                                    </span>
+                                                                </label>
+                                                            @endforeach
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="text-muted text-center py-3">
+                                            {{ __('Không có quyền nào để hiển thị') }}
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -159,16 +171,16 @@
 
             <x-slot name="footer">
                 <button type="button" class="btn btn-ghost-secondary" data-bs-dismiss="modal">
-                    {{ __('Cancel') }}
+                    {{ __('Hủy') }}
                 </button>
                 <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
                     <span wire:loading.remove wire:target="save">
-                        {{ tabler_icon('device-floppy') }}
-                        {{ $isEdit ? __('Update User') : __('Create User') }}
+                        <i class="ti ti-device-floppy me-1"></i>
+                        {{ $isEdit ? __('Cập nhật') : __('Tạo mới') }}
                     </span>
                     <span wire:loading wire:target="save">
-                        {{ tabler_icon('loader-2', ['class' => 'icon-spin']) }}
-                        {{ __('Saving...') }}
+                        <i class="ti ti-loader-2 icon-spin me-1"></i>
+                        {{ __('Đang lưu...') }}
                     </span>
                 </button>
             </x-slot>

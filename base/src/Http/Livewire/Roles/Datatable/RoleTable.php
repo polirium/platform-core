@@ -41,12 +41,7 @@ final class RoleTable extends BaseTable
 
     public function header(): array
     {
-        return [
-            Button::add('bulk-modal-create-role')
-                ->slot(trans('core/base::role.name'))
-                ->class('btn btn-success')
-                ->dispatch('show-modal-create-role', []),
-        ];
+        return [];
     }
 
     public function datasource(): Builder
@@ -86,17 +81,22 @@ final class RoleTable extends BaseTable
     public function actions(Role $row): array
     {
         return [
-            Button::add('bulk-modal-create-role')
-            ->slot(trans('core/base::role.edit'))
-            ->class('btn btn-warning btn-sm')
-            ->dispatch('show-modal-create-role', ['id' => $row->id]),
+            Button::add('edit')
+                ->slot('<i class="ti ti-edit me-1"></i>' . __('Sửa'))
+                ->class('btn btn-sm btn-primary')
+                ->dispatch('show-modal-create-role', ['id' => $row->id]),
+
+            Button::add('delete')
+                ->slot('<i class="ti ti-trash me-1"></i>' . __('Xóa'))
+                ->class('btn btn-sm btn-outline-danger')
+                ->dispatch('show-modal-delete-role', ['id' => $row->id]),
         ];
     }
 
     public function actionRules($row): array
     {
         return [
-            
+
          ];
     }
 }

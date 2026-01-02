@@ -33,6 +33,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'phone',
         'super_admin',
+        'avatar',
+        'status',
     ];
 
     protected $hidden = [
@@ -73,9 +75,26 @@ class User extends Authenticatable implements MustVerifyEmail
         return $logOptions;
     }
 
-    public function getAvatarAttribute()
+    /**
+     * Get avatar URL - prioritize uploaded avatar, fallback to generated
+     */
+    public function getAvatarAttribute($value)
     {
+        // If there's an uploaded avatar path stored in DB
+        if (!empty($value) && str_starts_with($value, 'avatars/')) {
+            return asset('storage/' . $value);
+        }
+
+        // Fallback to generated avatar
         return Avatar::create($this->name)->setShape('square')->toBase64();
+    }
+
+    /**
+     * Get raw avatar path (for checking if uploaded avatar exists)
+     */
+    public function getAvatarPathAttribute()
+    {
+        return $this->attributes['avatar'] ?? null;
     }
 
     /**

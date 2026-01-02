@@ -32,11 +32,13 @@ class ModalCreateRoleComponent extends Component
     public function showModal(string|int|null $id = null)
     {
         if (! empty($id)) {
+            $this->authorize('roles.edit');
             $role = Role::findOrFail($id);
             $this->request['id'] = $role->id;
             $this->request['name'] = $role->name;
             $this->request['permissions'] = $role->permissions->pluck('name')->toArray();
         } else {
+            $this->authorize('roles.create');
             $this->reset('request');
         }
         $this->dispatch('poli.modal', ['modal-create-role', 'show']);
@@ -54,6 +56,12 @@ class ModalCreateRoleComponent extends Component
 
     public function submit()
     {
+        if (! empty($this->request['id'])) {
+            $this->authorize('roles.edit');
+        } else {
+            $this->authorize('roles.create');
+        }
+
         $this->validate([
             'request.name' => 'required|' . Rule::unique('roles', 'name')->ignore(! empty($this->request['id']) ? $this->request['id'] : null),
             'request.permissions' => 'array|required',
@@ -79,7 +87,7 @@ class ModalCreateRoleComponent extends Component
 
         $this->reset('request', 'modal');
         $this->dispatch('alert', trans('Hoàn thành tác vụ'), 'success');
-        $this->dispatch('role-manager-table-refresh');
+        $this->dispatch('pg:eventRefresh-roles-table');
         $this->dispatch('poli.modal', ['modal-create-role', 'hide']);
     }
 }

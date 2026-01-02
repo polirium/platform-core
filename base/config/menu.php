@@ -86,4 +86,12 @@ return [
         'icon' => 'user-check',
         'sort' => 3,
     ],
+    [
+        'id' => 'core.setting-modules',
+        'name' => trans('Quản lý Module'),
+        'parent' => 'core.setting',
+        'route' => 'core.modules.index',
+        'icon' => 'package',
+        'sort' => 4,
+    ],
 ];

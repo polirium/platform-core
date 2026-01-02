@@ -100,4 +100,11 @@ return [
         'alias' => 'core/base::dashboard.dashboard',
         'description' => 'Dashboard Statistics',
     ],
+
+    // Module Manager
+    'module-manager' => [
+        'class' => \Polirium\Core\Base\Http\Livewire\ModuleManagerComponent::class,
+        'alias' => 'module-manager',
+        'description' => 'Module Manager',
+    ],
 ];

@@ -20,56 +20,73 @@ use Polirium\Core\Base\Http\Controllers\UserProfileController;
 |
 */
 
-// Route::middleware(['web', 'auth', 'can:core.index']) // Nào a sửa lại phân quyền thì anh sửa lại cái comment này giúp e cái =.=
 Route::middleware(['web', 'auth'])
     ->prefix(admin_prefix())
     ->name('core.')
     ->group(function () {
-        Route::get('/', [DashboadController::class, 'index'])->name('index');
+
+        // Dashboard
+        Route::get('/', [DashboadController::class, 'index'])
+            ->name('index')
+            ->middleware('can:dashboard.index');
 
         /**
-         * User Manager Menu
+         * User Manager
          */
         Route::prefix("users")->name("users.")
-        ->controller(UsersManagerController::class)
-        ->group(function () {
-            Route::get('', 'index')->name('index');
-        });
+            ->controller(UsersManagerController::class)
+            ->middleware('can:users.index')
+            ->group(function () {
+                Route::get('', 'index')->name('index');
+            });
 
         /**
-         * Role Permission Menu
+         * Role Permission Manager
          */
         Route::prefix("role")->name("roles.")
-        ->controller(RoleManagerController::class)
-        ->group(function () {
-            Route::get('', 'index')->name('index');
-        });
+            ->controller(RoleManagerController::class)
+            ->middleware('can:roles.index')
+            ->group(function () {
+                Route::get('', 'index')->name('index');
+            });
 
-        // Chi nhánh
+        /**
+         * Branch Manager
+         */
         Route::prefix("branches")->name("branches.")
-        ->controller(BranchController::class)
-        ->group(function () {
-            Route::get('', 'index')->name('index');
-        });
-        // End Chi nhánh
+            ->controller(BranchController::class)
+            ->middleware('can:branches.index')
+            ->group(function () {
+                Route::get('', 'index')->name('index');
+            });
 
-        // Thương hiệu
+        /**
+         * Brand Manager
+         */
         Route::prefix("brands")->name("brands.")
-        ->controller(BrandController::class)
-        ->group(function () {
-            Route::get('', 'index')->name('index');
-        });
-        // End Thương hiệu
+            ->controller(BrandController::class)
+            ->middleware('can:brands.index')
+            ->group(function () {
+                Route::get('', 'index')->name('index');
+            });
 
-        // User Profile & Settings
+        /**
+         * User Profile & Settings (No permission needed - user's own profile)
+         */
         Route::prefix("user")->name("user.")
-        ->controller(UserProfileController::class)
-        ->group(function () {
-            Route::get('/profile', 'profile')->name('profile.view');
-            Route::post('/profile', 'updateProfile')->name('profile.update');
-            Route::get('/settings', 'settings')->name('settings');
-        });
-        // End User Profile & Settings
+            ->controller(UserProfileController::class)
+            ->group(function () {
+                Route::get('/profile', 'profile')->name('profile.view');
+                Route::post('/profile', 'updateProfile')->name('profile.update');
+                Route::get('/settings', 'settings')->name('settings');
+            });
+
+        /**
+         * Module Manager
+         */
+        Route::get('/modules', function () {
+            return view('core/base::modules.index');
+        })->name('modules.index')->middleware('can:modules.index');
     });
 
 Route::get('/', function () {

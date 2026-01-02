@@ -5,9 +5,11 @@ namespace Polirium\Core\Base\Providers;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
 use Polirium\Core\Base\Exceptions\Handler;
 use Polirium\Core\Base\Helpers\Assets;
 use Polirium\Core\Base\Helpers\BaseHelper;
+use Polirium\Core\Base\Service\ModuleManager;
 use Polirium\Core\Support\Providers\PoliriumBaseServiceProvider;
 
 class BaseServiceProvider extends PoliriumBaseServiceProvider
@@ -40,7 +42,13 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
             \Polirium\Core\Base\Commands\ModuleDependenciesCommand::class,
         ]);
 
-        $this->registerModules();
+        // Load modules using ModuleManager (if modules table exists)
+        // Falls back to legacy registerModules() if not
+        if (Schema::hasTable('modules')) {
+            $this->app->make(ModuleManager::class)->loadActiveModules();
+        } else {
+            $this->registerModules();
+        }
     }
 
     public function register()

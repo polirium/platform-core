@@ -9,12 +9,12 @@
  * http://www.lemoda.net/maths/bezier-length/index.html
  */
 
-import { Bezier } from './bezier';
-import { BasicPoint, Point } from './point';
-import { SignatureEventTarget } from './signature_event_target';
-import { throttle } from './throttle';
+import { Bezier } from './bezier.js';
+import { BasicPoint, Point } from './point.js';
+import { SignatureEventTarget } from './signature_event_target.js';
+import { throttle } from './throttle.js';
 
-export { BasicPoint } from './point';
+export { BasicPoint } from './point.js';
 
 export interface SignatureEvent {
   event: MouseEvent | TouchEvent | PointerEvent;
@@ -28,8 +28,17 @@ export interface FromDataOptions {
   clear?: boolean;
 }
 
+export interface FromDataUrlOptions {
+  ratio?: number;
+  width?: number;
+  height?: number;
+  xOffset?: number;
+  yOffset?: number;
+}
+
 export interface ToSVGOptions {
   includeBackgroundColor?: boolean;
+  includeDataUrl?: boolean;
 }
 
 export interface PointGroupOptions {
@@ -75,6 +84,8 @@ export default class SignaturePad extends SignatureEventTarget {
   private _ctx: CanvasRenderingContext2D;
   private _drawingStroke = false;
   private _isEmpty = true;
+  private _dataUrl: string | undefined;
+  private _dataUrlOptions: FromDataUrlOptions | undefined;
   private _lastPoints: Point[] = []; // Stores up to 4 most recent points; used to generate a new curve
   private _data: PointGroup[] = []; // Stores all points in groups (one group per line or dot)
   private _lastVelocity = 0;
@@ -137,18 +148,26 @@ export default class SignaturePad extends SignatureEventTarget {
     this._data = [];
     this._reset(this._getPointGroupOptions());
     this._isEmpty = true;
+    this._dataUrl = undefined;
+    this._dataUrlOptions = undefined;
     this._strokePointerId = undefined;
+  }
+
+  public redraw(): void {
+    const data = this._data;
+    const dataUrl = this._dataUrl;
+    const dataUrlOptions = this._dataUrlOptions;
+
+    this.clear();
+    if (dataUrl) {
+      this.fromDataURL(dataUrl, dataUrlOptions);
+    }
+    this.fromData(data, { clear: false });
   }
 
   public fromDataURL(
     dataUrl: string,
-    options: {
-      ratio?: number;
-      width?: number;
-      height?: number;
-      xOffset?: number;
-      yOffset?: number;
-    } = {},
+    options: FromDataUrlOptions = {},
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const image = new Image();
@@ -171,6 +190,8 @@ export default class SignaturePad extends SignatureEventTarget {
       image.src = dataUrl;
 
       this._isEmpty = false;
+      this._dataUrl = dataUrl;
+      this._dataUrlOptions = {...options};
     });
   }
 
@@ -333,7 +354,7 @@ export default class SignaturePad extends SignatureEventTarget {
       return;
     }
     this._strokeBegin(this._pointerEventToSignatureEvent(event));
-  };
+  }
 
   private _handleMouseMove(event: MouseEvent): void {
     if (!this._isLeftButtonPressed(event, true) || !this._drawingStroke) {
@@ -343,7 +364,7 @@ export default class SignaturePad extends SignatureEventTarget {
     }
 
     this._strokeMoveUpdate(this._pointerEventToSignatureEvent(event));
-  };
+  }
 
   private _handleMouseUp(event: MouseEvent): void {
     if (this._isLeftButtonPressed(event)) {
@@ -351,7 +372,7 @@ export default class SignaturePad extends SignatureEventTarget {
     }
 
     this._strokeEnd(this._pointerEventToSignatureEvent(event));
-  };
+  }
 
   private _handleTouchStart(event: TouchEvent): void {
     if (event.targetTouches.length !== 1 || this._drawingStroke) {
@@ -364,7 +385,7 @@ export default class SignaturePad extends SignatureEventTarget {
     }
 
     this._strokeBegin(this._touchEventToSignatureEvent(event));
-  };
+  }
 
   private _handleTouchMove(event: TouchEvent): void {
     if (event.targetTouches.length !== 1) {
@@ -382,7 +403,7 @@ export default class SignaturePad extends SignatureEventTarget {
     }
 
     this._strokeMoveUpdate(this._touchEventToSignatureEvent(event));
-  };
+  }
 
   private _handleTouchEnd(event: TouchEvent): void {
     if (event.targetTouches.length !== 0) {
@@ -394,14 +415,17 @@ export default class SignaturePad extends SignatureEventTarget {
     }
 
     this._strokeEnd(this._touchEventToSignatureEvent(event));
-  };
+  }
 
   private _getPointerId(event: PointerEvent) {
     // @ts-expect-error persistentDeviceId is not available yet but we want to use it when it is available
     return event.persistentDeviceId || event.pointerId;
   }
 
-  private _allowPointerId(event: PointerEvent, allowUndefined = false): boolean {
+  private _allowPointerId(
+    event: PointerEvent,
+    allowUndefined = false,
+  ): boolean {
     if (typeof this._strokePointerId === 'undefined') {
       return allowUndefined;
     }
@@ -423,7 +447,7 @@ export default class SignaturePad extends SignatureEventTarget {
     event.preventDefault();
 
     this._strokeBegin(this._pointerEventToSignatureEvent(event));
-  };
+  }
 
   private _handlePointerMove(event: PointerEvent): void {
     if (!this._allowPointerId(event)) {
@@ -437,19 +461,16 @@ export default class SignaturePad extends SignatureEventTarget {
 
     event.preventDefault();
     this._strokeMoveUpdate(this._pointerEventToSignatureEvent(event));
-  };
+  }
 
   private _handlePointerUp(event: PointerEvent): void {
-    if (
-      this._isLeftButtonPressed(event) ||
-      !this._allowPointerId(event)
-    ) {
+    if (this._isLeftButtonPressed(event) || !this._allowPointerId(event)) {
       return;
     }
 
     event.preventDefault();
     this._strokeEnd(this._pointerEventToSignatureEvent(event));
-  };
+  }
 
   private _getPointGroupOptions(group?: PointGroup): PointGroupOptions {
     return {
@@ -777,7 +798,7 @@ export default class SignaturePad extends SignatureEventTarget {
     }
   }
 
-  public toSVG({ includeBackgroundColor = false }: ToSVGOptions = {}): string {
+  public toSVG({ includeBackgroundColor = false, includeDataUrl = false }: ToSVGOptions = {}): string {
     const pointGroups = this._data;
     const ratio = Math.max(window.devicePixelRatio || 1, 1);
     const minX = 0;
@@ -799,6 +820,24 @@ export default class SignaturePad extends SignatureEventTarget {
       rect.setAttribute('fill', this.backgroundColor);
 
       svg.appendChild(rect);
+    }
+
+    if (includeDataUrl && this._dataUrl) {
+      const ratio = this._dataUrlOptions?.ratio || window.devicePixelRatio || 1;
+      const width = this._dataUrlOptions?.width || this.canvas.width / ratio;
+      const height = this._dataUrlOptions?.height || this.canvas.height / ratio;
+      const xOffset = this._dataUrlOptions?.xOffset || 0;
+      const yOffset = this._dataUrlOptions?.yOffset || 0;
+
+      const image = document.createElement('image');
+      image.setAttribute('x', xOffset.toString());
+      image.setAttribute('y', yOffset.toString());
+      image.setAttribute('width', width.toString());
+      image.setAttribute('height', height.toString());
+      image.setAttribute('preserveAspectRatio', 'none');
+      image.setAttribute('href', this._dataUrl);
+
+      svg.appendChild(image);
     }
 
     this._fromData(

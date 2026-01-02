@@ -8,9 +8,9 @@
  * Algorithm for approximated length of a Bézier curve is taken from:
  * http://www.lemoda.net/maths/bezier-length/index.html
  */
-import { BasicPoint } from './point';
-import { SignatureEventTarget } from './signature_event_target';
-export { BasicPoint } from './point';
+import { BasicPoint } from './point.js';
+import { SignatureEventTarget } from './signature_event_target.js';
+export { BasicPoint } from './point.js';
 export interface SignatureEvent {
     event: MouseEvent | TouchEvent | PointerEvent;
     type: string;
@@ -21,8 +21,16 @@ export interface SignatureEvent {
 export interface FromDataOptions {
     clear?: boolean;
 }
+export interface FromDataUrlOptions {
+    ratio?: number;
+    width?: number;
+    height?: number;
+    xOffset?: number;
+    yOffset?: number;
+}
 export interface ToSVGOptions {
     includeBackgroundColor?: boolean;
+    includeDataUrl?: boolean;
 }
 export interface PointGroupOptions {
     dotSize: number;
@@ -61,6 +69,8 @@ export default class SignaturePad extends SignatureEventTarget {
     private _ctx;
     private _drawingStroke;
     private _isEmpty;
+    private _dataUrl;
+    private _dataUrlOptions;
     private _lastPoints;
     private _data;
     private _lastVelocity;
@@ -69,13 +79,8 @@ export default class SignaturePad extends SignatureEventTarget {
     private _strokePointerId;
     constructor(canvas: HTMLCanvasElement, options?: Options);
     clear(): void;
-    fromDataURL(dataUrl: string, options?: {
-        ratio?: number;
-        width?: number;
-        height?: number;
-        xOffset?: number;
-        yOffset?: number;
-    }): Promise<void>;
+    redraw(): void;
+    fromDataURL(dataUrl: string, options?: FromDataUrlOptions): Promise<void>;
     toDataURL(type: 'image/svg+xml', encoderOptions?: ToSVGOptions): string;
     toDataURL(type?: string, encoderOptions?: number): string;
     on(): void;
@@ -115,5 +120,5 @@ export default class SignaturePad extends SignatureEventTarget {
     private _drawCurve;
     private _drawDot;
     private _fromData;
-    toSVG({ includeBackgroundColor }?: ToSVGOptions): string;
+    toSVG({ includeBackgroundColor, includeDataUrl }?: ToSVGOptions): string;
 }

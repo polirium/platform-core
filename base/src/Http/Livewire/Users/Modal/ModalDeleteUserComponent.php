@@ -27,16 +27,21 @@ class ModalDeleteUserComponent extends Component
     #[On('show-modal-delete-user')]
     public function showModal($id)
     {
+        $this->authorize('users.delete');
+
         $this->id = $id;
         $this->dispatch('poli.modal', ['modal-delete-user', 'show']);
     }
 
     public function save()
     {
+        $this->authorize('users.delete');
+
         $user = User::find($this->id);
 
         if ($user->super_admin) {
             $this->dispatch('poli.modal', ['modal-delete-user', 'hide']);
+            return;
         }
         $user->delete();
 
