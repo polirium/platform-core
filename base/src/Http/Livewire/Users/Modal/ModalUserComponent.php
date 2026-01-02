@@ -83,18 +83,21 @@ class ModalUserComponent extends Component
 
     public function render()
     {
-        // Debug current data state
-        if ($this->isEdit) {
-            \Log::info('Render Edit Modal:', [
-                'isEdit' => $this->isEdit,
-                'user_id' => $this->user_id,
-                'user_data' => $this->user,
-                'role_ids' => $this->role_ids,
-                'branch_ids' => $this->branch_ids,
-            ]);
+        // Get permissions from selected roles
+        $rolePermissions = [];
+        if (!empty($this->role_ids)) {
+            $roles = Role::whereIn('id', $this->role_ids)->with('permissions')->get();
+            foreach ($roles as $role) {
+                foreach ($role->permissions as $permission) {
+                    $rolePermissions[] = $permission->name;
+                }
+            }
+            $rolePermissions = array_unique($rolePermissions);
         }
 
-        return view('core/base::users.modal.modal-user');
+        return view('core/base::users.modal.modal-user', [
+            'rolePermissions' => $rolePermissions,
+        ]);
     }
 
     public function updatedUser($value, $key)

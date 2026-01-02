@@ -107,7 +107,7 @@
 
                         <!-- Row 5: Roles & Branches -->
                         <div class="col-md-6">
-                            <x-form::select wire:model="role_ids" :label="__('Vai trò')" :placeholder="__('Chọn vai trò...')" :options="$list['roles']" tomselect multiple />
+                            <x-form::select wire:model.live="role_ids" :label="__('Vai trò')" :placeholder="__('Chọn vai trò...')" :options="$list['roles']" tomselect multiple />
                         </div>
                         <div class="col-md-6">
                             <x-form::select wire:model="branch_ids" :label="__('Chi nhánh')" :options="$list['branches']" tomselect multiple />
@@ -140,15 +140,23 @@
                                                         </div>
                                                         @if (isset($list['permission_tree'][$element]))
                                                             @foreach ($list['permission_tree'][$element] as $subElement)
-                                                                <label class="form-check mb-0">
+                                                                @php
+                                                                    $permFlag = $list['permission_flags'][$subElement]['flag'] ?? $subElement;
+                                                                    $isFromRole = in_array($permFlag, $rolePermissions ?? []);
+                                                                @endphp
+                                                                <label class="form-check mb-0 {{ $isFromRole ? 'opacity-50' : '' }}">
                                                                     <input
                                                                         class="form-check-input"
                                                                         type="checkbox"
-                                                                        value="{{ $list['permission_flags'][$subElement]['flag'] ?? $subElement }}"
+                                                                        value="{{ $permFlag }}"
                                                                         wire:model.live="permission_ids"
+                                                                        {{ $isFromRole ? 'disabled checked' : '' }}
                                                                     >
                                                                     <span class="form-check-label small">
                                                                         {{ trans($list['permission_flags'][$subElement]['name'] ?? $subElement) }}
+                                                                        @if($isFromRole)
+                                                                            <span class="badge text-bg-secondary ms-1" style="font-size: 0.65rem;">Từ vai trò</span>
+                                                                        @endif
                                                                     </span>
                                                                 </label>
                                                             @endforeach
