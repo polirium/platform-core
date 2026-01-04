@@ -107,4 +107,10 @@ return [
         'alias' => 'module-manager',
         'description' => 'Module Manager',
     ],
+
+    'activity-log-table' => [
+        'class' => \Polirium\Core\Base\Http\Livewire\Table\ActivityLogTable::class,
+        'alias' => 'core-base-activity-log-table',
+        'description' => 'Activity Log Table',
+    ],
 ];

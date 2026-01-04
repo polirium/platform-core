@@ -76,40 +76,45 @@
                                             @if($module->status === 'pending')
                                                 <button class="btn btn-sm btn-success"
                                                         wire:click="install('{{ $module->name }}')"
-                                                        wire:loading.attr="disabled">
-                                                    <i class="ti ti-download me-1"></i> {{ __('Cài đặt') }}
+                                                        wire:loading.attr="disabled"
+                                                        title="Cài đặt module">
+                                                    {{ tabler_icon('download') }}
+                                                    {{ __('Cài đặt') }}
                                                 </button>
                                             @elseif($module->status === 'installed')
                                                 <button class="btn btn-sm btn-primary"
                                                         wire:click="enable('{{ $module->name }}')"
-                                                        wire:loading.attr="disabled">
-                                                    <i class="ti ti-player-play me-1"></i> {{ __('Kích hoạt') }}
+                                                        wire:loading.attr="disabled"
+                                                        title="Kích hoạt module">
+                                                    {{ tabler_icon('player-play') }}
+                                                    {{ __('Kích hoạt') }}
                                                 </button>
                                             @elseif($module->status === 'active')
                                                 <button class="btn btn-sm btn-warning"
                                                         wire:click="disable('{{ $module->name }}')"
-                                                        wire:loading.attr="disabled">
-                                                    <i class="ti ti-player-pause me-1"></i> {{ __('Tắt') }}
+                                                        wire:loading.attr="disabled"
+                                                        title="Tạm tắt module">
+                                                    {{ tabler_icon('player-pause') }}
+                                                    {{ __('Tắt') }}
                                                 </button>
                                             @elseif($module->status === 'disabled')
                                                 <button class="btn btn-sm btn-primary"
                                                         wire:click="enable('{{ $module->name }}')"
-                                                        wire:loading.attr="disabled">
-                                                    <i class="ti ti-player-play me-1"></i> {{ __('Bật lại') }}
+                                                        wire:loading.attr="disabled"
+                                                        title="Bật lại module">
+                                                    {{ tabler_icon('player-play') }}
+                                                    {{ __('Bật lại') }}
                                                 </button>
                                             @endif
-
-                                            <button class="btn btn-sm btn-outline-secondary"
-                                                    wire:click="showInfo({{ $module->id }})">
-                                                <i class="ti ti-info-circle"></i>
-                                            </button>
 
                                             @if($module->status !== 'pending')
                                                 <button class="btn btn-sm btn-outline-danger"
                                                         wire:click="uninstall('{{ $module->name }}')"
                                                         wire:loading.attr="disabled"
-                                                        onclick="return confirm('{{ __('Bạn có chắc muốn gỡ cài đặt module này?') }}')">
-                                                    <i class="ti ti-trash"></i>
+                                                        wire:confirm="Bạn có chắc muốn gỡ cài đặt module này? Thao tác này có thể xóa dữ liệu của module."
+                                                        title="Gỡ cài đặt module">
+                                                    {{ tabler_icon('trash') }}
+                                                    {{ __('Gỡ') }}
                                                 </button>
                                             @endif
                                         </div>

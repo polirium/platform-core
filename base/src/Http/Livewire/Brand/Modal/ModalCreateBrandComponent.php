@@ -10,16 +10,18 @@ class ModalCreateBrandComponent extends Component
 {
     public $brand_id = null;
 
-    public $brand;
+    public $name = '';
+    public $user_id = null;
+    public $note = '';
 
     public $list = [];
 
     protected function rules()
     {
         return [
-            'brand.name' => "required|unique:brands,name,{$this->brand_id},id",
-            'brand.user_id' => 'required|numeric|integer',
-            'brand.note' => 'nullable|string|max:255',
+            'name' => "required|unique:brands,name,{$this->brand_id},id",
+            'user_id' => 'required|numeric|integer',
+            'note' => 'nullable|string|max:255',
         ];
     }
 
@@ -40,8 +42,10 @@ class ModalCreateBrandComponent extends Component
 
     public function resetInput()
     {
-        $this->reset('brand');
-        $this->brand = new Brand();
+        $this->name = '';
+        $this->user_id = auth()->id();
+        $this->note = '';
+        $this->brand_id = null;
     }
 
     #[On('show-modal-create-brand')]
@@ -49,10 +53,12 @@ class ModalCreateBrandComponent extends Component
     {
         $this->brand_id = $id;
         if ($id) {
-            $this->brand = Brand::findOrFail($id);
+            $brand = Brand::findOrFail($id);
+            $this->name = $brand->name;
+            $this->user_id = $brand->user_id;
+            $this->note = $brand->note;
         } else {
             $this->resetInput();
-            $this->brand->user_id = auth()->id();
         }
         $this->dispatch('poli.modal', ['modal-create-brand', 'show']);
     }
@@ -61,7 +67,18 @@ class ModalCreateBrandComponent extends Component
     {
         $this->validate();
 
-        $this->brand->save();
+        $data = [
+            'name' => $this->name,
+            'user_id' => $this->user_id,
+            'note' => $this->note,
+        ];
+
+        if ($this->brand_id) {
+            $brand = Brand::findOrFail($this->brand_id);
+            $brand->update($data);
+        } else {
+            Brand::create($data);
+        }
 
         $this->dispatch('refresh-datatable-brands');
         $this->dispatch('poli.modal', ['modal-create-brand', 'hide']);

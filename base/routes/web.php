@@ -87,6 +87,12 @@ Route::middleware(['web', 'auth'])
         Route::get('/modules', function () {
             return view('core/base::modules.index');
         })->name('modules.index')->middleware('can:modules.index');
+
+        /**
+         * Activity Log
+         */
+        Route::get('/activity-logs', [\Polirium\Core\Base\Http\Controllers\ActivityLogController::class, 'index'])
+            ->name('activity-logs.index');
     });
 
 Route::get('/', function () {

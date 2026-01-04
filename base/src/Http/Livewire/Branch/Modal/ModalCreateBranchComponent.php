@@ -13,22 +13,28 @@ class ModalCreateBranchComponent extends Component
 {
     public $branch_id = null;
 
-    public $branch;
+    public $name = '';
+    public $phone = '';
+    public $phone_2 = '';
+    public $email = '';
+    public $address = '';
+    public $province_id = null;
+    public $district_id = null;
+    public $ward_id = null;
 
     public $list = [];
 
     protected function rules()
     {
         return [
-            'branch.name' => "required|unique:branches,name,{$this->branch_id},id",
-            'branch.phone' => "nullable|unique:branches,phone,{$this->branch_id},id",
-            'branch.phone_2' => "nullable|unique:branches,phone_2,{$this->branch_id},id",
-            'branch.email' => "nullable|email|string|max:255|unique:branches,email,{$this->branch_id},id",
-            'branch.address' => 'nullable|string|max:255',
-            'branch.province_id' => 'nullable|numeric|integer',
-            'branch.district_id' => 'nullable|numeric|integer',
-            'branch.ward_id' => 'nullable|numeric|integer',
-            'branch.user_id' => 'required|numeric|integer',
+            'name' => "required|unique:branches,name,{$this->branch_id},id",
+            'phone' => "nullable|unique:branches,phone,{$this->branch_id},id",
+            'phone_2' => "nullable|unique:branches,phone_2,{$this->branch_id},id",
+            'email' => "nullable|email|string|max:255|unique:branches,email,{$this->branch_id},id",
+            'address' => 'nullable|string|max:255',
+            'province_id' => 'nullable|numeric|integer',
+            'district_id' => 'nullable|numeric|integer',
+            'ward_id' => 'nullable|numeric|integer',
         ];
     }
 
@@ -45,28 +51,29 @@ class ModalCreateBranchComponent extends Component
         $this->validateOnly($value);
     }
 
-    public function updatedBranch($value, $key)
+    public function updatedProvinceId($value)
     {
-        if ($key == 'province_id') {
-            if ($value) {
-                $this->list['districts'] = District::select(['id', 'name'])->where('province_id', $value)->pluck('name', 'id')->all();
-                $this->list['wards'] = [];
-            } else {
-                $this->list['districts'] = [];
-                $this->list['wards'] = [];
-            }
-
-            $this->branch->district_id = null;
-            $this->branch->ward_id = null;
-        } elseif ($key == 'district_id') {
-            if ($value) {
-                $this->list['wards'] = Ward::select(['id', 'name'])->where('district_id', $value)->pluck('name', 'id')->all();
-            } else {
-                $this->list['wards'] = [];
-            }
-
-            $this->branch->ward_id = null;
+        if ($value) {
+            $this->list['districts'] = District::select(['id', 'name'])->where('province_id', $value)->pluck('name', 'id')->all();
+            $this->list['wards'] = [];
+        } else {
+            $this->list['districts'] = [];
+            $this->list['wards'] = [];
         }
+
+        $this->district_id = null;
+        $this->ward_id = null;
+    }
+
+    public function updatedDistrictId($value)
+    {
+        if ($value) {
+            $this->list['wards'] = Ward::select(['id', 'name'])->where('district_id', $value)->pluck('name', 'id')->all();
+        } else {
+            $this->list['wards'] = [];
+        }
+
+        $this->ward_id = null;
     }
 
     public function render()
@@ -76,8 +83,15 @@ class ModalCreateBranchComponent extends Component
 
     public function resetInput()
     {
-        $this->reset('branch');
-        $this->branch = new Branch();
+        $this->name = '';
+        $this->phone = '';
+        $this->phone_2 = '';
+        $this->email = '';
+        $this->address = '';
+        $this->province_id = null;
+        $this->district_id = null;
+        $this->ward_id = null;
+        $this->branch_id = null;
     }
 
     #[On('show-modal-create-branch')]
@@ -85,16 +99,25 @@ class ModalCreateBranchComponent extends Component
     {
         $this->branch_id = $id;
         if ($id) {
-            $this->branch = Branch::findOrFail($id);
+            $branch = Branch::findOrFail($id);
 
-            $district_id = $this->branch->district_id;
-            $ward_id = $this->branch->ward_id;
+            $this->name = $branch->name;
+            $this->phone = $branch->phone;
+            $this->phone_2 = $branch->phone_2;
+            $this->email = $branch->email;
+            $this->address = $branch->address;
+            $this->province_id = $branch->province_id;
 
-            $this->updatedBranch($this->branch->province_id, 'province_id');
-            $this->updatedBranch($district_id, 'district_id');
+            // Load districts and wards for the existing branch
+            if ($branch->province_id) {
+                $this->list['districts'] = District::select(['id', 'name'])->where('province_id', $branch->province_id)->pluck('name', 'id')->all();
+            }
+            if ($branch->district_id) {
+                $this->list['wards'] = Ward::select(['id', 'name'])->where('district_id', $branch->district_id)->pluck('name', 'id')->all();
+            }
 
-            $this->branch->district_id = $district_id;
-            $this->branch->ward_id = $ward_id;
+            $this->district_id = $branch->district_id;
+            $this->ward_id = $branch->ward_id;
         } else {
             $this->resetInput();
         }
@@ -103,11 +126,26 @@ class ModalCreateBranchComponent extends Component
 
     public function save()
     {
-        $this->branch->user_id = auth()->id();
-
         $this->validate();
 
-        $this->branch->save();
+        $data = [
+            'name' => $this->name,
+            'phone' => $this->phone ?: null,
+            'phone_2' => $this->phone_2 ?: null,
+            'email' => $this->email ?: null,
+            'address' => $this->address ?: null,
+            'province_id' => $this->province_id,
+            'district_id' => $this->district_id,
+            'ward_id' => $this->ward_id,
+            'user_id' => auth()->id(),
+        ];
+
+        if ($this->branch_id) {
+            $branch = Branch::findOrFail($this->branch_id);
+            $branch->update($data);
+        } else {
+            Branch::create($data);
+        }
 
         $this->dispatch('refresh-datatable-branches');
         $this->dispatch('poli.modal', ['modal-create-branch', 'hide']);

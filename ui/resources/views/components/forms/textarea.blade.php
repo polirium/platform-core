@@ -19,7 +19,6 @@
     <textarea {{ $attributes->class([
         "form-control",
         'is-invalid'    => $errors->has($name),
-        'is-valid'      => !$errors->has($name),
     ]) }}>{{ $slot }}</textarea>
 
 @if ($prepend || $append)

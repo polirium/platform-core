@@ -5,15 +5,17 @@
                 <ul class="navbar-nav">
                     @foreach ($menuItems as $menu)
                         <li class="nav-item @if (!empty($menu->attributes['class'])) active @endif  @if ($menu->hasChildren()) dropdown @endif">
-                            <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
-                                <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                    {{ tabler_icon($menu->attributes['icon']) }}
-                                </span>
-                                <span class="nav-link-title">
-                                    {{ $menu->title }}
-                                </span>
-                            </a>
                             @if ($menu->hasChildren())
+                                <a class="nav-link dropdown-toggle" href="#navbar-extra" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+                                    @if(!empty($menu->attributes['icon']))
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            {{ tabler_icon($menu->attributes['icon']) }}
+                                        </span>
+                                    @endif
+                                    <span class="nav-link-title">
+                                        {{ $menu->title }}
+                                    </span>
+                                </a>
                                 <div class="dropdown-menu">
                                     <div class="dropdown-menu-columns">
                                         <div class="dropdown-menu-column">
@@ -22,21 +24,31 @@
                                                     @include('core/ui::components.header.menu-sub-item', ['menu' => $children])
                                                 @else
                                                     <a class="dropdown-item" href="{{ $children->url() }}">
-                                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                                            {{ tabler_icon($children->attributes['icon']) }}
-                                                        </span>
+                                                        @if(!empty($children->attributes['icon']))
+                                                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                                                {{ tabler_icon($children->attributes['icon']) }}
+                                                            </span>
+                                                        @endif
                                                         <span class="nav-link-title">
                                                             {{ $children->title }}
                                                         </span>
-                                                        {{-- <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span> --}}
                                                     </a>
                                                 @endif
                                             @endforeach
-
-
                                         </div>
                                     </div>
                                 </div>
+                            @else
+                                <a class="nav-link" href="{{ $menu->url() }}">
+                                    @if(!empty($menu->attributes['icon']))
+                                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                            {{ tabler_icon($menu->attributes['icon']) }}
+                                        </span>
+                                    @endif
+                                    <span class="nav-link-title">
+                                        {{ $menu->title }}
+                                    </span>
+                                </a>
                             @endif
                         </li>
                     @endforeach

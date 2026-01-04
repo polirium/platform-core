@@ -9,9 +9,11 @@
                 @include('core/ui::components.header.menu-sub-item', ['menu' => $children])
             @else
                 <a href="{{ $children->url() }}" class="dropdown-item">
-                    <span class="nav-link-icon d-md-none d-lg-inline-block">
-                        {{ tabler_icon($children->attributes['icon']) }}
-                    </span>
+                    @if(!empty($children->attributes['icon']))
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            {{ tabler_icon($children->attributes['icon']) }}
+                        </span>
+                    @endif
                     <span class="nav-link-title">
                         {{ $children->title }}
                     </span>

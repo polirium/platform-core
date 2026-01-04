@@ -2,11 +2,11 @@
     <form wire:submit.prevent="save">
         <x-ui::modal id="modal-create-brand" :header="trans(($brand_id ? 'Sửa' : 'Tạo') . ' thương hiệu')">
             <div class="mb-3">
-                <x-form::input wire:model="brand.name" :label="trans('Tên thương hiệu')" />
+                <x-form::input wire:model="name" :label="trans('Tên thương hiệu')" />
             </div>
 
             <div class="mb-3">
-                <x-form::input wire:model="brand.note" :label="trans('Note')" />
+                <x-form::input wire:model="note" :label="trans('Note')" />
             </div>
 
             <x-slot name="footer">
@@ -18,3 +18,4 @@
         </x-ui::modal>
     </form>
 </div>
+

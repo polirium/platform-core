@@ -32,7 +32,16 @@ trait GetPermission
         $permissions = [];
 
         foreach (BaseHelper::scanFolder(platform_path($type)) as $module) {
-            $configuration = config(strtolower($type . '.' . $module . '.permissions'));
+            $key = strtolower($type . '.' . $module . '.permissions');
+            $configuration = config($key);
+
+            if (empty($configuration)) {
+                $configFile = platform_path($type . '/' . $module . '/config/permissions.php');
+                if (file_exists($configFile)) {
+                    $configuration = require $configFile;
+                }
+            }
+
             if (! empty($configuration)) {
                 foreach ($configuration as $config) {
                     $permissions[$config['flag']] = $config;

@@ -4,12 +4,12 @@ namespace Polirium\Core\Settings\Http\Models;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Polirium\Core\Base\Http\Models\BaseModel;
 use Illuminate\Support\Collection;
 use Polirium\Core\Settings\Contracts\Setting as SettingContract;
 use Polirium\Core\Settings\Facades\Settings;
 
-class Setting extends Model implements SettingContract
+class Setting extends BaseModel implements SettingContract
 {
     public $timestamps = false;
 

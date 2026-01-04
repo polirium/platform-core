@@ -40,6 +40,7 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
             \Polirium\Core\Base\Commands\UserCreateCommand::class,
             \Polirium\Core\Base\Commands\ImportCountriesCommand::class,
             \Polirium\Core\Base\Commands\ModuleDependenciesCommand::class,
+            \Polirium\Core\Base\Commands\SampleDataCommand::class,
         ]);
 
         // Load modules using ModuleManager (if modules table exists)
@@ -59,6 +60,20 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
 
         $this->app->singleton('core:assets', function () {
             return new Assets();
+        });
+
+        $this->app->singleton(\Polirium\Core\Base\Services\PageTitle::class);
+
+        // Register Dashboard Widget Registry
+        $this->app->singleton('dashboard.widgets', function () {
+            return new \Polirium\Core\Base\Services\Dashboard\WidgetRegistry();
+        });
+
+        // Auto-discover and register widgets
+        $this->app->booted(function () {
+            $registry = $this->app->make('dashboard.widgets');
+            $discovery = new \Polirium\Core\Base\Services\Dashboard\WidgetDiscoveryService($registry);
+            $discovery->discover();
         });
 
         $this->app->make('config')->set([

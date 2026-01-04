@@ -132,10 +132,10 @@ if (! function_exists('user_branch')) {
     /**
      * Get or set the current user's selected branch
      *
-     * @param int|null $branch_id
+     * @param int|string|null $branch_id
      * @return int|null
      */
-    function user_branch(int $branch_id = null): ?int
+    function user_branch($branch_id = null): ?int
     {
         if (! auth()->check()) {
             return null;
@@ -145,13 +145,28 @@ if (! function_exists('user_branch')) {
         $sessionKey = 'user_branch_' . $user->id;
 
         // If setting a branch
-        if ($branch_id !== null) {
-            // Verify the user has access to this branch
+        if ($branch_id !== null && $branch_id !== '' && $branch_id !== 0 && $branch_id !== '0') {
+            // Cast to int
+            $branch_id = (int) $branch_id;
+
+            // Super admin can access any branch
+            if ((bool) $user->super_admin === true) {
+                // Verify the branch exists
+                $branchExists = \Polirium\Core\Base\Http\Models\Branch\Branch::where('id', $branch_id)->exists();
+                if ($branchExists) {
+                    session()->put($sessionKey, $branch_id);
+                    session()->save();
+                    return $branch_id;
+                }
+                return null;
+            }
+
+            // Regular users need to be assigned to the branch
             $hasAccess = $user->branches()->where('branch_id', $branch_id)->exists();
 
             if ($hasAccess) {
-                session([$sessionKey => $branch_id]);
-
+                session()->put($sessionKey, $branch_id);
+                session()->save();
                 return $branch_id;
             }
 
@@ -159,7 +174,7 @@ if (! function_exists('user_branch')) {
         }
 
         // If getting the current branch
-        $currentBranch = session($sessionKey);
+        $currentBranch = session()->get($sessionKey);
 
         // If no branch is set in session, get the user's first active branch
         if (! $currentBranch) {
@@ -169,13 +184,23 @@ if (! function_exists('user_branch')) {
 
             if ($firstBranch) {
                 $currentBranch = $firstBranch->id;
-                session([$sessionKey => $currentBranch]);
+                session()->put($sessionKey, $currentBranch);
+                session()->save();
             } else {
                 // If no active branch, try to get any branch the user has access to
                 $anyBranch = $user->branches()->first();
                 if ($anyBranch) {
                     $currentBranch = $anyBranch->id;
-                    session([$sessionKey => $currentBranch]);
+                    session()->put($sessionKey, $currentBranch);
+                    session()->save();
+                } else {
+                    // Fallback: get the first branch in the database (for super admin or unassigned users)
+                    $fallbackBranch = \Polirium\Core\Base\Http\Models\Branch\Branch::first();
+                    if ($fallbackBranch) {
+                        $currentBranch = $fallbackBranch->id;
+                        session()->put($sessionKey, $currentBranch);
+                        session()->save();
+                    }
                 }
             }
         }

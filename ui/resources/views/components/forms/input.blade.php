@@ -19,7 +19,6 @@
     <input {{ $attributes->class([
         "form-control",
         'is-invalid'    => $errors->has($name),
-        'is-valid'      => !$errors->has($name),
     ]) }} />
 
 @if ($prepend || $append)

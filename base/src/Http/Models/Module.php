@@ -2,9 +2,9 @@
 
 namespace Polirium\Core\Base\Http\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Polirium\Core\Base\Http\Models\BaseModel;
 
-class Module extends Model
+class Module extends BaseModel
 {
     protected $fillable = [
         'name',

@@ -7,9 +7,9 @@ use Polirium\Core\Base\Http\Models\Branch\Branch;
 
 class SwitchBranchComponent extends Component
 {
-    public $branch_id = null;
+    public ?int $branch_id = null;
 
-    public $branches;
+    public $branches = [];
 
     public function mount()
     {
@@ -17,10 +17,18 @@ class SwitchBranchComponent extends Component
         $this->branch_id = user_branch();
     }
 
-    public function updatedBranchId()
+    public function updatedBranchId($value)
     {
-        user_branch($this->branch_id);
-        $this->dispatch('window-location-reload');
+        // Cast to int
+        $branchId = (int) $value;
+
+        // Save to session
+        $result = user_branch($branchId);
+
+        if ($result) {
+            // Reload page to apply new branch
+            $this->js('window.location.reload()');
+        }
     }
 
     public function render()

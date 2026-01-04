@@ -16,7 +16,7 @@
         @click="show = true"
         @blur="setTimeout(() => show = false, 200)"
     />
-    <div class="list-group list-group-flush bg-light position-absolute w-100" style="z-index: 1050;" x-show="show" x-cloak>
+    <div class="list-group list-group-flush bg-light position-absolute w-100 shadow custom-scrollbar" style="z-index: 1050; max-height: 300px; overflow-y: auto;" x-show="show" x-cloak>
         {{ $slot }}
     </div>
 </span>

@@ -7,5 +7,5 @@ Route::prefix(admin_prefix())
     ->middleware(['web', 'auth'])
     ->name('core.settings.')
     ->group(function () {
-        Route::get('settings', [SettingsController::class, 'index'])->name('index');
+        Route::get('settings', [SettingsController::class, 'index'])->name('index')->middleware('can:settings.index');
     });

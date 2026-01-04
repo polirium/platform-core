@@ -9,7 +9,7 @@
 ])
 
 @php
-    $ref = 'input_' . str_replace('.', '_', $name);
+    $ref = 'currency_' . str_replace('.', '_', $name);
 @endphp
 
 <x-form::input
@@ -20,19 +20,24 @@
     {{ $attributes }}
     x-ref="{{ $ref }}"
     x-init="
-        $($refs.{{ $ref }}).inputmask({
-            alias : 'numeric',
-            groupSeparator: '{{ $thousands_separator }}',
-            autoGroup: true,
-            digits: 0,
-            digitsOptional: false,
-            rightAlign: false,
-            removeMaskOnSubmit: true
-        })
-        .on('change', function (e) {
-            var val = Inputmask.unmask($refs.{{ $ref }}.value, { alias : 'numeric', digits: 0 });
-            $wire.set('{{ $name }}', val ? parseInt(val) : 0);
-        });
+        if (typeof $ !== 'undefined' && typeof Inputmask !== 'undefined') {
+            $($refs.{{ $ref }}).inputmask({
+                alias: 'numeric',
+                groupSeparator: '{{ $thousands_separator }}',
+                autoGroup: true,
+                digits: 0,
+                digitsOptional: false,
+                rightAlign: false,
+                removeMaskOnSubmit: true
+            })
+            .on('change', function(e) {
+                const val = Inputmask.unmask($refs.{{ $ref }}.value, { alias: 'numeric', digits: 0 });
+                const numVal = val ? parseInt(val) : 0;
+                if (typeof $wire !== 'undefined' && $wire) {
+                    $wire.set('{{ $name }}', numVal);
+                }
+            });
+        }
     "
 >
     @if ($append)

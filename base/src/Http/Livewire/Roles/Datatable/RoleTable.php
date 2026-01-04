@@ -80,17 +80,23 @@ final class RoleTable extends BaseTable
 
     public function actions(Role $row): array
     {
-        return [
-            Button::add('edit')
+        $actions = [];
+
+        if (auth()->user()->can('roles.edit')) {
+            $actions[] = Button::add('edit')
                 ->slot('<i class="ti ti-edit me-1"></i>' . __('Sửa'))
                 ->class('btn btn-sm btn-primary')
-                ->dispatch('show-modal-create-role', ['id' => $row->id]),
+                ->dispatch('show-modal-create-role', ['id' => $row->id]);
+        }
 
-            Button::add('delete')
+        if (auth()->user()->can('roles.delete')) {
+            $actions[] = Button::add('delete')
                 ->slot('<i class="ti ti-trash me-1"></i>' . __('Xóa'))
                 ->class('btn btn-sm btn-outline-danger')
-                ->dispatch('show-modal-delete-role', ['id' => $row->id]),
-        ];
+                ->dispatch('show-modal-delete-role', ['id' => $row->id]);
+        }
+
+        return $actions;
     }
 
     public function actionRules($row): array

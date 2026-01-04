@@ -12,16 +12,8 @@ return [
     [
         'id' => 'core',
         'name' => trans('Trang chủ'),
-        'route' => null,
-        'icon' => 'building',
-        'sort' => 0,
-    ],
-    [
-        'id' => 'core.dashboard',
-        'name' => trans('Trang chủ 2 2'),
         'route' => 'core.index',
-        'parent' => 'core',
-        'icon' => 'eye',
+        'icon' => 'home',
         'sort' => 0,
     ],
     /**
@@ -93,5 +85,13 @@ return [
         'route' => 'core.modules.index',
         'icon' => 'package',
         'sort' => 4,
+    ],
+    [
+        'id' => 'core.activity-logs',
+        'name' => trans('Lịch sử hoạt động'),
+        'parent' => 'core.setting',
+        'route' => 'core.activity-logs.index',
+        'icon' => 'activity',
+        'sort' => 5,
     ],
 ];

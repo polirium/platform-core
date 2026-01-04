@@ -168,21 +168,27 @@ final class UserTable extends BaseTable
 
     public function actions(User $row): array
     {
-        return [
-            Button::add('edit')
+        $actions = [];
+
+        if (auth()->user()->can('users.edit')) {
+            $actions[] = Button::add('edit')
                 ->slot('<i class="ti ti-edit me-1"></i>' . __('Sửa'))
                 ->id()
                 ->class('btn btn-sm btn-primary')
-                ->dispatch('show-modal-edit-user', ['id' => $row->id]),
+                ->dispatch('show-modal-edit-user', ['id' => $row->id]);
+        }
 
-            Button::add('delete')
+        if (auth()->user()->can('users.delete')) {
+            $actions[] = Button::add('delete')
                 ->slot('<i class="ti ti-trash me-1"></i>' . __('Xóa'))
                 ->id()
                 ->class('btn btn-sm btn-outline-danger')
                 ->attributes([
                     'onclick' => "Livewire.dispatch('show-modal-delete-user', {id: $row->id});",
-                ]),
-        ];
+                ]);
+        }
+
+        return $actions;
     }
 
     public function actionRules($row): array

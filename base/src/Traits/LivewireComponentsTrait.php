@@ -24,11 +24,19 @@ trait LivewireComponentsTrait
         $components = [];
 
         foreach (BaseHelper::scanFolder(platform_path($type)) as $module) {
-            $configuration = config(strtolower($type . '.' . $module . '.livewire'));
+            $key = strtolower($type . '.' . $module . '.livewire');
+            $configuration = config($key);
+
+            if (empty($configuration)) {
+                $configFile = platform_path($type . '/' . $module . '/config/livewire.php');
+                if (file_exists($configFile)) {
+                    $configuration = require $configFile;
+                }
+            }
 
             if (! empty($configuration)) {
-                foreach ($configuration as $key => $config) {
-                    $components[$key] = $config;
+                foreach ($configuration as $alias => $config) {
+                    $components[$alias] = $config;
                 }
             }
         }

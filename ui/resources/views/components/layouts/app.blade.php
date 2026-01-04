@@ -115,7 +115,7 @@
                     <div class="row g-2 align-items-center">
                         <div class="col">
                             <h2 class="page-title">
-                                {{ $title ?? 'Dashboard' }}
+                                {{ $title ?? page_title()->getTitle() ?? 'Dashboard' }}
                             </h2>
                             @if(isset($subtitle))
                                 <div class="text-secondary mt-1">{{ $subtitle }}</div>
