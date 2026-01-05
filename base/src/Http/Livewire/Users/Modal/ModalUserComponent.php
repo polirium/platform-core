@@ -9,6 +9,7 @@ use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Base\Http\Models\Role;
 use Polirium\Core\Base\Http\Models\User;
 use Polirium\Core\Base\Traits\GetPermission;
+use Spatie\Permission\Models\Permission;
 
 class ModalUserComponent extends Component
 {
@@ -18,7 +19,8 @@ class ModalUserComponent extends Component
     public array $list = [];
     public $role_ids = [];  // No type hint to allow normalization before type check
     public $branch_ids = [];  // No type hint to allow normalization before type check
-    public $permission_ids = [];  // No type hint to allow normalization before type check
+    public array $permission_ids = [];  // Direct permissions (used by checkbox wire:model)
+
     public ?int $user_id = null;
     public bool $isEdit = false;
     public string $modalTitle = '';
@@ -121,16 +123,14 @@ class ModalUserComponent extends Component
             $this->branch_ids = array_values(array_filter(array_map('intval', $this->branch_ids)));
         }
 
-        // Normalize permission_ids
-        if (!is_array($this->permission_ids)) {
-            if (is_string($this->permission_ids) && !empty($this->permission_ids)) {
-                $this->permission_ids = array_filter(explode(',', $this->permission_ids));
-            } else {
-                $this->permission_ids = [];
-            }
-        } else {
-            $this->permission_ids = array_values(array_filter($this->permission_ids));
+        // Normalize permission_ids – Livewire checkboxes already work with arrays,
+        // this is only a safety net to avoid null/string edge cases.
+        if (! is_array($this->permission_ids)) {
+            $this->permission_ids = empty($this->permission_ids)
+                ? []
+                : array_filter(explode(',', (string) $this->permission_ids));
         }
+        $this->permission_ids = array_values(array_filter($this->permission_ids));
     }
 
     public function render()
@@ -179,15 +179,6 @@ class ModalUserComponent extends Component
     public function updatedBranchIds($value)
     {
         $this->branch_ids = $this->normalizeArrayValue($value, true);
-    }
-
-    /**
-     * Normalize permission_ids to always be an array
-     * Component may send JSON string, comma-separated string, or array from frontend
-     */
-    public function updatedPermissionIds($value)
-    {
-        $this->permission_ids = $this->normalizeArrayValue($value, false);
     }
 
     /**
@@ -333,7 +324,14 @@ class ModalUserComponent extends Component
         // Ensure arrays are properly formatted before syncing
         $roleIds = is_array($this->role_ids) ? array_filter(array_map('intval', $this->role_ids)) : [];
         $branchIds = is_array($this->branch_ids) ? array_filter(array_map('intval', $this->branch_ids)) : [];
-        $permissionIds = is_array($this->permission_ids) ? array_filter($this->permission_ids) : [];
+        $permissionIds = is_array($this->permission_ids) ? array_values(array_filter($this->permission_ids)) : [];
+
+        \Log::info('User save sync data', [
+            'user_id' => $user->id ?? null,
+            'role_ids' => $roleIds,
+            'branch_ids' => $branchIds,
+            'permission_ids' => $permissionIds,
+        ]);
 
         // Sync roles
         if (!empty($roleIds)) {
@@ -352,7 +350,13 @@ class ModalUserComponent extends Component
 
         // Sync direct permissions (additional to role permissions)
         if (!empty($permissionIds)) {
-            $user->syncPermissions($permissionIds);
+            // Ensure all permissions exist in database before syncing
+            $permissionsToSync = [];
+            foreach ($permissionIds as $permissionName) {
+                $permission = Permission::updateOrCreate(['name' => $permissionName]);
+                $permissionsToSync[] = $permission->name;
+            }
+            $user->syncPermissions($permissionsToSync);
         } else {
             $user->syncPermissions([]);
         }
