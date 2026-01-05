@@ -7,6 +7,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | This option controls the dashboard menu.
+    | Add 'permission' key to control visibility based on user permissions.
+    | If 'permission' is not set, menu item is visible to all authenticated users.
     |
      */
     [
@@ -15,6 +17,7 @@ return [
         'route' => 'core.index',
         'icon' => 'home',
         'sort' => 0,
+        // No permission = visible to all
     ],
     /**
      * User Manager Menu
@@ -25,6 +28,7 @@ return [
         'route' => null,
         'icon' => 'eye',
         'sort' => 0,
+        'permission' => 'users.view',
     ],
     [
         'id' => 'core.user.manager',
@@ -33,6 +37,7 @@ return [
         'route' => 'core.users.index',
         'icon' => 'map-pins',
         'sort' => 1,
+        'permission' => 'users.view',
     ],
 
 
@@ -45,6 +50,7 @@ return [
         'route' => null,
         'icon' => 'settings',
         'sort' => 0,
+        // Parent menus are auto-hidden if no children are visible
     ],
     [
         'id' => 'core.setting-general',
@@ -53,6 +59,7 @@ return [
         'route' => 'core.settings.index',
         'icon' => 'settings-2',
         'sort' => 0,
+        'permission' => 'settings.view',
     ],
     [
         'id' => 'core.setting-brand',
@@ -61,6 +68,7 @@ return [
         'route' => 'core.brands.index',
         'icon' => 'star',
         'sort' => 1,
+        'permission' => 'brands.view',
     ],
     [
         'id' => 'core.setting-branch',
@@ -69,6 +77,7 @@ return [
         'route' => 'core.branches.index',
         'icon' => 'map-pins',
         'sort' => 2,
+        'permission' => 'branches.view',
     ],
     [
         'id' => 'core.setting-role',
@@ -77,6 +86,7 @@ return [
         'route' => 'core.roles.index',
         'icon' => 'user-check',
         'sort' => 3,
+        'permission' => 'roles.view',
     ],
     [
         'id' => 'core.setting-modules',
@@ -85,6 +95,7 @@ return [
         'route' => 'core.modules.index',
         'icon' => 'package',
         'sort' => 4,
+        'permission' => 'modules.view',
     ],
     [
         'id' => 'core.activity-logs',
@@ -93,5 +104,6 @@ return [
         'route' => 'core.activity-logs.index',
         'icon' => 'activity',
         'sort' => 5,
+        'permission' => 'activity-logs.view',
     ],
 ];

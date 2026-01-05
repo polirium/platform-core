@@ -62,7 +62,7 @@ class DashboardComponent extends Component
                 ];
             })->toArray();
         } else {
-            // Map DB fields to component expected format
+            // Map DB fields to component expected format (already ordered by 'order' from DB)
             $this->layout = collect($savedLayout)->map(function ($item) {
                 return [
                     'id' => $item['widget_id'],
@@ -71,7 +71,7 @@ class DashboardComponent extends Component
                     'w' => $item['width'] ?? 12,
                     'h' => $item['height'] ?? 2,
                 ];
-            })->sortBy('y')->values()->toArray();
+            })->values()->toArray();
         }
     }
 

@@ -15,6 +15,7 @@ class UserDashboardLayout extends BaseModel
     protected $table = 'user_dashboard_layouts';
 
     protected $fillable = [
+        'uuid',
         'user_id',
         'widget_id',
         'position_x',
@@ -53,7 +54,7 @@ class UserDashboardLayout extends BaseModel
             ->where('is_visible', true)
             ->orderBy('order')
             ->get()
-            ->keyBy('widget_id')
+            ->values()
             ->toArray();
     }
 

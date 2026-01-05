@@ -24,6 +24,8 @@ trait GetMenuDataTrait
             $menus = array_merge($menus, $this->getAvailableMenuForEachType($type));
         }
 
+        // Note: Permission filtering is now done in Menu component render
+        // because auth()->user() is not available during ServiceProvider boot
         return $menus;
     }
 
