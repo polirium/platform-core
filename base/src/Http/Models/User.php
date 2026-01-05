@@ -71,6 +71,8 @@ class User extends Authenticatable implements MustVerifyEmail
         $logOptions = new LogOptions();
         $logOptions->logAll();
         $logOptions->logOnlyDirty();
+        // Never log password for security reasons
+        $logOptions->logExcept(['password']);
 
         return $logOptions;
     }

@@ -17,6 +17,7 @@
 @if ($tomselect)
     {{-- Custom Alpine.js Select Component with hidden input for wire:model --}}
     @php
+        $isMultiple = $attributes->has('multiple') || str_contains($attributes->get('wire:model', ''), 'role_ids') || str_contains($attributes->get('wire:model', ''), 'branch_ids') || str_contains($attributes->get('wire:model', ''), 'permission_ids');
         $normalizedOptions = [];
         foreach ($options as $key => $item) {
             if (is_array($item)) {
@@ -38,21 +39,35 @@
             open: false,
             search: '',
             options: {{ json_encode($normalizedOptions) }},
-            selectedValue: '',
+            selectedValue: {{ $isMultiple ? '[]' : "''" }},
+            isMultiple: {{ $isMultiple ? 'true' : 'false' }},
 
             init() {
                 // Get initial value from hidden input (which has wire:model)
                 this.$nextTick(() => {
                     let hiddenVal = this.$refs.hiddenInput?.value;
                     if (hiddenVal !== undefined && hiddenVal !== null && hiddenVal !== '') {
-                        this.selectedValue = String(hiddenVal);
+                        if (this.isMultiple) {
+                            // Parse JSON array or comma-separated string
+                            try {
+                                this.selectedValue = JSON.parse(hiddenVal);
+                            } catch (e) {
+                                // If not JSON, try comma-separated
+                                this.selectedValue = hiddenVal ? hiddenVal.split(',').map(v => v.trim()) : [];
+                            }
+                        } else {
+                            this.selectedValue = String(hiddenVal);
+                        }
                     }
                 });
 
                 // Watch for external changes from Livewire
                 this.$watch('selectedValue', (newVal) => {
-                    if (this.$refs.hiddenInput && String(this.$refs.hiddenInput.value) !== String(newVal)) {
-                        this.$refs.hiddenInput.value = newVal;
+                    if (this.$refs.hiddenInput) {
+                        let valueToSet = this.isMultiple ? JSON.stringify(newVal) : String(newVal);
+                        if (String(this.$refs.hiddenInput.value) !== valueToSet) {
+                            this.$refs.hiddenInput.value = valueToSet;
+                        }
                     }
                 });
             },
@@ -65,20 +80,42 @@
             },
 
             get selectedLabel() {
-                let selected = this.options.find(opt => String(opt.id) === String(this.selectedValue));
-                return selected ? selected.label : '{{ trans('Chọn...') }}';
+                if (this.isMultiple) {
+                    if (this.selectedValue.length === 0) {
+                        return '{{ trans('Chọn...') }}';
+                    }
+                    let labels = this.selectedValue.map(id => {
+                        let opt = this.options.find(o => String(o.id) === String(id));
+                        return opt ? opt.label : id;
+                    });
+                    return labels.join(', ');
+                } else {
+                    let selected = this.options.find(opt => String(opt.id) === String(this.selectedValue));
+                    return selected ? selected.label : '{{ trans('Chọn...') }}';
+                }
             },
 
             select(id) {
-                this.selectedValue = String(id);
+                if (this.isMultiple) {
+                    let index = this.selectedValue.indexOf(String(id));
+                    if (index > -1) {
+                        this.selectedValue.splice(index, 1);
+                    } else {
+                        this.selectedValue.push(String(id));
+                    }
+                } else {
+                    this.selectedValue = String(id);
+                    this.open = false;
+                    this.search = '';
+                }
+                
                 if (this.$refs.hiddenInput) {
-                    this.$refs.hiddenInput.value = id;
+                    let valueToSet = this.isMultiple ? JSON.stringify(this.selectedValue) : this.selectedValue;
+                    this.$refs.hiddenInput.value = valueToSet;
                     // Dispatch both input and change events for Livewire compatibility
                     this.$refs.hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
                     this.$refs.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
                 }
-                this.open = false;
-                this.search = '';
             }
         }"
         @click.outside="open = false"
@@ -136,12 +173,12 @@
                         <a
                             href="javascript:void(0)"
                             class="dropdown-item d-flex justify-content-between align-items-center px-2 py-2"
-                            :class="selectedValue == '{{ $option['id'] }}' ? 'active' : ''"
+                            :class="isMultiple ? (selectedValue.includes('{{ $option['id'] }}') ? 'active' : '') : (selectedValue == '{{ $option['id'] }}' ? 'active' : '')"
                             x-show="search === '' || '{{ str_replace("'", "\'", strtolower($option['label'])) }}'.includes(search.toLowerCase())"
                             @click.stop="select('{{ $option['id'] }}')"
                         >
                             <span>{{ $option['label'] }}</span>
-                            <i x-show="selectedValue == '{{ $option['id'] }}'" class="ti ti-check fs-4"></i>
+                            <i x-show="isMultiple ? selectedValue.includes('{{ $option['id'] }}') : selectedValue == '{{ $option['id'] }}'" class="ti ti-check fs-4"></i>
                         </a>
                     @endforeach
                     <div x-show="options.filter(opt => opt.label.toLowerCase().includes(search.toLowerCase())).length === 0" class="p-2 text-center text-muted">

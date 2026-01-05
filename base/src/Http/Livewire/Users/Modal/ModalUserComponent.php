@@ -16,9 +16,9 @@ class ModalUserComponent extends Component
     use GetPermission;
 
     public array $list = [];
-    public array $role_ids = [];
-    public array $branch_ids = [];
-    public array $permission_ids = [];  // Direct permissions
+    public $role_ids = [];  // No type hint to allow normalization before type check
+    public $branch_ids = [];  // No type hint to allow normalization before type check
+    public $permission_ids = [];  // No type hint to allow normalization before type check
     public ?int $user_id = null;
     public bool $isEdit = false;
     public string $modalTitle = '';
@@ -63,6 +63,15 @@ class ModalUserComponent extends Component
         return $rules;
     }
 
+    /**
+     * Normalize array properties on every request
+     * This runs before Livewire processes properties
+     */
+    public function boot(): void
+    {
+        $this->normalizeArrays();
+    }
+
     public function mount(): void
     {
         $this->list['roles'] = Role::select(['id', 'name'])->pluck('name', 'id')->all();
@@ -79,6 +88,49 @@ class ModalUserComponent extends Component
         })->all();
         $this->list['permission_tree'] = $this->getPermissionTree($permissions);
         $this->list['permission_flags'] = $permissions;
+
+        // Ensure arrays are initialized
+        $this->normalizeArrays();
+    }
+
+    /**
+     * Normalize all array properties to ensure they are arrays
+     * Called on every request to handle string values from frontend
+     */
+    protected function normalizeArrays(): void
+    {
+        // Normalize role_ids
+        if (!is_array($this->role_ids)) {
+            if (is_string($this->role_ids) && !empty($this->role_ids)) {
+                $this->role_ids = array_map('intval', array_filter(explode(',', $this->role_ids)));
+            } else {
+                $this->role_ids = [];
+            }
+        } else {
+            $this->role_ids = array_values(array_filter(array_map('intval', $this->role_ids)));
+        }
+
+        // Normalize branch_ids
+        if (!is_array($this->branch_ids)) {
+            if (is_string($this->branch_ids) && !empty($this->branch_ids)) {
+                $this->branch_ids = array_map('intval', array_filter(explode(',', $this->branch_ids)));
+            } else {
+                $this->branch_ids = [];
+            }
+        } else {
+            $this->branch_ids = array_values(array_filter(array_map('intval', $this->branch_ids)));
+        }
+
+        // Normalize permission_ids
+        if (!is_array($this->permission_ids)) {
+            if (is_string($this->permission_ids) && !empty($this->permission_ids)) {
+                $this->permission_ids = array_filter(explode(',', $this->permission_ids));
+            } else {
+                $this->permission_ids = [];
+            }
+        } else {
+            $this->permission_ids = array_values(array_filter($this->permission_ids));
+        }
     }
 
     public function render()
@@ -103,7 +155,70 @@ class ModalUserComponent extends Component
     public function updatedUser($value, $key)
     {
         // This ensures Livewire properly tracks user data changes
-        \Log::info('User data updated:', ['key' => $key, 'value' => $value]);
+        // Never log sensitive information like passwords
+        if (in_array($key, ['password', 'password_confirmation'])) {
+            \Log::info('User data updated:', ['key' => $key, 'value' => '***REDACTED***']);
+        } else {
+            \Log::info('User data updated:', ['key' => $key, 'value' => $value]);
+        }
+    }
+
+    /**
+     * Normalize role_ids to always be an array
+     * Component may send JSON string, comma-separated string, or array from frontend
+     */
+    public function updatedRoleIds($value)
+    {
+        $this->role_ids = $this->normalizeArrayValue($value, true);
+    }
+
+    /**
+     * Normalize branch_ids to always be an array
+     * Component may send JSON string, comma-separated string, or array from frontend
+     */
+    public function updatedBranchIds($value)
+    {
+        $this->branch_ids = $this->normalizeArrayValue($value, true);
+    }
+
+    /**
+     * Normalize permission_ids to always be an array
+     * Component may send JSON string, comma-separated string, or array from frontend
+     */
+    public function updatedPermissionIds($value)
+    {
+        $this->permission_ids = $this->normalizeArrayValue($value, false);
+    }
+
+    /**
+     * Normalize a value to array
+     * @param mixed $value The value to normalize
+     * @param bool $convertToInt Whether to convert values to integers
+     * @return array
+     */
+    protected function normalizeArrayValue($value, bool $convertToInt = false): array
+    {
+        if (is_array($value)) {
+            $result = array_values(array_filter($value));
+            return $convertToInt ? array_map('intval', $result) : $result;
+        }
+        
+        if (is_string($value)) {
+            // Try to parse as JSON first (from updated component)
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $result = array_values(array_filter($decoded));
+                return $convertToInt ? array_map('intval', $result) : $result;
+            }
+            
+            // Fallback to comma-separated string
+            if (!empty($value)) {
+                $result = array_filter(explode(',', $value));
+                return $convertToInt ? array_map('intval', $result) : $result;
+            }
+        }
+        
+        return [];
     }
 
     #[On('show-modal-create-user')]
@@ -215,20 +330,29 @@ class ModalUserComponent extends Component
 
         $user->refresh();
 
+        // Ensure arrays are properly formatted before syncing
+        $roleIds = is_array($this->role_ids) ? array_filter(array_map('intval', $this->role_ids)) : [];
+        $branchIds = is_array($this->branch_ids) ? array_filter(array_map('intval', $this->branch_ids)) : [];
+        $permissionIds = is_array($this->permission_ids) ? array_filter($this->permission_ids) : [];
+
         // Sync roles
-        $roles = Role::whereIn('id', $this->role_ids)->pluck('name')->all();
-        $user->syncRoles($roles);
+        if (!empty($roleIds)) {
+            $roles = Role::whereIn('id', $roleIds)->pluck('name')->all();
+            $user->syncRoles($roles);
+        } else {
+            $user->syncRoles([]);
+        }
 
         // Sync branches
-        if (count($this->branch_ids) > 0) {
-            $user->branches()->sync($this->branch_ids);
+        if (!empty($branchIds)) {
+            $user->branches()->sync($branchIds);
         } else {
             $user->branches()->detach();
         }
 
         // Sync direct permissions (additional to role permissions)
-        if (count($this->permission_ids) > 0) {
-            $user->syncPermissions($this->permission_ids);
+        if (!empty($permissionIds)) {
+            $user->syncPermissions($permissionIds);
         } else {
             $user->syncPermissions([]);
         }
