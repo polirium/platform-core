@@ -149,7 +149,7 @@
                                                                         class="form-check-input"
                                                                         type="checkbox"
                                                                         value="{{ $permFlag }}"
-                                                                        wire:model.live="permission_ids"
+                                                                        wire:model="permission_ids"
                                                                         {{ $isFromRole ? 'disabled checked' : '' }}
                                                                     >
                                                                     <span class="form-check-label small">
