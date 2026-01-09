@@ -24,14 +24,18 @@ trait LivewireComponentsTrait
         $components = [];
 
         foreach (BaseHelper::scanFolder(platform_path($type)) as $module) {
-            $key = strtolower($type . '.' . $module . '.livewire');
-            $configuration = config($key);
+            $configuration = [];
 
+            // Always read from file first to get latest components
+            $configFile = platform_path($type . '/' . $module . '/config/livewire.php');
+            if (file_exists($configFile)) {
+                $configuration = require $configFile;
+            }
+
+            // Fallback to config if file doesn't exist
             if (empty($configuration)) {
-                $configFile = platform_path($type . '/' . $module . '/config/livewire.php');
-                if (file_exists($configFile)) {
-                    $configuration = require $configFile;
-                }
+                $key = strtolower($type . '.' . $module . '.livewire');
+                $configuration = config($key, []);
             }
 
             if (! empty($configuration)) {
