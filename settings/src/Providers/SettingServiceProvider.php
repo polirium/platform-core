@@ -26,7 +26,8 @@ class SettingServiceProvider extends PoliriumBaseServiceProvider
             ->loadConfigurations(['config', 'livewire'])
             ->loadMigrations()
             ->loadRoutes(['web'])
-            ->loadViews();
+            ->loadViews()
+            ->loadTranslations();
 
         $this->registerDefaultSettings();
     }

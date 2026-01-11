@@ -13,14 +13,28 @@
         "issues": "https://nghiane.com",
         "document": "https://nghiane.com"
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../packages/laravel-impersonate",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "require": {
+        "php": "^8.2",
+        "laravel/framework": "^10.0|^11.0|^12.0",
+        "livewire/livewire": "^3.4",
+        "davejamesmiller/laravel-breadcrumbs": "^5.0",
+        "kalnoy/nestedset": "^6.0",
+        "mcamara/laravel-localization": "^1.8 || ^2.0 || dev-master",
         "twig/twig": "^3.21",
         "doctrine/dbal": "^3.10",
         "aws/aws-sdk-php": "^3.356",
         "laravel/fortify": "^1.28",
         "laravel/horizon": "^5.33",
         "laravolt/avatar": "^6.1",
-        "livewire/livewire": "^3.6",
         "lavary/laravel-menu": "^1.8.4",
         "intervention/image": "^3.8",
         "openspout/openspout": "^4.30",
@@ -32,7 +46,8 @@
         "spatie/laravel-permission": "^6.21",
         "spatie/laravel-medialibrary": "^11.14",
         "power-components/livewire-powergrid": "^6.5",
-        "vigstudio/laravel-tabler-icons": "@dev"
+        "vigstudio/laravel-tabler-icons": "@dev",
+        "polirium/laravel-impersonate": "@dev"
     },
     "autoload": {
         "psr-4": {

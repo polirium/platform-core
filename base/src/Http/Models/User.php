@@ -11,6 +11,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Base\Http\Models\Traits\HasUuid;
+use Polirium\Impersonate\Models\Impersonate;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
@@ -23,6 +24,23 @@ class User extends Authenticatable implements MustVerifyEmail
     use LogsActivity;
     use HasUuid;
     use HasRoles;
+    use Impersonate;
+
+    /**
+     * @return bool
+     */
+    public function canImpersonate()
+    {
+        return $this->can('users.impersonate');
+    }
+
+    /**
+     * @return bool
+     */
+    public function canBeImpersonated()
+    {
+        return ! $this->super_admin;
+    }
 
     protected $fillable = [
         'username',

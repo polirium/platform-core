@@ -11,6 +11,7 @@ return [
     'users.create' => 'Thêm mới',
     'users.edit' => 'Chỉnh sửa',
     'users.delete' => 'Xóa',
+    'users.impersonate' => 'Đăng nhập (Impersonate)',
 
     // Roles
     'roles' => 'Quản lý vai trò',
@@ -42,4 +43,14 @@ return [
     'settings' => 'Cài đặt hệ thống',
     'settings.index' => 'Xem cài đặt',
     'settings.edit' => 'Chỉnh sửa cài đặt',
+
+    // Widgets
+    'widgets' => 'Quản lý Widget',
+    'widgets.index' => 'Xem danh sách Widget',
+    'widgets.manage' => 'Quản lý Widget (Thêm/Sửa/Xóa)',
+    'widgets.stats' => 'Widget Thống kê',
+    'widgets.welcome' => 'Widget Chào mừng',
+    'widgets.quick_access' => 'Widget Truy cập nhanh',
+    'widgets.revenue' => 'Widget Doanh thu',
+    'widgets.sales' => 'Widget Bán hàng',
 ];

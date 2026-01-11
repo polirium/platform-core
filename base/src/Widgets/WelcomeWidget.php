@@ -39,6 +39,13 @@ class WelcomeWidget extends AbstractWidget
         return 2;
     }
 
+    public static function getPermissions(): array
+    {
+        return [
+            'core/base::widgets.welcome'
+        ];
+    }
+
     protected static function getComponentName(): string
     {
         return 'core/base::widgets.welcome';

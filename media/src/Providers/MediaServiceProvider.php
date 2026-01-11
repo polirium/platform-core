@@ -23,6 +23,7 @@ class MediaServiceProvider extends PoliriumBaseServiceProvider
             ->loadConfigurations(['media', 'menu'])
             ->loadRoutes(['web', 'api'])
             ->loadViews()
+            ->loadTranslations()
             ->loadMigrations();
 
         // Load helpers

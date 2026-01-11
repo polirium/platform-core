@@ -45,6 +45,11 @@ return [
         'flag' => 'users.delete',
         'parent_flag' => 'users',
     ],
+    [
+        'name' => 'core/base::permission.users.impersonate',
+        'flag' => 'users.impersonate',
+        'parent_flag' => 'users',
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -174,5 +179,50 @@ return [
         'name' => 'core/base::permission.settings.edit',
         'flag' => 'settings.edit',
         'parent_flag' => 'settings',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Widgets Management
+    |--------------------------------------------------------------------------
+    */
+    [
+        'name' => 'core/base::permission.widgets',
+        'flag' => 'widgets',
+    ],
+    [
+        'name' => 'core/base::permission.widgets.index',
+        'flag' => 'widgets.index',
+        'parent_flag' => 'widgets',
+    ],
+    [
+        'name' => 'core/base::permission.widgets.manage',
+        'flag' => 'widgets.manage',
+        'parent_flag' => 'widgets',
+    ],
+    [
+        'name' => 'core/base::permission.widgets.stats',
+        'flag' => 'widgets.stats',
+        'parent_flag' => 'widgets',
+    ],
+    [
+        'name' => 'core/base::permission.widgets.welcome',
+        'flag' => 'widgets.welcome',
+        'parent_flag' => 'widgets',
+    ],
+    [
+        'name' => 'core/base::permission.widgets.quick_access',
+        'flag' => 'widgets.quick_access',
+        'parent_flag' => 'widgets',
+    ],
+    [
+        'name' => 'core/base::permission.widgets.revenue',
+        'flag' => 'widgets.revenue',
+        'parent_flag' => 'widgets',
+    ],
+    [
+        'name' => 'core/base::permission.widgets.sales',
+        'flag' => 'widgets.sales',
+        'parent_flag' => 'widgets',
     ],
 ];

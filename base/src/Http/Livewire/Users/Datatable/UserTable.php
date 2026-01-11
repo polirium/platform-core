@@ -188,6 +188,14 @@ final class UserTable extends BaseTable
                 ]);
         }
 
+        if (auth()->user()->can('users.impersonate') && $row->id !== auth()->id() && $row->canBeImpersonated()) {
+            $actions[] = Button::add('impersonate')
+                ->slot('<i class="ti ti-login me-1"></i>' . __('Đăng nhập'))
+                ->id()
+                ->class('btn btn-sm btn-outline-warning')
+                ->route('impersonate', ['id' => $row->id]);
+        }
+
         return $actions;
     }
 

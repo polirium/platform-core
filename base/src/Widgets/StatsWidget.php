@@ -41,6 +41,13 @@ class StatsWidget extends AbstractWidget
         return 1;
     }
 
+    public static function getPermissions(): array
+    {
+        return [
+            'core/base::widgets.stats'
+        ];
+    }
+
     protected static function getComponentName(): string
     {
         return 'core/base::widgets.stats';

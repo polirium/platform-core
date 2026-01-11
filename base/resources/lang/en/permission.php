@@ -11,6 +11,7 @@ return [
     'users.create' => 'Create',
     'users.edit' => 'Edit',
     'users.delete' => 'Delete',
+    'users.impersonate' => 'Login as User',
 
     // Roles
     'roles' => 'Role Management',
@@ -42,4 +43,14 @@ return [
     'settings' => 'System Settings',
     'settings.index' => 'View Settings',
     'settings.edit' => 'Edit Settings',
+
+    // Widgets
+    'widgets' => 'Widget Management',
+    'widgets.index' => 'View Widgets',
+    'widgets.manage' => 'Manage Widgets',
+    'widgets.stats' => 'Stats Widget',
+    'widgets.welcome' => 'Welcome Widget',
+    'widgets.quick_access' => 'Quick Access Widget',
+    'widgets.revenue' => 'Revenue Widget',
+    'widgets.sales' => 'Sales Widget',
 ];
