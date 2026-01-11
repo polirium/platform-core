@@ -7,6 +7,7 @@
   height: var(--#{$prefix}icon-size);
   font-size: var(--#{$prefix}icon-size);
   vertical-align: bottom;
+  color: currentColor; // Ensure icon inherits color from text utility classes
 
   @if $icon-stroke-width {
     stroke-width: $icon-stroke-width;
