@@ -76,7 +76,7 @@
                             <th>#</th>
                             <td>{{ $item->address }}, {{ $item->province?->name }} {{ $item->district?->name }}, {{ $item->ward?->name }} - {{ $item->phone }}</td>
                             <td>
-                                <button class="btn btn-warning" wire:click="$dispatch('show-modal-create-branch-taking-address', { branch_id: {{ $id }}, id: {{ $item->id }} })">{{ trans('Sửa') }}</button>
+                                <button class="btn btn-sm btn-warning" wire:click="$dispatch('show-modal-create-branch-taking-address', { branch_id: {{ $id }}, id: {{ $item->id }} })">{{ trans('Sửa') }}</button>
                             </td>
                         </tr>
                     @endforeach
@@ -86,23 +86,26 @@
             {{ $addresses->links() }}
         </x-ui::tab.item>
 
-        <br>
-
-        @if ($tab == 1)
-            <button @class([
-                "btn",
-                "btn-danger" => !$row->status,
-                "btn-success" => $row->status,
-            ]) wire:click="toggleActive({{ $id }}, '{{ $row->status ? 0 : 1 }}')">
-                {{ tabler_icon("lock") }}
-                @if ($row->status)
-                    {{ trans('Hoạt động') }}
-                @else
-                    {{ trans('Ngưng hoạt động') }}
-                @endif
-            </button>
-        @elseif ($tab == 3)
-            <button class="btn btn-success" wire:click="$dispatch('show-modal-create-branch-taking-address', { branch_id: {{ $id }} })">{{ trans('Thêm địa chỉ') }}</button>
-        @endif
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            @if ($tab == 1)
+                <button @class([
+                    "btn btn-sm",
+                    "btn-outline-danger" => !$row->status,
+                    "btn-outline-success" => $row->status,
+                ]) wire:click="toggleActive({{ $id }}, '{{ $row->status ? 0 : 1 }}')">
+                    {!! tabler_icon("lock", ['class' => 'icon']) !!}
+                    @if ($row->status)
+                        {{ trans('Hoạt động') }}
+                    @else
+                        {{ trans('Ngưng hoạt động') }}
+                    @endif
+                </button>
+            @elseif ($tab == 3)
+                <button class="btn btn-sm btn-success" wire:click="$dispatch('show-modal-create-branch-taking-address', { branch_id: {{ $id }} })">
+                    {!! tabler_icon("plus", ['class' => 'icon']) !!}
+                    {{ trans('Thêm địa chỉ') }}
+                </button>
+            @endif
+        </div>
     </x-ui::tab>
 </div>

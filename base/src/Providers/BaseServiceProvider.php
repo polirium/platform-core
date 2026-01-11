@@ -33,7 +33,7 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
         });
 
         Config::set('auth.providers.users.model', \Polirium\Core\Base\Http\Models\User::class);
-        Config::set('livewire-powergrid.theme', \PowerComponents\LivewirePowerGrid\Themes\Bootstrap5::class);
+        Config::set('polirium-datatable.theme', \Polirium\Datatable\Themes\Tabler::class);
 
         $this->commands([
             \Polirium\Core\Base\Commands\InstallCommand::class,
@@ -137,7 +137,7 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
     protected function setConfigurations()
     {
         Config::set('auth.providers.users.model', \Polirium\Core\Base\Http\Models\User::class);
-        Config::set('livewire-powergrid.theme', \PowerComponents\LivewirePowerGrid\Themes\Bootstrap5::class);
+        Config::set('polirium-datatable.theme', \Polirium\Datatable\Themes\Tabler::class);
     }
 
     protected function registerModules()

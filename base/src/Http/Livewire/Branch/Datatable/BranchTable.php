@@ -5,12 +5,12 @@ namespace Polirium\Core\Base\Http\Livewire\Branch\Datatable;
 use Illuminate\Database\Eloquent\Builder;
 use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
-use PowerComponents\LivewirePowerGrid\Button;
-use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
-use PowerComponents\LivewirePowerGrid\Facades\Filter;
-use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
+use Polirium\Datatable\Button;
+use Polirium\Datatable\Column;
+use Polirium\Datatable\Components\SetUp\Exportable;
+use Polirium\Datatable\Facades\Filter;
+use Polirium\Datatable\Facades\PowerGrid;
+use Polirium\Datatable\PowerGridFields;
 
 final class BranchTable extends BaseTable
 {

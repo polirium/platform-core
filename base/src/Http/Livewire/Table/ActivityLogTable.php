@@ -5,10 +5,10 @@ namespace Polirium\Core\Base\Http\Livewire\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
 use Spatie\Activitylog\Models\Activity;
-use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
-use PowerComponents\LivewirePowerGrid\Facades\Filter;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
+use Polirium\Datatable\Column;
+use Polirium\Datatable\Facades\PowerGrid;
+use Polirium\Datatable\Facades\Filter;
+use Polirium\Datatable\PowerGridFields;
 
 final class ActivityLogTable extends BaseTable
 {

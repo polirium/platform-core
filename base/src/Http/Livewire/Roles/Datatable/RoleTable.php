@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\Blade;
 use Polirium\Core\Base\Http\Models\Role;
 use Polirium\Core\Base\Http\Models\User;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
-use PowerComponents\LivewirePowerGrid\Button;
-use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
-use PowerComponents\LivewirePowerGrid\Facades\Filter;
-use PowerComponents\LivewirePowerGrid\Facades\PowerGrid;
-use PowerComponents\LivewirePowerGrid\Facades\Rule;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
-use PowerComponents\LivewirePowerGrid\Traits\WithExport;
+use Polirium\Datatable\Button;
+use Polirium\Datatable\Column;
+use Polirium\Datatable\Components\SetUp\Exportable;
+use Polirium\Datatable\Facades\Filter;
+use Polirium\Datatable\Facades\PowerGrid;
+use Polirium\Datatable\Facades\Rule;
+use Polirium\Datatable\PowerGridFields;
+use Polirium\Datatable\Traits\WithExport;
 
 final class RoleTable extends BaseTable
 {

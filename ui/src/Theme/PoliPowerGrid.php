@@ -2,41 +2,52 @@
 
 namespace Polirium\Core\UI\Theme;
 
-use PowerComponents\LivewirePowerGrid\Themes\Theme;
+use Polirium\Datatable\Themes\Theme;
 
 class PoliPowerGrid extends Theme
 {
-    public string $name = 'bootstrap5';
+    public string $name = 'tabler';
+
+    public function layout(): array
+    {
+        return [
+            'table' => $this->root().'.table-base',
+            'table-content' => $this->root().'.table',
+            'header' => $this->root().'.header',
+            'pagination' => $this->root().'.pagination',
+            'footer' => $this->root().'.footer',
+        ];
+    }
 
     public function table(): array
     {
         return [
             'layout' => [
-                'base'      => 'pt-3 px-sm-3 px-lg-5 align-middle d-inline-block',
-                'div'       => 'table-responsive col-md-12 my-2 mx-0',
-                'table'     => 'table-hover table-striped table-bordered w-100',
-                'container' => 'my-0 mx-sm-n1 mx-lg-n3 overflow-x-auto',
-                'actions'   => 'd-flex gap-1',
+                'base' => 'card',
+                'div' => 'table-responsive',
+                'table' => 'table table-vcenter text-nowrap datatable',
+                'container' => 'card-table',
+                'actions' => 'd-flex gap-2',
             ],
 
             'header' => [
-                'thead'    => '',
-                'tr'       => '',
-                'th'       => 'fw-bold text-secondary small py-2',
+                'thead' => '',
+                'tr' => '',
+                'th' => 'text-nowrap',
                 'thAction' => '',
             ],
 
             'body' => [
-                'tbody'              => 'table-group-divider',
-                'tbodyEmpty'         => '',
-                'tr'                 => '',
-                'td'                 => 'align-middle px-3 py-2 lh-sm',
-                'tdEmpty'            => 'p-2',
-                'tdSummarize'        => 'text-dark-emphasis small px-3 py-2 lh-sm',
-                'trSummarize'        => '',
-                'tdFilters'          => '',
-                'trFilters'          => '',
-                'tdActionsContainer' => 'd-flex gap-1',
+                'tbody' => '',
+                'tbodyEmpty' => '',
+                'tr' => '',
+                'td' => '',
+                'tdEmpty' => 'p-2 text-nowrap',
+                'tdSummarize' => 'text-dark-emphasis small px-3 py-2 lh-sm',
+                'trSummarize' => '',
+                'tdFilters' => '',
+                'trFilters' => '',
+                'tdActionsContainer' => 'text-end',
             ],
         ];
     }
@@ -44,16 +55,16 @@ class PoliPowerGrid extends Theme
     public function cols(): array
     {
         return [
-            'div' => '',
+            'div' => 'd-flex align-items-center gap-1',
         ];
     }
 
     public function footer(): array
     {
         return [
-            'view'                   => $this->root() . '.footer',
-            'select'                 => '',
-            'footer'                 => 'mt-50 pb-1 w-100 align-items-end px-1 d-flex flex-wrap justify-content-sm-center justify-content-md-between',
+            'view' => $this->root().'.footer',
+            'select' => 'form-select form-select-sm w-auto',
+            'footer' => 'card-footer',
             'footer_with_pagination' => '',
         ];
     }
@@ -61,37 +72,37 @@ class PoliPowerGrid extends Theme
     public function toggleable(): array
     {
         return [
-            'view'  => $this->root() . '.toggleable',
-            'base'  => 'form-check form-switch',
+            'view' => $this->root().'.toggleable',
+            'base' => 'form-check form-switch',
             'label' => 'form-check-label',
             'input' => 'form-check-input',
-            'role'  => 'switch',
+            'role' => 'switch',
         ];
     }
 
     public function editable(): array
     {
         return [
-            'view'  => $this->root() . '.editable',
-            'input' => 'form-control',
+            'view' => $this->root().'.editable',
+            'input' => 'form-control form-control-sm',
         ];
     }
 
     public function checkbox(): array
     {
         return [
-            'th'    => 'fs-6 text-center',
-            'base'  => 'form-check',
+            'th' => 'w-1',
+            'base' => 'form-check',
             'label' => 'form-check-label',
-            'input' => 'form-check-input',
+            'input' => 'form-check-input m-0 align-middle',
         ];
     }
 
     public function radio(): array
     {
         return [
-            'th'    => '',
-            'base'  => 'form-check',
+            'th' => '',
+            'base' => 'form-check',
             'label' => 'form-check-label',
             'input' => 'form-check-input',
         ];
@@ -100,63 +111,63 @@ class PoliPowerGrid extends Theme
     public function filterBoolean(): array
     {
         return [
-            'view'   => $this->root() . '.filters.boolean',
-            'base'   => '',
-            'select' => 'form-control form-select form-select-sm',
+            'view' => $this->root().'.filters.boolean',
+            'base' => '',
+            'select' => 'form-select form-select-sm',
         ];
     }
 
     public function filterDatePicker(): array
     {
         return [
-            'base'  => '',
-            'view'  => $this->root() . '.filters.date-picker',
-            'input' => 'form-control form-control-sm',
+            'base' => '',
+            'view' => $this->root().'.filters.date-picker',
+            'input' => 'form-control form-control-sm flatpickr-input',
         ];
     }
 
     public function filterMultiSelect(): array
     {
         return [
-            'view'   => $this->root() . '.filters.multi-select',
-            'base'   => '',
-            'select' => 'form-control form-select form-select-sm',
+            'view' => $this->root().'.filters.multi-select',
+            'base' => '',
+            'select' => 'form-select form-select-sm',
         ];
     }
 
     public function filterNumber(): array
     {
         return [
-            'view'  => $this->root() . '.filters.number',
-            'input' => 'form-control form-control-sm text-12',
+            'view' => $this->root().'.filters.number',
+            'input' => 'form-control form-control-sm',
         ];
     }
 
     public function filterSelect(): array
     {
         return [
-            'view'   => $this->root() . '.filters.select',
-            'base'   => '',
-            'select' => 'form-control form-select-sm form-select',
+            'view' => $this->root().'.filters.select',
+            'base' => '',
+            'select' => 'form-select form-select-sm',
         ];
     }
 
     public function filterInputText(): array
     {
         return [
-            'view'   => $this->root() . '.filters.input-text',
-            'base'   => '',
-            'select' => 'form-control form-select-sm mb-1 form-select',
-            'input'  => 'form-control form-control-sm',
+            'view' => $this->root().'.filters.input-text',
+            'base' => '',
+            'select' => 'form-select form-select-sm mb-1',
+            'input' => 'form-control form-control-sm',
         ];
     }
 
     public function searchBox(): array
     {
         return [
-            'input'      => 'col-12 col-sm-8 form-control',
-            'iconSearch' => 'bi bi-search',
-            'iconClose'  => '',
+            'input' => 'form-control form-control-sm',
+            'iconSearch' => 'icon',
+            'iconClose' => 'icon',
         ];
     }
 }

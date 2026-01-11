@@ -21,7 +21,7 @@ export * as tabler from './src/tabler'
 
 
 //Polirium Core
-import '../../../../../../vendor/power-components/livewire-powergrid/dist/powergrid'
+import '../../../../../../vendor/polirium/datatable/dist/powergrid'
 import 'flatpickr'
 import 'tom-select'
 import 'autonumeric'

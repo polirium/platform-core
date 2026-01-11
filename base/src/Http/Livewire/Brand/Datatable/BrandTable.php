@@ -5,14 +5,14 @@ namespace Polirium\Core\Base\Http\Livewire\Brand\Datatable;
 use Illuminate\Database\Eloquent\Builder;
 use Polirium\Core\Base\Http\Models\Brand\Brand;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
-use PowerComponents\LivewirePowerGrid\Button;
-use PowerComponents\LivewirePowerGrid\Column;
-use PowerComponents\LivewirePowerGrid\Components\SetUp\Detail;
-use PowerComponents\LivewirePowerGrid\Components\SetUp\Exportable;
-use PowerComponents\LivewirePowerGrid\Facades\Filter;
-use PowerComponents\LivewirePowerGrid\Components\SetUp\Footer;
-use PowerComponents\LivewirePowerGrid\Components\SetUp\Header;
-use PowerComponents\LivewirePowerGrid\PowerGridFields;
+use Polirium\Datatable\Button;
+use Polirium\Datatable\Column;
+use Polirium\Datatable\Components\SetUp\Detail;
+use Polirium\Datatable\Components\SetUp\Exportable;
+use Polirium\Datatable\Facades\Filter;
+use Polirium\Datatable\Components\SetUp\Footer;
+use Polirium\Datatable\Components\SetUp\Header;
+use Polirium\Datatable\PowerGridFields;
 
 final class BrandTable extends BaseTable
 {
