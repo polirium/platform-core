@@ -57,18 +57,18 @@ class DashboardComponent extends Component
                     'id' => $widget['id'],
                     'x' => 0,
                     'y' => $index,
-                    'w' => $widget['default_width'] ?? 12,
+                    'w' => $widget['default_width'] ?? 6,
                     'h' => $widget['default_height'] ?? 2,
                 ];
             })->toArray();
         } else {
-            // Map DB fields to component expected format (already ordered by 'order' from DB)
+            // Map DB fields to component expected format
             $this->layout = collect($savedLayout)->map(function ($item) {
                 return [
                     'id' => $item['widget_id'],
                     'x' => $item['position_x'] ?? 0,
                     'y' => $item['position_y'] ?? 0,
-                    'w' => $item['width'] ?? 12,
+                    'w' => $item['width'] ?? 6,
                     'h' => $item['height'] ?? 2,
                 ];
             })->values()->toArray();
@@ -102,6 +102,7 @@ class DashboardComponent extends Component
     public function toggleEditMode(): void
     {
         $this->editMode = true;
+        $this->dispatch('editModeChanged', editMode: true);
     }
 
     /**
@@ -111,6 +112,8 @@ class DashboardComponent extends Component
     {
         $this->editMode = false;
         $this->loadUserLayout();
+        $this->dispatch('editModeChanged', editMode: false);
+        $this->dispatch('layoutUpdated');
     }
 
     /**
@@ -124,13 +127,19 @@ class DashboardComponent extends Component
             return;
         }
 
+        // Find the next available Y position
+        $maxY = collect($this->layout)->max('y') ?? -1;
+
         $this->layout[] = [
             'id' => $widgetId,
             'x' => 0,
-            'y' => count($this->layout),
+            'y' => $maxY + 1,
             'w' => $widget['default_width'] ?? 6,
             'h' => $widget['default_height'] ?? 2,
         ];
+
+        // Dispatch event to refresh grid
+        $this->dispatch('layoutUpdated');
     }
 
     /**
@@ -141,6 +150,9 @@ class DashboardComponent extends Component
         $this->layout = array_values(
             array_filter($this->layout, fn($item) => $item['id'] !== $widgetId)
         );
+
+        // Dispatch event to refresh grid
+        $this->dispatch('layoutUpdated');
     }
 
     /**
@@ -198,6 +210,25 @@ class DashboardComponent extends Component
     }
 
     /**
+     * Update order from drag-drop (wire:sortable)
+     */
+    public function updateOrder(array $items): void
+    {
+        $orderedLayout = [];
+
+        foreach ($items as $item) {
+            $widgetId = $item['value'];
+            $existingItem = collect($this->layout)->firstWhere('id', $widgetId);
+
+            if ($existingItem) {
+                $orderedLayout[] = $existingItem;
+            }
+        }
+
+        $this->layout = $orderedLayout;
+    }
+
+    /**
      * Save layout
      */
     public function saveLayout(): void
@@ -205,6 +236,7 @@ class DashboardComponent extends Component
         UserDashboardLayout::saveLayoutForUser(auth()->id(), $this->layout);
         $this->editMode = false;
 
+        $this->dispatch('editModeChanged', editMode: false);
         $this->dispatch('notify', [
             'type' => 'success',
             'message' => __('Đã lưu bố cục dashboard'),
