@@ -21,7 +21,8 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
             ->loadViews()
             ->loadTranslations()
             ->loadRoutes(['web', 'api', 'auth'])
-            ->loadMigrations();
+            ->loadMigrations()
+            ->publishAssets();
 
         $this->app->register(FortifyServiceProvider::class);
         $this->app->register(AuthServiceProvider::class);

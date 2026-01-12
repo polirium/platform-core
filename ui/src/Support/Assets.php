@@ -3,61 +3,215 @@
 namespace Polirium\Core\UI\Support;
 
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 class Assets
 {
-    protected $css = [];
+    /**
+     * Đã load config chưa
+     */
+    protected bool $configLoaded = false;
 
-    protected $js = [];
+    /**
+     * Các assets cơ bản (luôn được load)
+     */
+    protected array $css = [];
 
-    protected $optionalCss = [];
+    protected array $js = [];
 
-    protected $optionalJs = [];
+    /**
+     * Các assets tùy chọn (chỉ load khi được yêu cầu)
+     */
+    protected array $optionalCss = [];
 
-    protected $loadedOptionalCss = [];
+    protected array $optionalJs = [];
 
-    protected $loadedOptionalJs = [];
+    /**
+     * Danh sách các assets tùy chọn đã được kích hoạt để load
+     */
+    protected array $loadedOptionalCss = [];
+
+    protected array $loadedOptionalJs = [];
+
+    /**
+     * Đường dẫn base cho assets
+     */
+    protected string $basePath = 'vendor/polirium';
 
     public function __construct()
     {
-        $this->css = $this->getOption('css', []);
-        $this->js = $this->getOption('js', []);
-        $this->optionalCss = $this->getOption('optional.css', []);
-        $this->optionalJs = $this->getOption('optional.js', []);
+        // Don't load config in constructor - lazy load when needed
     }
 
-    public function getOption(string $key, string|array $default = null): string|array
+    /**
+     * Load configuration from config file (lazy load)
+     */
+    protected function loadConfig(): void
     {
-        return config('core.ui.assets.' . $key, $default);
+        if ($this->configLoaded) {
+            return;
+        }
+
+        $config = config('core.ui.assets', []);
+
+        $this->css = $config['css'] ?? [];
+        $this->js = $config['js'] ?? [];
+        $this->optionalCss = $config['optional']['css'] ?? [];
+        $this->optionalJs = $config['optional']['js'] ?? [];
+
+        $this->configLoaded = true;
     }
 
-    public function get(?string $path): string
+    /**
+     * Load assets from modules (via PackageManifest)
+     *
+     * @note: Reserved for future use when modules declare assets in composer.json
+     * Currently modules should register assets in their ServiceProvider
+     */
+    protected function loadModuleAssets(): void
     {
-        return asset('vendor/polirium/' . $path);
+        // TODO: Auto-discover assets from module composer.json
+        // Currently modules should register assets in their ServiceProvider
+
+        // Example composer.json structure:
+        // "extra": {
+        //     "polirium": {
+        //         "assets": {
+        //             "css": ["css/module.css"],
+        //             "optional": {
+        //                 "js": ["feature" => "js/feature.js"]
+        //             }
+        //         }
+        //     }
+        // }
     }
 
-    public function addCss(array $assets): self
+    /**
+     * Get full URL for an asset
+     *
+     * @param string $path Relative path to asset
+     * @return string Full URL to asset
+     */
+    public function get(string $path): string
     {
-        $this->css = array_merge($this->css, $assets);
-
-        return $this;
+        return asset($this->basePath . '/' . ltrim($path, '/'));
     }
 
-    public function addJs(array $assets): self
+    /**
+     * Add CSS to base assets (always loaded)
+     *
+     * @param array $assets Array of assets ['key' => 'path'] or ['path1', 'path2']
+     * @return static
+     *
+     * @example
+     * // Add with key
+     * Assets::addCss(['custom' => 'modules/my/css/custom.css'])
+     *
+     * // Add multiple (auto-generate key)
+     * Assets::addCss(['modules/my/css/style.css', 'modules/my/css/theme.css'])
+     */
+    public function addCss(array $assets): static
     {
-        $this->js = array_merge($this->js, $assets);
+        $this->loadConfig();
+        $this->css = array_merge($this->css, $this->normalizeAssets($assets));
 
         return $this;
     }
 
     /**
-     * Load một CSS asset tùy chọn theo tên
+     * Thêm JS vào danh sách JS cơ bản
      *
-     * @param string|array $names Tên asset hoặc mảng các tên
-     * @return self
+     * @param array $assets Mảng assets ['key' => 'path'] hoặc ['path1', 'path2']
+     * @return static
+     *
+     * @example
+     * Assets::addJs(['custom' => 'modules/my/js/custom.js'])
      */
-    public function loadCss(string|array $names): self
+    public function addJs(array $assets): static
     {
+        $this->loadConfig();
+        $this->js = array_merge($this->js, $this->normalizeAssets($assets));
+
+        return $this;
+    }
+
+    /**
+     * Chuẩn hóa mảng assets để đảm bảo có key
+     */
+    protected function normalizeAssets(array $assets): array
+    {
+        $normalized = [];
+
+        foreach ($assets as $key => $value) {
+            if (is_int($key)) {
+                // Nếu key là số, tự sinh key từ path
+                $normalized[Str::slug(basename($value, '.css'), '_') . '_' . Str::random(4)] = $value;
+            } else {
+                $normalized[$key] = $value;
+            }
+        }
+
+        return $normalized;
+    }
+
+    /**
+     * Add optional CSS (only loaded when requested)
+     *
+     * @param array $assets Array of assets ['key' => 'path']
+     * @return static
+     *
+     * @example
+     * // In ServiceProvider
+     * Assets::addOptionalCss([
+     *     'dashboard' => 'modules/dashboard/css/dashboard.css',
+     *     'chart' => 'core/ui/libs/chartjs/chart.css',
+     * ]);
+     */
+    public function addOptionalCss(array $assets): static
+    {
+        $this->loadConfig();
+        $this->optionalCss = array_merge($this->optionalCss, $assets);
+
+        return $this;
+    }
+
+    /**
+     * Add optional JS (only loaded when requested)
+     *
+     * @param array $assets Array of assets ['key' => 'path']
+     * @return static
+     *
+     * @example
+     * Assets::addOptionalJs([
+     *     'chartjs' => 'core/ui/libs/chartjs/chart.min.js',
+     *     'sortable' => 'core/base/js/vendor/sortable.min.js',
+     * ]);
+     */
+    public function addOptionalJs(array $assets): static
+    {
+        $this->loadConfig();
+        $this->optionalJs = array_merge($this->optionalJs, $assets);
+
+        return $this;
+    }
+
+    /**
+     * Activate CSS loading (mark for rendering)
+     *
+     * @param string|array $names Asset name or array of names
+     * @return static
+     *
+     * @example
+     * // In Blade view
+     * @php
+     *     Assets::loadCss('dashboard');
+     *     // or load multiple
+     *     Assets::loadCss(['dashboard', 'chart']);
+     * @endphp
+     */
+    public function loadCss(string|array $names): static
+    {
+        $this->loadConfig();
         $names = is_array($names) ? $names : [$names];
 
         foreach ($names as $name) {
@@ -70,13 +224,17 @@ class Assets
     }
 
     /**
-     * Load một JS asset tùy chọn theo tên
+     * Activate JS loading (mark for rendering)
      *
-     * @param string|array $names Tên asset hoặc mảng các tên
-     * @return self
+     * @param string|array $names Asset name or array of names
+     * @return static
+     *
+     * @example
+     * Assets::loadJs(['sortable', 'dashboard']);
      */
-    public function loadJs(string|array $names): self
+    public function loadJs(string|array $names): static
     {
+        $this->loadConfig();
         $names = is_array($names) ? $names : [$names];
 
         foreach ($names as $name) {
@@ -88,103 +246,197 @@ class Assets
         return $this;
     }
 
+    /**
+     * Render all CSS tags (base + loaded optional)
+     */
     public function renderCss(): HtmlString
     {
-        $cssBase = $this->css;
+        $this->loadConfig();
         $html = '';
 
-        // Thêm các CSS tùy chọn đã được load
-        $optionalCss = [];
-        foreach ($this->loadedOptionalCss as $name) {
-            if (isset($this->optionalCss[$name])) {
-                $optionalCss[$name] = $this->optionalCss[$name];
-            }
-        }
-
-        $allCss = array_merge($cssBase, $optionalCss);
+        // Merge base CSS + loaded optional CSS
+        $allCss = array_merge($this->css, $this->getLoadedOptionalCss());
 
         foreach ($allCss as $css) {
-            $html .= "<link href='" . $this->get($css) . "' rel='stylesheet' />";
+            $html .= sprintf('<link href="%s" rel="stylesheet" />', $this->get($css)) . PHP_EOL;
         }
 
         return new HtmlString($html);
     }
 
+    /**
+     * Render all JS tags (base + loaded optional)
+     */
     public function renderJs(): HtmlString
     {
-        $jsBase = $this->js;
+        $this->loadConfig();
         $html = '';
 
-        // Thêm các JS tùy chọn đã được load
-        $optionalJs = [];
-        foreach ($this->loadedOptionalJs as $name) {
-            if (isset($this->optionalJs[$name])) {
-                $optionalJs[$name] = $this->optionalJs[$name];
+        // Merge base JS + loaded optional JS
+        $allJs = array_merge($this->js, $this->getLoadedOptionalJs());
+
+        foreach ($allJs as $js) {
+            $html .= sprintf('<script src="%s"></script>', $this->get($js)) . PHP_EOL;
+        }
+
+        return new HtmlString($html);
+    }
+
+    /**
+     * Get list of loaded optional CSS
+     */
+    protected function getLoadedOptionalCss(): array
+    {
+        $css = [];
+
+        foreach ($this->loadedOptionalCss as $name) {
+            if (isset($this->optionalCss[$name])) {
+                $css[$name] = $this->optionalCss[$name];
             }
         }
 
-        $allJs = array_merge($jsBase, $optionalJs);
+        return $css;
+    }
 
-        foreach ($allJs as $js) {
-            $html .= "<script src='" . $this->get($js) . "'></script>";
+    /**
+     * Get list of loaded optional JS
+     */
+    protected function getLoadedOptionalJs(): array
+    {
+        $js = [];
+
+        foreach ($this->loadedOptionalJs as $name) {
+            if (isset($this->optionalJs[$name])) {
+                $js[$name] = $this->optionalJs[$name];
+            }
         }
 
-        return new HtmlString($html);
+        return $js;
     }
 
     /**
-     * Thêm optional CSS assets
+     * Add assets from module (legacy method - backward compatibility)
      *
-     * @param array $assets Mảng assets [key => path]
-     * @return self
-     */
-    public function addOptionalCss(array $assets): self
-    {
-        $this->optionalCss = array_merge($this->optionalCss, $assets);
-
-        return $this;
-    }
-
-    /**
-     * Thêm optional JS assets
+     * @param array $assets Array of assets ['css' => [], 'js' => [], 'optional' => ['css' => [], 'js' => []]]
+     * @return static
      *
-     * @param array $assets Mảng assets [key => path]
-     * @return self
+     * @deprecated Use addCss(), addJs(), addOptionalCss(), addOptionalJs() directly instead
      */
-    public function addOptionalJs(array $assets): self
+    public function addModuleAssets(array $assets): static
     {
-        $this->optionalJs = array_merge($this->optionalJs, $assets);
-
-        return $this;
-    }
-
-    /**
-     * Thêm assets từ module khác
-     *
-     * @param array $assets Mảng assets theo cấu trúc ['css' => [], 'js' => [], 'optional' => ['css' => [], 'js' => []]]
-     * @return self
-     */
-    public function addModuleAssets(array $assets): self
-    {
-        // Thêm CSS cơ bản
         if (isset($assets['css']) && is_array($assets['css'])) {
             $this->addCss($assets['css']);
         }
 
-        // Thêm JS cơ bản
         if (isset($assets['js']) && is_array($assets['js'])) {
             $this->addJs($assets['js']);
         }
 
-        // Thêm optional CSS
         if (isset($assets['optional']['css']) && is_array($assets['optional']['css'])) {
             $this->addOptionalCss($assets['optional']['css']);
         }
 
-        // Thêm optional JS
         if (isset($assets['optional']['js']) && is_array($assets['optional']['js'])) {
             $this->addOptionalJs($assets['optional']['js']);
         }
+
+        return $this;
+    }
+
+    /**
+     * Register assets for a module
+     *
+     * @param string $module Module name (e.g., 'accounting', 'product')
+     * @param array $assets Array of assets
+     * @return static
+     *
+     * @example
+     * Assets::registerModuleAssets('accounting', [
+     *     'css' => ['modules/accounting/css/accounting.css'],
+     *     'optional' => [
+     *         'js' => ['invoice' => 'modules/accounting/js/invoice.js'],
+     *     ],
+     * ]);
+     */
+    public function registerModuleAssets(string $module, array $assets): static
+    {
+        // Add module prefix to paths if not present
+        $assets = $this->prefixModulePaths($module, $assets);
+
+        return $this->addModuleAssets($assets);
+    }
+
+    /**
+     * Add module prefix to asset paths
+     */
+    protected function prefixModulePaths(string $module, array $assets): array
+    {
+        $prefix = 'modules/' . $module . '/';
+
+        $prefixPath = function (&$array) use ($prefix) {
+            foreach ($array as $key => $path) {
+                if (! str_starts_with($path, 'core/') && ! str_starts_with($path, 'modules/')) {
+                    $array[$key] = $prefix . ltrim($path, '/');
+                }
+            }
+        };
+
+        if (isset($assets['css'])) {
+            $prefixPath($assets['css']);
+        }
+
+        if (isset($assets['js'])) {
+            $prefixPath($assets['js']);
+        }
+
+        if (isset($assets['optional']['css'])) {
+            $prefixPath($assets['optional']['css']);
+        }
+
+        if (isset($assets['optional']['js'])) {
+            $prefixPath($assets['optional']['js']);
+        }
+
+        return $assets;
+    }
+
+    /**
+     * Check if asset exists
+     *
+     * @param string $name Asset name
+     * @param string $type Type (css|js)
+     * @return bool
+     */
+    public function has(string $name, string $type = 'js'): bool
+    {
+        $this->loadConfig();
+        $array = $type === 'css' ? $this->optionalCss : $this->optionalJs;
+
+        return isset($array[$name]);
+    }
+
+    /**
+     * Get asset path
+     *
+     * @param string $name Asset name
+     * @param string $type Type (css|js)
+     * @return string|null
+     */
+    public function path(string $name, string $type = 'js'): ?string
+    {
+        $this->loadConfig();
+        $array = $type === 'css' ? $this->optionalCss : $this->optionalJs;
+
+        return $array[$name] ?? null;
+    }
+
+    /**
+     * Clear loaded assets cache
+     */
+    public function clearLoaded(): static
+    {
+        $this->loadedOptionalCss = [];
+        $this->loadedOptionalJs = [];
 
         return $this;
     }
