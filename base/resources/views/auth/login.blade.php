@@ -15,12 +15,17 @@
 
                 <form action="{{ route('login') }}" method="post" autocomplete="off" novalidate>
                     @csrf
-                    <div class="mb-3">
-                        <label class="form-label">{{ trans('core/base::auth.user') }}</label>
-                        <input type="text" name="user" class="form-control" value="{{ old('user') }}" placeholder="{{ trans('core/base::auth.user') }}" autocomplete="off">
-                    </div>
+                    <x-ui.form.input
+                        name="user"
+                        value="{{ old('user') }}"
+                        :label="trans('core/base::auth.user')"
+                        :placeholder="trans('core/base::auth.user')"
+                        icon="user"
+                        autocomplete="off"
+                        required
+                    />
 
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <label class="form-label">
                             {{ trans('core/base::auth.password') }}
                             <span class="form-label-description">
@@ -29,22 +34,25 @@
                         </label>
 
                         <div class="input-group input-group-flat">
-                            <input name="password" type="password" class="form-control" placeholder="{{ trans('core/base::auth.your_password') }}" autocomplete="off">
+                            <input name="password" type="password" class="form-control" placeholder="{{ trans('core/base::auth.your_password') }}" autocomplete="off" required>
                             <span class="input-group-text">
                                 <a href="#" onclick="viewPassword(this)" class="link-secondary" title="{{ trans('core/base::auth.show_password') }}" data-bs-toggle="tooltip">
-                                    <x-tabler-icons::eye />
+                                    <i class="ti ti-eye"></i>
                                 </a>
                             </span>
                         </div>
                     </div>
-                    <div class="mb-2">
-                        <label class="form-check">
-                            <input type="checkbox" class="form-check-input" name="remember" {{ old('remember') ? 'checked' : '' }} />
-                            <span class="form-check-label">{{ trans('core/base::auth.remember_me') }}</span>
-                        </label>
-                    </div>
-                    <div class="form-footer">
-                        <button type="submit" class="btn btn-primary w-100">{{ trans('core/base::auth.sign_in') }}</button>
+
+                    <label class="form-check">
+                        <input type="checkbox" class="form-check-input" name="remember" {{ old('remember') ? 'checked' : '' }} />
+                        <span class="form-check-label">{{ trans('core/base::auth.remember_me') }}</span>
+                    </label>
+
+                    <div class="form-footer mt-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="ti ti-login me-1"></i>
+                            {{ trans('core/base::auth.sign_in') }}
+                        </button>
                     </div>
                 </form>
             </div>

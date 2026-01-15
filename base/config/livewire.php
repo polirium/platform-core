@@ -15,6 +15,7 @@ use Polirium\Core\Base\Http\Livewire\Roles\Modal\ModalCreateRoleComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Datatable\UserTable;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalCreateUserComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalDeleteUserComponent;
+use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalDetailUserComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalEditUserComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalUserComponent;
 
@@ -31,6 +32,11 @@ return [
         'class' => ModalUserComponent::class,
         'alias' => 'core/base::user.modal',
         'description' => 'User Modal (Create/Edit)',
+    ],
+    'user.modal.detail' => [
+        'class' => ModalDetailUserComponent::class,
+        'alias' => 'core/base::user.modal.detail',
+        'description' => 'User Modal Detail',
     ],
     'user.modal.delete' => [
         'class' => ModalDeleteUserComponent::class,

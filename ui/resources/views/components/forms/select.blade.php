@@ -193,7 +193,7 @@
 @else
     {{-- Standard Native Select --}}
     @if ($prepend || $append)
-        <div {{ $prepend?->attributes->class(['input-group']) }} {{ $append?->attributes->class(['input-group']) }}>
+        <div class="input-group">
             {{ $prepend }}
     @endif
 

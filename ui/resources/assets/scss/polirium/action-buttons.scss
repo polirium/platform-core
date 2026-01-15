@@ -1,0 +1,206 @@
+/**
+ * Polirium ERP - Action Buttons
+ * Icon + Text + Màu sắc rõ ràng
+ *
+ * Rules:
+ * - Icon + Badge label ngắn (như "Sửa", "Xóa")
+ * - Màu sắc rõ ràng cho từng loại action
+ * - Responsive: Icon+Badge trên desktop, Icon+Full text trên mobile
+ */
+
+/* ============================================
+   CSS VARIABLES - Màu sắc Action Buttons
+   ============================================ */
+
+:root {
+    /* Action Button Colors - Bright & Clear */
+    --action-edit-bg: #3B82F6;
+    --action-edit-text: #FFFFFF;
+    --action-edit-hover: #2563EB;
+    --action-edit-shadow: rgba(59, 130, 246, 0.25);
+
+    --action-delete-bg: #EF4444;
+    --action-delete-text: #FFFFFF;
+    --action-delete-hover: #DC2626;
+    --action-delete-shadow: rgba(239, 68, 68, 0.25);
+
+    --action-view-bg: #64748B;
+    --action-view-text: #FFFFFF;
+    --action-view-hover: #475569;
+    --action-view-shadow: rgba(100, 116, 139, 0.25);
+
+    --action-copy-bg: #8B5CF6;
+    --action-copy-text: #FFFFFF;
+    --action-copy-hover: #7C3AED;
+    --action-copy-shadow: rgba(139, 92, 246, 0.25);
+
+    --action-refund-bg: #06B6D4;
+    --action-refund-text: #FFFFFF;
+    --action-refund-hover: #0891B2;
+    --action-refund-shadow: rgba(6, 182, 212, 0.25);
+}
+
+/* ============================================
+   ACTION BUTTON BASE
+   ============================================ */
+
+.action-btn-v2 {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 36px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 150ms ease;
+    white-space: nowrap;
+}
+
+/* Icon styling */
+.action-btn-v2 .icon,
+.action-btn-v2 svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
+/* Badge label - Luôn hiện */
+.action-btn-v2 .badge-label {
+    display: inline-flex;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.025em;
+    text-transform: uppercase;
+    color: white;
+}
+
+/* Full text label - Desktop: ẩn, Mobile: hiện */
+.action-btn-v2 .full-label {
+    display: none;
+    color: white;
+}
+
+/* ============================================
+   ACTION BUTTON COLORS
+   ============================================ */
+
+/* Edit - Blue */
+.action-btn-v2.edit {
+    background: var(--action-edit-bg);
+    color: var(--action-edit-text);
+    box-shadow: 0 2px 8px var(--action-edit-shadow);
+}
+
+.action-btn-v2.edit:hover {
+    background: var(--action-edit-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--action-edit-shadow);
+}
+
+/* Delete - Red */
+.action-btn-v2.delete {
+    background: var(--action-delete-bg);
+    color: var(--action-delete-text);
+    box-shadow: 0 2px 8px var(--action-delete-shadow);
+}
+
+.action-btn-v2.delete:hover {
+    background: var(--action-delete-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--action-delete-shadow);
+}
+
+/* View - Gray */
+.action-btn-v2.view {
+    background: var(--action-view-bg);
+    color: var(--action-view-text);
+    box-shadow: 0 2px 8px var(--action-view-shadow);
+}
+
+.action-btn-v2.view:hover {
+    background: var(--action-view-hover);
+    transform: translateY(-1px);
+}
+
+/* Copy - Purple */
+.action-btn-v2.copy {
+    background: var(--action-copy-bg);
+    color: var(--action-copy-text);
+    box-shadow: 0 2px 8px var(--action-copy-shadow);
+}
+
+.action-btn-v2.copy:hover {
+    background: var(--action-copy-hover);
+    transform: translateY(-1px);
+}
+
+/* Refund - Cyan */
+.action-btn-v2.refund {
+    background: var(--action-refund-bg);
+    color: var(--action-refund-text);
+    box-shadow: 0 2px 8px var(--action-refund-shadow);
+}
+
+.action-btn-v2.refund:hover {
+    background: var(--action-refund-hover);
+    transform: translateY(-1px);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+/* Mobile: Hiện full text, ẩn badge */
+@media (max-width: 767px) {
+    .action-btn-v2 {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+        min-height: 40px;
+    }
+
+    .action-btn-v2 .badge-label {
+        display: none;
+    }
+
+    .action-btn-v2 .full-label {
+        display: inline-flex;
+    }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+.action-btn-v2:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+.action-btn-v2:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .action-btn-v2 {
+        transition: none;
+    }
+    .action-btn-v2:hover {
+        transform: none;
+    }
+}
+
+/* ============================================
+   PRINT
+   ============================================ */
+
+@media print {
+    .action-btn-v2 {
+        display: none !important;
+    }
+}

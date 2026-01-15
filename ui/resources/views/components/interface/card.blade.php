@@ -6,8 +6,8 @@
 ])
 
 <div {{ $attributes->class('card') }}>
-    @isset($header)
-        @if (!is_html($header))
+    @if ($header)
+        @if (is_string($header))
             <div class="card-header">
                 <h3 class="card-title">{{ $header }}</h3>
                 @if ($action)
@@ -15,7 +15,7 @@
                 @endif
             </div>
         @else
-            <div {{ $header->attributes->class('card-header') }}>
+            <div {{ $header->attributes?->class('card-header') ?? 'class=card-header' }}>
                 {{ $header }}
 
                 @if ($action)
@@ -23,17 +23,17 @@
                 @endif
             </div>
         @endif
-    @endisset
+    @endif
 
-    @isset($body)
-        <div {{ $body->attributes->class('card-body') }}>{{ $body }}</div>
+    @if ($body)
+        <div {{ $body->attributes?->class('card-body') ?? 'class=card-body' }}>{{ $body }}</div>
     @else
         <div class="card-body">{{ $slot }}</div>
-    @endisset
+    @endif
 
-    @isset($footer)
-        <div {{ $footer->attributes->class('card-footer') }}>
+    @if ($footer)
+        <div {{ $footer->attributes?->class('card-footer') ?? 'class=card-footer' }}>
             {{ $footer }}
         </div>
-    @endisset
+    @endif
 </div>

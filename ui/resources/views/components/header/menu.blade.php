@@ -13,7 +13,7 @@
                                         </span>
                                     @endif
                                     <span class="nav-link-title">
-                                        {{ $menu->title }}
+                                        {{ trans($menu->title) }}
                                     </span>
                                 </a>
                                 <div class="dropdown-menu">
@@ -30,7 +30,7 @@
                                                             </span>
                                                         @endif
                                                         <span class="nav-link-title">
-                                                            {{ $children->title }}
+                                                            {{ trans($children->title) }}
                                                         </span>
                                                     </a>
                                                 @endif
@@ -46,7 +46,7 @@
                                         </span>
                                     @endif
                                     <span class="nav-link-title">
-                                        {{ $menu->title }}
+                                        {{ trans($menu->title) }}
                                     </span>
                                 </a>
                             @endif

@@ -5,6 +5,7 @@ namespace Polirium\Core\Base\Http\Livewire\Branch\Datatable;
 use Illuminate\Database\Eloquent\Builder;
 use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
+use Polirium\Core\UI\Facades\Assets;
 use Polirium\Datatable\Button;
 use Polirium\Datatable\Column;
 use Polirium\Datatable\Components\SetUp\Exportable;
@@ -17,6 +18,12 @@ final class BranchTable extends BaseTable
     public string $tableName = 'table-branches';
 
     public $tab = 1;
+
+    public function mount(): void
+    {
+        Assets::loadCss(['professional-table', 'professional-detail']);
+        parent::mount();
+    }
 
     protected function getListeners(): array
     {
@@ -49,7 +56,7 @@ final class BranchTable extends BaseTable
     public function datasource(): Builder
     {
         return Branch::query()
-        ->with('users:id,name', 'takingAddresses')
+        ->with('users:id,name', 'takingAddresses', 'province', 'district', 'ward')
         ->withCount(['users']);
     }
 
@@ -63,6 +70,18 @@ final class BranchTable extends BaseTable
         return PowerGrid::fields()
             ->add('amount', function ($row) {
                 return $row->users_count;
+            })
+            ->add('status_name', function ($row) {
+                if ($row->status) {
+                    return '<span class="business-status-badge active">
+                        <span class="business-status-badge-dot"></span>
+                        ' . trans('core/base::general.active') . '
+                    </span>';
+                }
+                return '<span class="business-status-badge inactive">
+                    <span class="business-status-badge-dot"></span>
+                    ' . trans('core/base::general.inactive') . '
+                </span>';
             });
     }
 
@@ -93,13 +112,31 @@ final class BranchTable extends BaseTable
 
     public function actions(Branch $row): array
     {
-        return [
-            Button::add('edit')
-            ->slot(trans('Sửa'))
+        $actions = [];
+
+        // Edit button
+        $actions[] = Button::add('edit')
+            ->slot(tabler_icon('edit', ['class' => 'icon']))
             ->id()
-            ->class('btn btn-warning btn-sm')
-            ->dispatch('show-modal-create-branch', ['id' => $row->id]),
-        ];
+            ->class('btn btn-ghost-primary btn-icon btn-sm')
+            ->attributes(['aria-label' => trans('core/base::general.edit')])
+            ->dispatch('show-modal-create-branch', ['id' => $row->id]);
+
+        // Toggle status button - shows action to take (opposite of current status)
+        // If active → show pause icon (to deactivate), if inactive → show play icon (to activate)
+        $toggleIcon = $row->status ? 'player-pause' : 'player-play';
+        $toggleColor = $row->status ? 'warning' : 'success';
+        $toggleLabel = $row->status ? trans('core/base::general.deactivate') : trans('core/base::general.activate');
+
+        $actions[] = Button::add('toggle-status')
+            ->slot(tabler_icon($toggleIcon, ['class' => 'icon', 'width' => 16, 'height' => 16]))
+            ->id()
+            ->class('btn btn-ghost-' . $toggleColor . ' btn-icon btn-sm p-1')
+            ->attributes(['aria-label' => $toggleLabel, 'title' => $toggleLabel])
+            ->tooltip($toggleLabel)
+            ->dispatch('toggleActive', ['id' => $row->id, 'status' => $row->status ? 0 : 1]);
+
+        return $actions;
     }
 
     /*
@@ -114,10 +151,13 @@ final class BranchTable extends BaseTable
     }
     */
 
-    public function toggleActive($id, $status)
+    #[\Livewire\Attributes\On('toggleActive')]
+    public function toggleActive($id, $status): void
     {
         Branch::findOrFail($id)->update([
             'status' => $status,
         ]);
+
+        $this->dispatch('refresh-datatable-branches');
     }
 }

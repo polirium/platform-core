@@ -2,8 +2,33 @@
 @import "app/highlight";
 @import "app/app";
 @import "../../../../../../vendor/polirium/datatable/dist/tabler.css";
+@import "../../../../../../vendor/polirium/datatable/dist/mobile-card.css";
 @import "../../../../../../node_modules/flatpickr/dist/flatpickr.min.css";
 @import "../../../../../../node_modules/tom-select/dist/css/tom-select.bootstrap5.css";
+
+/* ============================================
+   Plain CSS Files Import
+   Source: platform/core/ui/resources/assets/scss/polirium/
+   ============================================ */
+
+@import "./polirium/design-tokens.scss";
+@import "./polirium/base-styles.scss";
+@import "./polirium/professional-table.scss";
+@import "./polirium/role-table.scss";
+@import "./polirium/crm-users.scss";
+@import "./polirium/action-buttons.scss";
+@import "./polirium/dashboard.scss";
+@import "./polirium/professional-detail-view.scss";
+@import "./polirium/settings.scss";
+@import "./polirium/brand-modal.scss";
+@import "./polirium/responsive-layout.scss";
+@import "./polirium/ui-select.scss";
+@import "./polirium/payment-view.scss";
+@import "./polirium/tab-styles.scss";
+
+/* ============================================
+   Demo & Settings Styles
+   ============================================ */
 
 .card-sponsor {
   background: var(--#{$prefix}primary-lt) no-repeat center/100% 100%;
@@ -144,3 +169,4 @@ $demo-icon-size: 4rem;
     );
   }
 }
+

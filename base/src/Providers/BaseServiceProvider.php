@@ -10,6 +10,7 @@ use Polirium\Core\Base\Exceptions\Handler;
 use Polirium\Core\Base\Helpers\Assets;
 use Polirium\Core\Base\Helpers\BaseHelper;
 use Polirium\Core\Base\Service\ModuleManager;
+use Polirium\Core\Settings\Facades\SettingRegistry;
 use Polirium\Core\Support\Providers\PoliriumBaseServiceProvider;
 
 class BaseServiceProvider extends PoliriumBaseServiceProvider
@@ -43,6 +44,9 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
             \Polirium\Core\Base\Commands\ModuleDependenciesCommand::class,
             \Polirium\Core\Base\Commands\SampleDataCommand::class,
         ]);
+
+        // Register base settings
+        $this->registerSettings();
 
         // Load modules using ModuleManager (if modules table exists)
         // Falls back to legacy registerModules() if not
@@ -209,6 +213,83 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
                 }
             }
         }
+    }
+
+    /**
+     * Register base module settings
+     */
+    protected function registerSettings(): void
+    {
+        SettingRegistry::group('email', [
+            'title' => 'core/base::general.email_configuration',
+            'icon' => 'mail',
+            'description' => 'core/base::general.email_configuration_description',
+        ])
+        ->add('smtp_host', [
+            'type' => 'text',
+            'label' => 'core/base::general.smtp_host',
+            'description' => 'core/base::general.smtp_host_description',
+            'default' => config('mail.host', 'smtp.mailgun.org'),
+            'required' => true,
+            'validation' => ['required', 'string', 'max:255'],
+        ])
+        ->add('smtp_port', [
+            'type' => 'number',
+            'label' => 'core/base::general.smtp_port',
+            'description' => 'core/base::general.smtp_port_description',
+            'default' => config('mail.port', 587),
+            'required' => true,
+            'validation' => ['required', 'integer', 'min:1', 'max:65535'],
+            'attributes' => ['min' => 1, 'max' => 65535],
+        ])
+        ->add('smtp_username', [
+            'type' => 'text',
+            'label' => 'core/base::general.smtp_username',
+            'description' => 'core/base::general.smtp_username_description',
+            'default' => config('mail.username'),
+            'validation' => ['nullable', 'string', 'max:255'],
+        ])
+        ->add('smtp_password', [
+            'type' => 'password',
+            'label' => 'core/base::general.smtp_password',
+            'description' => 'core/base::general.smtp_password_description',
+            'validation' => ['nullable', 'string', 'max:255'],
+        ])
+        ->add('smtp_encryption', [
+            'type' => 'select',
+            'label' => 'core/base::general.smtp_encryption',
+            'description' => 'core/base::general.smtp_encryption_description',
+            'options' => [
+                'tls' => 'TLS',
+                'ssl' => 'SSL',
+                '' => 'None',
+            ],
+            'default' => config('mail.encryption', 'tls'),
+            'validation' => ['nullable', 'string', 'in:tls,ssl,'],
+        ])
+        ->add('from_email', [
+            'type' => 'email',
+            'label' => 'core/base::general.from_email',
+            'description' => 'core/base::general.from_email_description',
+            'default' => config('mail.from.address'),
+            'required' => true,
+            'validation' => ['required', 'email', 'max:255'],
+        ])
+        ->add('from_name', [
+            'type' => 'text',
+            'label' => 'core/base::general.from_name',
+            'description' => 'core/base::general.from_name_description',
+            'default' => config('mail.from.name', config('app.name')),
+            'required' => true,
+            'validation' => ['required', 'string', 'max:255'],
+        ])
+        ->add('email_signature', [
+            'type' => 'textarea',
+            'label' => 'core/base::general.email_signature',
+            'description' => 'core/base::general.email_signature_description',
+            'validation' => ['nullable', 'string', 'max:1000'],
+            'attributes' => ['rows' => 4],
+        ]);
     }
 
 }

@@ -13,7 +13,7 @@ return [
      */
     [
         'id' => 'core',
-        'name' => trans('Trang chủ'),
+        'name' => 'core/base::general.home',
         'route' => 'core.index',
         'icon' => 'home',
         'sort' => 0,
@@ -24,7 +24,7 @@ return [
      */
     [
         'id' => 'core.user',
-        'name' => trans('Nhân viên'),
+        'name' => 'core/base::general.staff',
         'route' => null,
         'icon' => 'eye',
         'sort' => 0,
@@ -32,7 +32,7 @@ return [
     ],
     [
         'id' => 'core.user.manager',
-        'name' => trans('Quản lý nhân viên'),
+        'name' => 'core/base::general.staff_management',
         'parent' => 'core.user',
         'route' => 'core.users.index',
         'icon' => 'map-pins',
@@ -46,7 +46,7 @@ return [
      */
     [
         'id' => 'core.setting',
-        'name' => trans('Cài đặt'),
+        'name' => 'core/base::general.settings',
         'route' => null,
         'icon' => 'settings',
         'sort' => 0,
@@ -54,7 +54,7 @@ return [
     ],
     [
         'id' => 'core.setting-general',
-        'name' => trans('Cài đặt chung'),
+        'name' => 'core/base::general.general_settings',
         'parent' => 'core.setting',
         'route' => 'core.settings.index',
         'icon' => 'settings-2',
@@ -63,7 +63,7 @@ return [
     ],
     [
         'id' => 'core.setting-brand',
-        'name' => trans('Thương hiệu'),
+        'name' => 'core/base::general.brands',
         'parent' => 'core.setting',
         'route' => 'core.brands.index',
         'icon' => 'star',
@@ -72,7 +72,7 @@ return [
     ],
     [
         'id' => 'core.setting-branch',
-        'name' => trans('Chi nhánh'),
+        'name' => 'core/base::general.branches',
         'parent' => 'core.setting',
         'route' => 'core.branches.index',
         'icon' => 'map-pins',
@@ -81,7 +81,7 @@ return [
     ],
     [
         'id' => 'core.setting-role',
-        'name' => trans('Quản lý vai trò'),
+        'name' => 'core/base::general.role_management_menu',
         'parent' => 'core.setting',
         'route' => 'core.roles.index',
         'icon' => 'user-check',
@@ -90,7 +90,7 @@ return [
     ],
     [
         'id' => 'core.setting-modules',
-        'name' => trans('Quản lý Module'),
+        'name' => 'core/base::general.module_management',
         'parent' => 'core.setting',
         'route' => 'core.modules.index',
         'icon' => 'package',
@@ -99,7 +99,7 @@ return [
     ],
     [
         'id' => 'core.activity-logs',
-        'name' => trans('Lịch sử hoạt động'),
+        'name' => 'core/base::general.activity_logs',
         'parent' => 'core.setting',
         'route' => 'core.activity-logs.index',
         'icon' => 'activity',

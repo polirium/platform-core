@@ -3,7 +3,7 @@
 {{-- Sidebar Panel --}}
 <div class="media-sidebar p-3" x-show="showSidebar" x-cloak>
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h6 class="mb-0">{{ __('Chi tiết') }}</h6>
+        <h6 class="mb-0">{{ __('core/media::media.details') }}</h6>
         <button type="button" class="btn-close btn-close-sm" @click="showSidebar = false"></button>
     </div>
 
@@ -23,33 +23,33 @@
 
         {{-- Info --}}
         <dl class="sidebar-info small">
-            <dt>{{ __('Tên') }}</dt>
+            <dt>{{ __('core/media::media.name') }}</dt>
             <dd>{{ $selectedMedia->name }}</dd>
 
-            <dt>{{ __('Tên file') }}</dt>
+            <dt>{{ __('core/media::media.file_name') }}</dt>
             <dd>{{ $selectedMedia->file_name }}</dd>
 
-            <dt>{{ __('Loại') }}</dt>
+            <dt>{{ __('core/media::media.type') }}</dt>
             <dd>{{ $selectedMedia->mime_type }}</dd>
 
-            <dt>{{ __('Kích thước') }}</dt>
+            <dt>{{ __('core/media::media.size') }}</dt>
             <dd>{{ $selectedMedia->formatted_size }}</dd>
 
             @if(str_starts_with($selectedMedia->mime_type, 'image/') && $selectedMedia->custom_properties)
-                <dt>{{ __('Kích thước ảnh') }}</dt>
+                <dt>{{ __('core/media::media.image_size') }}</dt>
                 <dd>{{ $selectedMedia->custom_properties['width'] ?? '?' }} x {{ $selectedMedia->custom_properties['height'] ?? '?' }} px</dd>
             @endif
 
-            <dt>{{ __('Thư mục') }}</dt>
+            <dt>{{ __('core/media::media.directory') }}</dt>
             <dd>{{ $selectedMedia->collection_name ?: 'uploads' }}</dd>
 
-            <dt>{{ __('Ngày tải lên') }}</dt>
+            <dt>{{ __('core/media::media.uploaded_at') }}</dt>
             <dd>{{ $selectedMedia->created_at->format('d/m/Y H:i') }}</dd>
         </dl>
 
         {{-- URL Copy --}}
         <div class="mb-3">
-            <label class="form-label small">{{ __('URL') }}</label>
+            <label class="form-label small">{{ __('core/media::media.url') }}</label>
             <div class="input-group input-group-sm">
                 <input type="text" class="form-control" value="{{ $selectedMedia->getUrl() }}" readonly>
                 <button type="button" class="btn btn-outline-secondary" onclick="navigator.clipboard.writeText('{{ $selectedMedia->getUrl() }}')">
@@ -61,20 +61,20 @@
         {{-- Actions --}}
         <div class="d-grid gap-2">
             <a href="{{ $selectedMedia->getUrl() }}" target="_blank" class="btn btn-sm btn-outline-primary">
-                {{ __('Mở trong tab mới') }}
+                {{ __('core/media::media.open_new_tab') }}
             </a>
             @if(str_starts_with($selectedMedia->mime_type, 'image/'))
                 <button type="button" wire:click="openImageEditor({{ $selectedMedia->id }})" class="btn btn-sm btn-outline-secondary">
-                    {{ __('Chỉnh sửa ảnh') }}
+                    {{ __('core/media::media.edit_image') }}
                 </button>
             @endif
             <button type="button" wire:click="deleteMedia({{ $selectedMedia->id }})"
-                    onclick="return confirm('{{ __('Xác nhận xóa?') }}')"
+                    onclick="return confirm('{{ __('core/media::media.confirm_delete') }}')"
                     class="btn btn-sm btn-outline-danger">
-                {{ __('Xóa') }}
+                {{ __('core/media::media.delete') }}
             </button>
         </div>
     @else
-        <p class="text-muted small">{{ __('Chọn một file để xem chi tiết') }}</p>
+        <p class="text-muted small">{{ __('core/media::media.select_file_details') }}</p>
     @endif
 </div>

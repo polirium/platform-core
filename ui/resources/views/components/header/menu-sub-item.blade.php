@@ -1,6 +1,6 @@
 <div class="dropend">
     <a class="dropdown-item dropdown-toggle" href="#{{ $menu->id }}" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
-        {{ $menu->title }}
+        {{ trans($menu->title) }}
         {{-- <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span> --}}
     </a>
     <div class="dropdown-menu">
@@ -15,7 +15,7 @@
                         </span>
                     @endif
                     <span class="nav-link-title">
-                        {{ $children->title }}
+                        {{ trans($children->title) }}
                     </span>
                     {{-- <span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span> --}}
                 </a>

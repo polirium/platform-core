@@ -16,10 +16,11 @@ return [
     |
     */
     'css' => [
+        // Core CSS - all polirium styles bundled in app.min.css
         'core' => 'core/ui/css/polirium-core.min.css',
         'flags' => 'core/ui/css/polirium-flags.min.css',
         'vendors' => 'core/ui/css/polirium-vendors.min.css',
-        'app' => 'core/ui/css/app.min.css',
+        'app' => 'core/ui/css/app.min.css', // Includes: design-tokens, base-styles, professional-table, role-table, crm-users, action-buttons
     ],
 
     /*
@@ -62,7 +63,7 @@ return [
             'payments' => 'core/ui/css/polirium-payments.min.css',
             'social' => 'core/ui/css/polirium-social.min.css',
             'dropzone' => 'core/ui/libs/dropzone/dist/dropzone.css',
-            'dashboard' => 'core/base/css/dashboard.css',
+            'print-forms-editor' => 'modules/print-forms/css/editor.min.css',
         ],
 
         /*
@@ -78,8 +79,9 @@ return [
         */
         'js' => [
             'dropzone' => 'core/ui/libs/dropzone/dist/dropzone-min.js',
-            'sortable' => 'core/base/js/vendor/sortable.min.js',
-            'dashboard' => 'core/base/js/dashboard.js',
+            'sortable' => 'core/ui/libs/vendor/sortable.min.js',
+            'dashboard' => 'core/ui/js/dashboard.js',
+            'print-forms-editor' => 'modules/print-forms/js/editor.min.js',
         ],
     ],
 ];

@@ -18,7 +18,7 @@
         // Fallback jQuery if CDN fails
         window.jQuery || document.write('<script src="{{ asset('vendor/polirium/core/ui/libs/jquery/jquery.min.js') }}"><\/script>');
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.9/dist/jquery.inputmask.min.js" onerror="this.onerror=null;this.remove()"></script>
+    <script src="{{ asset('vendor/polirium/core/ui/libs/inputmask/jquery.inputmask.min.js') }}"></script>
 
     @stack('styles')
 

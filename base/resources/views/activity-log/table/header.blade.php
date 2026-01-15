@@ -1,9 +1,9 @@
 @php
     $tabs = [
-        'all' => ['label' => 'Tất cả', 'icon' => 'list'],
-        'created' => ['label' => 'Thêm mới', 'icon' => 'plus'],
-        'updated' => ['label' => 'Cập nhật', 'icon' => 'edit'],
-        'deleted' => ['label' => 'Xóa', 'icon' => 'trash'],
+        'all' => ['label' => __('core/base::general.all'), 'icon' => 'list'],
+        'created' => ['label' => __('core/base::general.created'), 'icon' => 'plus'],
+        'updated' => ['label' => __('core/base::general.updated'), 'icon' => 'pencil'],
+        'deleted' => ['label' => __('core/base::general.deleted'), 'icon' => 'trash']
     ];
 @endphp
 
@@ -13,7 +13,7 @@
             <button type="button"
                     class="btn {{ $currentEvent === $key ? 'btn-primary' : 'btn-outline-secondary' }}"
                     wire:click="setEvent('{{ $key }}')">
-                <i class="icon ti ti-{{ $tab['icon'] }}"></i> {{ $tab['label'] }}
+                {!! tabler_icon($tab['icon']) !!} {{ $tab['label'] }}
             </button>
         @endforeach
     </div>

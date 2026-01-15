@@ -8,6 +8,7 @@ import './src/switch-icon'
 import './src/tab'
 import './src/toast'
 import './src/sortable'
+import './src/keep-alive'
 
 // Import bootstrap and tabler
 import * as bootstrap from 'bootstrap'

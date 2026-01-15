@@ -20,6 +20,38 @@ use Polirium\Core\Base\Http\Controllers\UserProfileController;
 |
 */
 
+/**
+ * Keep-Alive Routes (Session & CSRF Token Refresh)
+ * These routes are used by the POS system to prevent session timeout
+ */
+Route::middleware(['web'])->prefix(admin_prefix())->group(function () {
+    // Heartbeat - Keep session alive and refresh CSRF token
+    Route::post('/heartbeat', function () {
+        if (auth()->check()) {
+            // Touch session to extend lifetime
+            session()->regenerate(false);
+            return response()->json([
+                'status' => 'ok',
+                'csrf_token' => csrf_token(),
+                'authenticated' => true,
+                'session_lifetime' => config('session.lifetime'),
+            ]);
+        }
+        return response()->json([
+            'status' => 'unauthenticated',
+            'csrf_token' => csrf_token(),
+            'authenticated' => false,
+        ], 401);
+    })->name('heartbeat');
+
+    // CSRF Token refresh only (lightweight)
+    Route::get('/csrf-token', function () {
+        return response()->json([
+            'csrf_token' => csrf_token(),
+        ]);
+    })->name('csrf-token');
+});
+
 Route::middleware(['web', 'auth'])
     ->prefix(admin_prefix())
     ->name('core.')

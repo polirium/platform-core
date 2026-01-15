@@ -27,7 +27,8 @@ class SettingServiceProvider extends PoliriumBaseServiceProvider
             ->loadMigrations()
             ->loadRoutes(['web'])
             ->loadViews()
-            ->loadTranslations();
+            ->loadTranslations()
+            ->publishAssets();
 
         $this->registerDefaultSettings();
     }
@@ -143,33 +144,43 @@ class SettingServiceProvider extends PoliriumBaseServiceProvider
         $registry = app('polirium:setting-registry');
 
         $registry->group('general', [
-                'title' => 'General Settings',
+                'title' => 'core/base::general.general_settings',
                 'icon' => 'settings',
-                'description' => 'Basic site configuration',
+                'description' => 'core/base::general.general_settings_description',
             ])
             ->add('title', [
                 'type' => 'text',
-                'label' => 'Site Title',
-                'description' => 'The title of your website',
+                'label' => 'core/base::general.site_title',
+                'description' => 'core/base::general.site_title_description',
                 'default' => config('core.base.setting.title'),
                 'required' => true,
                 'validation' => ['required', 'string', 'max:255'],
             ])
             ->add('logo', [
                 'type' => 'file',
-                'label' => 'Logo',
-                'description' => 'Upload your site logo',
+                'label' => 'core/base::general.logo',
+                'description' => 'core/base::general.logo_description',
                 'default' => config('core.base.setting.logo'),
                 'validation' => ['nullable', 'image', 'max:2048'],
                 'attributes' => ['accept' => 'image/*'],
             ])
             ->add('favicon', [
                 'type' => 'file',
-                'label' => 'Favicon',
-                'description' => 'Upload your site favicon',
+                'label' => 'core/base::general.favicon',
+                'description' => 'core/base::general.favicon_description',
                 'default' => config('core.base.setting.favicon'),
                 'validation' => ['nullable', 'image', 'max:1024'],
                 'attributes' => ['accept' => 'image/*'],
+            ])
+            ->add('locale', [
+                'type' => 'select',
+                'label' => 'core/base::general.default_language',
+                'description' => 'core/base::general.default_language_description',
+                'default' => config('app.locale'),
+                'options' => [
+                    'vi' => 'Vietnamese',
+                    'en' => 'English',
+                ],
             ]);
     }
 

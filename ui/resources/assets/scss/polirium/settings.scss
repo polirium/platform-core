@@ -1,0 +1,95 @@
+/**
+ * Settings Page Styles - Polirium ERP
+ * Navigation sidebar, tabs, and sticky card for settings administration
+ */
+
+/* ============================================
+   Settings Navigation Sidebar
+   ============================================ */
+
+.settings-nav .nav-link {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.25rem;
+    border-radius: var(--tblr-border-radius);
+    color: var(--tblr-body-color);
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    gap: 0.75rem;
+}
+
+.settings-nav .nav-link .nav-link-icon {
+    color: var(--tblr-muted);
+    font-size: 1.25rem;
+    transition: color 0.2s ease;
+}
+
+.settings-nav .nav-link .nav-link-title {
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.settings-nav .nav-link .nav-link-subtitle {
+    font-size: 0.75rem;
+    color: var(--tblr-muted);
+    line-height: 1.3;
+}
+
+.settings-nav .nav-link:hover {
+    background-color: var(--tblr-bg-surface-tertiary);
+    border-color: var(--tblr-border-color-translucent);
+}
+
+.settings-nav .nav-link:hover .nav-link-icon {
+    color: var(--tblr-primary);
+}
+
+.settings-nav .nav-link.active {
+    background-color: var(--tblr-primary-bg-subtle);
+    color: var(--tblr-primary);
+    border-color: var(--tblr-primary);
+}
+
+.settings-nav .nav-link.active .nav-link-icon {
+    color: var(--tblr-primary);
+}
+
+.settings-nav .nav-link.active .nav-link-subtitle {
+    color: var(--tblr-primary);
+    opacity: 0.75;
+}
+
+/* ============================================
+   Sticky Card for Desktop
+   ============================================ */
+
+.card-sticky {
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+}
+
+/* Custom scrollbar for sticky card */
+.card-sticky::-webkit-scrollbar {
+    width: 4px;
+}
+
+.card-sticky::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.card-sticky::-webkit-scrollbar-thumb {
+    background: var(--tblr-border-color);
+    border-radius: 4px;
+}
+
+/* ============================================
+   Responsive - Mobile
+   ============================================ */
+
+@media (max-width: 991.98px) {
+    .card-sticky {
+        position: static;
+        max-height: none;
+    }
+}

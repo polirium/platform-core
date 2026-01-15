@@ -51,7 +51,7 @@ class ModalUserComponent extends Component
             'user.status' => 'required|in:active,inactive',
             'role_ids' => 'array',
             'branch_ids' => 'array',
-            'avatar_file' => 'nullable|image|max:2048', // 2MB max
+            'avatar_file' => 'nullable|mimes:jpeg,jpg,png,gif,webp|max:2048', // 2MB max, accept common image formats
         ];
 
         if (! $this->isEdit) {

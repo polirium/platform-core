@@ -15,10 +15,16 @@ class PageTitle
     public function getTitle(): ?string
     {
         if ($this->title) {
-            return $this->title;
+            return trans($this->title);
         }
 
-        return $this->resolveFromMenu();
+        $title = $this->resolveFromMenu();
+
+        if ($title) {
+            return trans($title);
+        }
+
+        return null;
     }
 
     protected function resolveFromMenu(): ?string

@@ -19,10 +19,12 @@
     {{ $attributes }}
     x-ref="{{ $ref }}"
     x-init="
-        const phone = $($refs.{{ $ref }}).inputmask({ mask : '(99) 999-999-999' })
-        .change(function (e) {
-            $wire.set('{{ $name }}', Inputmask.unmask($refs.{{ $ref }}.value, { mask : '(99) 999-999-999' }));
-        });
+        if (typeof $ !== 'undefined' && typeof $.fn.inputmask !== 'undefined') {
+            const phone = $($refs.{{ $ref }}).inputmask({ mask : '(99) 999-999-999' })
+            .change(function (e) {
+                $wire.set('{{ $name }}', Inputmask.unmask($refs.{{ $ref }}.value, { mask : '(99) 999-999-999' }));
+            });
+        }
     "
 >
     @if ($prepend)

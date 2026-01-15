@@ -35,9 +35,24 @@ class UIServiceProvider extends PoliriumBaseServiceProvider
         Blade::componentNamespace('Polirium\\Core\\UI\\View\\Components\\Layouts', 'ui.layouts');
         Blade::componentNamespace('Polirium\\Core\\UI\\View\\Components\\Header', 'ui.header');
 
+        // Register 'ui' namespace for class-based components (x-ui::button, etc.)
+        Blade::componentNamespace('Polirium\\Core\\UI\\View\\Components', 'ui');
+
         Blade::anonymousComponentPath(__DIR__ . '/../../resources/views/components/table', 'ui.table');
         Blade::anonymousComponentPath(__DIR__ . '/../../resources/views/components/interface', 'ui');
+        // Load old form components from 'forms' directory with 'form' namespace (backward compatibility)
         Blade::anonymousComponentPath(__DIR__ . '/../../resources/views/components/forms', 'form');
+
+        // Register new form components individually with view paths
+        Blade::component('core/ui::components/form/input', 'ui.form.input');
+        Blade::component('core/ui::components/form/textarea', 'ui.form.textarea');
+        Blade::component('core/ui::components/form/select', 'ui.form.select');
+        Blade::component('core/ui::components/form/checkbox', 'ui.form.checkbox');
+        Blade::component('core/ui::components/form/radio', 'ui.form.radio');
+        Blade::component('core/ui::components/form/group', 'ui.form.group');
+        Blade::component('core/ui::components/form/actions', 'ui.form.actions');
+        Blade::component('core/ui::components/form/tabs', 'ui.form.tabs');
+        Blade::component('core/ui::components/form/image-upload', 'ui.form.image-upload');
 
         $this->callAfterResolving(BladeCompiler::class, static function (BladeCompiler $blade): void {
             foreach (config('core.ui.components', []) as $alias => $component) {

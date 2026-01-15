@@ -91,9 +91,48 @@ trait LoadAndPublishDataTrait
 
     public function loadTranslations(): self
     {
-        $this->loadTranslationsFrom($this->getTranslationsPath(), $this->getDashedNamespace());
+        $namespace = $this->getDashedNamespace();
+        $this->loadTranslationsFrom($this->getTranslationsPath(), $namespace);
+
+        // Also register with dot notation for Laravel translator compatibility
+        // e.g., core/base -> core.base
+        $dotNamespace = $this->getDotedNamespace();
+        if ($namespace !== $dotNamespace) {
+            $this->loadTranslationsFrom($this->getTranslationsPath(), $dotNamespace);
+        }
+
+        // Reset any pre-cached empty translations for this namespace
+        // This fixes the issue where trans() is called before namespace is registered,
+        // causing empty cache entries that prevent real translations from loading
+        $this->resetTranslatorCache($namespace);
+        if ($namespace !== $dotNamespace) {
+            $this->resetTranslatorCache($dotNamespace);
+        }
 
         return $this;
+    }
+
+    /**
+     * Reset translator loaded cache for a specific namespace.
+     * This ensures fresh translations are loaded after namespace registration.
+     */
+    protected function resetTranslatorCache(string $namespace): void
+    {
+        $translator = $this->app['translator'];
+
+        try {
+            $loaded = (new \ReflectionProperty($translator, 'loaded'));
+            $loaded->setAccessible(true);
+            $loadedArr = $loaded->getValue($translator);
+
+            // Remove cached entries for this namespace (they may be empty from early calls)
+            if (isset($loadedArr[$namespace])) {
+                unset($loadedArr[$namespace]);
+                $loaded->setValue($translator, $loadedArr);
+            }
+        } catch (\ReflectionException $e) {
+            // Silently ignore if reflection fails
+        }
     }
 
     protected function getTranslationsPath(): string

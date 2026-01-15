@@ -24,13 +24,13 @@
                 @endif
             </span>
             <div>
-                <h3 class="mb-0">{{ __('Xin chào') }}, {{ $user->name ?? 'Admin' }}!</h3>
-                <div class="text-muted">{{ __('Chúc bạn một ngày làm việc hiệu quả') }}</div>
+                <h3 class="mb-0">{{ __('core/base::general.hello') }}, {{ $user->name ?? 'Admin' }}!</h3>
+                <div class="text-muted">{{ __('core/base::general.welcome_message') }}</div>
             </div>
         </div>
 
         @if(!empty($quickActions))
-            <div class="hr-text">{{ __('Hành động nhanh') }}</div>
+            <div class="hr-text">{{ __('core/base::general.quick_actions') }}</div>
             <div class="d-flex gap-2 flex-wrap">
                 @foreach($quickActions as $action)
                     <a href="{{ route($action['route']) }}" class="btn btn-{{ $action['color'] ?? 'primary' }}">

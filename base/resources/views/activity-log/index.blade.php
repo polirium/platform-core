@@ -1,5 +1,5 @@
 <x-ui.layouts::app>
-    <x-slot:title>{{ __('Lịch sử hoạt động') }}</x-slot:title>
+    <x-slot:title>{{ __('core/base::general.activity_log') }}</x-slot:title>
 
     <div class="row">
         <div class="col-12">

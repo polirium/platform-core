@@ -1,0 +1,88 @@
+// Tab Component Styles (v1 - Original Blue Theme)
+.nav-tabs {
+    border-bottom: 1px solid #dee2e6;
+
+    .nav-item {
+        margin-bottom: -1px;
+
+        .nav-link {
+            border: 1px solid transparent;
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+            color: #495057;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+
+            &:hover {
+                border-color: #e9ecef #e9ecef #dee2e6;
+                color: #206bc4; // Brand blue hover
+            }
+
+            &.active {
+                color: #206bc4; // Brand blue active text
+                background-color: #fff;
+                border-color: #dee2e6 #dee2e6 #fff;
+                font-weight: 600;
+
+                // Close button inside active tab
+                .close-tab-btn {
+                    color: #d63939; // Red close button
+                    opacity: 0.7;
+
+                    &:hover {
+                        opacity: 1;
+                        background: #fce8e8;
+                    }
+                }
+            }
+
+            // Close button style
+            .close-tab-btn {
+                color: #d63939;
+                opacity: 0.5;
+                transition: all 0.2s;
+                padding: 2px;
+                margin-left: 8px;
+                border-radius: 4px;
+                width: 20px;
+                height: 20px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+
+                &:hover {
+                    opacity: 1;
+                    background: #fce8e8;
+                }
+            }
+        }
+    }
+}
+
+// Add New Tab Button (v1 Style)
+.add-tab-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px dashed #206bc4; // Blue dashed border
+    color: #206bc4; // Blue icon
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: transparent;
+    padding: 0;
+    margin-left: 0.5rem;
+
+    &:hover {
+        background: #e7f1ff; // Light blue hover
+        border-style: solid;
+    }
+
+    svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2;
+    }
+}

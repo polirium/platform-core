@@ -5,7 +5,7 @@
             <div class="row g-2 align-items-center">
                 <div class="col">
                     <div class="page-pretitle text-muted">
-                        {{ trans('Chào mừng trở lại') }}
+                        {{ __('core/base::general.welcome_back') }}
                     </div>
                     <h2 class="page-title">
                         {{ auth()->user()->name ?? 'Admin' }}
@@ -15,20 +15,20 @@
                     @if($editMode)
                         <button wire:click="cancelEdit" class="btn btn-ghost-secondary">
                             <x-tabler-icons::x class="icon" />
-                            {{ __('Hủy') }}
+                            {{ __('core/base::general.cancel') }}
                         </button>
                         <button wire:click="saveLayout" class="btn btn-primary">
                             <x-tabler-icons::device-floppy class="icon" />
-                            {{ __('Lưu bố cục') }}
+                            {{ __('core/base::general.save_layout') }}
                         </button>
                         <button type="button" class="btn btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#widgetPanel">
                             <x-tabler-icons::plus class="icon" />
-                            {{ __('Thêm Widget') }}
+                            {{ __('core/base::general.add_widget') }}
                         </button>
                     @else
                         <button wire:click="toggleEditMode" class="btn btn-outline-primary">
                             <x-tabler-icons::settings class="icon" />
-                            {{ __('Tùy chỉnh') }}
+                            {{ __('core/base::general.customize') }}
                         </button>
                     @endif
                 </div>
@@ -43,8 +43,8 @@
                 <div class="d-flex align-items-center">
                     <x-tabler-icons::info-circle class="icon alert-icon me-2" />
                     <div>
-                        <strong>{{ __('Chế độ tùy chỉnh') }}</strong>:
-                        {{ __('Kéo thanh tiêu đề để sắp xếp, chọn kích thước, nhấn X để xóa.') }}
+                        <strong>{{ __('core/base::general.customize') }}</strong>:
+                        {{ __('core/base::general.edit_mode_hint') }}
                     </div>
                 </div>
             </div>
@@ -111,13 +111,13 @@
                         <div class="mb-3 text-muted">
                             <x-tabler-icons::layout-dashboard class="icon" width="64" height="64" stroke-width="1.5" />
                         </div>
-                        <h3 class="text-muted">{{ trans('Chưa có widget nào') }}</h3>
+                        <h3 class="text-muted">{{ __('core/base::general.no_widgets_yet') }}</h3>
                         <p class="text-muted mb-4">
-                            {{ trans('Nhấn Tùy chỉnh để thêm widget vào dashboard.') }}
+                            {{ __('core/base::general.no_widgets_hint') }}
                         </p>
                         <button wire:click="toggleEditMode" class="btn btn-primary btn-lg">
                             <x-tabler-icons::plus class="icon me-1" />
-                            {{ __('Tùy chỉnh Dashboard') }}
+                            {{ __('core/base::general.customize_dashboard') }}
                         </button>
                     </div>
                 </div>
@@ -129,8 +129,8 @@
     <div class="offcanvas offcanvas-end" tabindex="-1" id="widgetPanel" wire:ignore.self style="width: 380px;">
         <div class="offcanvas-header border-bottom">
             <div>
-                <h5 class="offcanvas-title mb-1">{{ __('Thêm Widget') }}</h5>
-                <p class="text-muted small mb-0">{{ __('Chọn widget để thêm') }}</p>
+                <h5 class="offcanvas-title mb-1">{{ __('core/base::general.add_widget') }}</h5>
+                <p class="text-muted small mb-0">{{ __('core/base::general.select_widget_to_add') }}</p>
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
@@ -158,7 +158,7 @@
             @else
                 <div class="text-center text-muted py-5">
                     <x-tabler-icons::checkbox class="icon mb-3" width="48" height="48" />
-                    <p class="mb-0">{{ __('Đã thêm tất cả widgets!') }}</p>
+                    <p class="mb-0">{{ __('core/base::general.all_widgets_added') }}</p>
                 </div>
             @endif
         </div>

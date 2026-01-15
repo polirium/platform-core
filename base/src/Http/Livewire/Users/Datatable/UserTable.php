@@ -66,20 +66,22 @@ final class UserTable extends BaseTable
             ->add('phone')
             ->add('roles_list', function (User $model) {
                 $badges = $model->roles->map(function ($role) {
-                    return "<span class='badge text-bg-secondary me-1'>{$role->name}</span>";
+                    $isAdmin = strtolower($role->name) === 'admin' || strtolower($role->name) === 'super admin';
+                    $class = $isAdmin ? 'crm-role-badge admin' : 'crm-role-badge';
+                    return "<span class='{$class} me-1'>{$role->name}</span>";
                 })->join('');
                 return $badges ?: '<span class="text-muted">—</span>';
             })
             ->add('status_badge', function (User $model) {
                 $status = $model->status ?? 'active';
                 if ($status === 'active') {
-                    return '<span class="badge text-bg-success">Hoạt động</span>';
+                    return '<span class="crm-status-badge active">Hoạt động</span>';
                 }
-                return '<span class="badge text-bg-warning">Không hoạt động</span>';
+                return '<span class="crm-status-badge inactive">Không hoạt động</span>';
             })
             ->add('super_admin_badge', function (User $model) {
                 if ($model->super_admin) {
-                    return '<span class="badge text-bg-primary"><i class="ti ti-shield-check me-1"></i>Super Admin</span>';
+                    return '<span class="crm-role-badge admin"><i class="ti ti-shield-check me-1"></i>Super Admin</span>';
                 }
                 return '<span class="text-muted">—</span>';
             })
@@ -170,30 +172,45 @@ final class UserTable extends BaseTable
     {
         $actions = [];
 
+        // Detail action
+        $actions[] = Button::add('detail')
+            ->slot('<i class="ti ti-eye"></i>')
+            ->id()
+            ->class('crm-action-btn')
+            ->attributes([
+                'onclick' => "Livewire.dispatch('show-modal-detail-user', {id: {$row->id}});",
+                'title' => __('Chi tiết'),
+            ]);
+
         if (auth()->user()->can('users.edit')) {
             $actions[] = Button::add('edit')
-                ->slot('<i class="ti ti-edit me-1"></i>' . __('Sửa'))
+                ->slot('<i class="ti ti-edit"></i>')
                 ->id()
-                ->class('btn btn-sm btn-primary')
-                ->dispatch('show-modal-edit-user', ['id' => $row->id]);
+                ->class('crm-action-btn')
+                ->attributes([
+                    'onclick' => "Livewire.dispatch('show-modal-edit-user', {id: {$row->id}});",
+                    'title' => __('Sửa'),
+                ]);
         }
 
         if (auth()->user()->can('users.delete')) {
             $actions[] = Button::add('delete')
-                ->slot('<i class="ti ti-trash me-1"></i>' . __('Xóa'))
+                ->slot('<i class="ti ti-trash"></i>')
                 ->id()
-                ->class('btn btn-sm btn-outline-danger')
+                ->class('crm-action-btn')
                 ->attributes([
-                    'onclick' => "Livewire.dispatch('show-modal-delete-user', {id: $row->id});",
+                    'onclick' => "Livewire.dispatch('show-modal-delete-user', {id: {$row->id}});",
+                    'title' => __('Xóa'),
                 ]);
         }
 
         if (auth()->user()->can('users.impersonate') && $row->id !== auth()->id() && $row->canBeImpersonated()) {
             $actions[] = Button::add('impersonate')
-                ->slot('<i class="ti ti-login me-1"></i>' . __('Đăng nhập'))
+                ->slot('<i class="ti ti-login"></i>')
                 ->id()
-                ->class('btn btn-sm btn-outline-warning')
-                ->route('impersonate', ['id' => $row->id]);
+                ->class('crm-action-btn')
+                ->route('impersonate', ['id' => $row->id])
+                ->attributes(['title' => __('Đăng nhập')]);
         }
 
         return $actions;

@@ -8,9 +8,9 @@
     <table class="table table-bordered table-sm">
         <thead>
             <tr>
-                <th style="width: 20%">{{ __('Trường') }}</th>
-                <th style="width: 40%">{{ __('Cũ') }}</th>
-                <th style="width: 40%">{{ __('Mới') }}</th>
+                <th style="width: 20%">{{ __('core/base::general.field') }}</th>
+                <th style="width: 40%">{{ __('core/base::general.old') }}</th>
+                <th style="width: 40%">{{ __('core/base::general.new') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -27,8 +27,8 @@
     <table class="table table-bordered table-sm">
         <thead>
             <tr>
-                <th style="width: 30%">{{ __('Trường') }}</th>
-                <th>{{ __('Giá trị mới') }}</th>
+                <th style="width: 30%">{{ __('core/base::general.field') }}</th>
+                <th>{{ __('core/base::general.new_value') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -44,8 +44,8 @@
     <table class="table table-bordered table-sm">
         <thead>
             <tr>
-                <th style="width: 30%">{{ __('Trường') }}</th>
-                <th>{{ __('Giá trị cũ') }}</th>
+                <th style="width: 30%">{{ __('core/base::general.field') }}</th>
+                <th>{{ __('core/base::general.old_value') }}</th>
             </tr>
         </thead>
         <tbody>

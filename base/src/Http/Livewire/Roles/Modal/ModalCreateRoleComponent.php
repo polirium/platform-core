@@ -22,6 +22,11 @@ class ModalCreateRoleComponent extends Component
 
     public function render()
     {
+        // Ensure permissions is always an array
+        if (!isset($this->request['permissions']) || !is_array($this->request['permissions'])) {
+            $this->request['permissions'] = [];
+        }
+
         $flags = $this->getAvailablePermissions();
         $children = $this->getPermissionTree($flags);
 
@@ -39,19 +44,34 @@ class ModalCreateRoleComponent extends Component
             $this->request['permissions'] = $role->permissions->pluck('name')->toArray();
         } else {
             $this->authorize('roles.create');
-            $this->reset('request');
+            // Reset but ensure permissions is always an array
+            $this->request = [
+                'name' => null,
+                'permissions' => [],
+            ];
         }
         $this->dispatch('poli.modal', ['modal-create-role', 'show']);
     }
 
     public function addPermission($flag): void
     {
-        $this->request['permissions'][] = $flag;
+        if (!is_array($this->request['permissions'])) {
+            $this->request['permissions'] = [];
+        }
+        if (!in_array($flag, $this->request['permissions'])) {
+            $this->request['permissions'][] = $flag;
+        }
     }
 
     public function removePermission($flag): void
     {
-        unset($this->request['permissions'][array_search($flag, $this->request['permissions'])]);
+        if (is_array($this->request['permissions'])) {
+            $key = array_search($flag, $this->request['permissions']);
+            if ($key !== false) {
+                unset($this->request['permissions'][$key]);
+                $this->request['permissions'] = array_values($this->request['permissions']);
+            }
+        }
     }
 
     public function submit()
@@ -62,9 +82,14 @@ class ModalCreateRoleComponent extends Component
             $this->authorize('roles.create');
         }
 
+        // Ensure permissions is always an array before validation
+        if (!is_array($this->request['permissions'])) {
+            $this->request['permissions'] = [];
+        }
+
         $this->validate([
             'request.name' => 'required|' . Rule::unique('roles', 'name')->ignore(! empty($this->request['id']) ? $this->request['id'] : null),
-            'request.permissions' => 'array|required',
+            'request.permissions' => 'array',
         ]);
 
         $role = Role::updateOrCreate(
@@ -87,7 +112,8 @@ class ModalCreateRoleComponent extends Component
 
         $this->reset('request', 'modal');
         $this->dispatch('alert', trans('Hoàn thành tác vụ'), 'success');
-        $this->dispatch('pg:eventRefresh-roles-table');
+        $this->dispatch('pg-toggle-detail-roles-table-hidden-all'); // Collapse all detail rows first
+        $this->dispatch('pg:eventRefresh-roles-table'); // Then refresh table data
         $this->dispatch('poli.modal', ['modal-create-role', 'hide']);
     }
 }
