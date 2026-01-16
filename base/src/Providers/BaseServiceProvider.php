@@ -43,6 +43,7 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
             \Polirium\Core\Base\Commands\ImportCountriesCommand::class,
             \Polirium\Core\Base\Commands\ModuleDependenciesCommand::class,
             \Polirium\Core\Base\Commands\SampleDataCommand::class,
+            \Polirium\Core\Base\Commands\AssetsPublishCommand::class,
         ]);
 
         // Register base settings
