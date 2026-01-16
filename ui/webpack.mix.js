@@ -36,6 +36,7 @@ const jsFiles = [
     'polirium',
     'theme',
     'app',
+    'dashboard',
 ];
 
 // Compile SCSS files

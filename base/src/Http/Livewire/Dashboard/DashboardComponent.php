@@ -27,6 +27,7 @@ class DashboardComponent extends Component
 
     public function mount(): void
     {
+        \Polirium\Core\UI\Facades\Assets::loadJs(['sortable', 'dashboard']);
         $this->loadWidgets();
         $this->loadUserLayout();
     }

@@ -79,8 +79,8 @@ return [
         */
         'js' => [
             'dropzone' => 'core/ui/libs/dropzone/dist/dropzone-min.js',
-            'sortable' => 'core/ui/libs/vendor/sortable.min.js',
-            'dashboard' => 'core/ui/js/dashboard.js',
+            'sortable' => 'core/ui/libs/sortablejs/Sortable.min.js',
+            'dashboard' => 'core/ui/js/dashboard.min.js',
             'print-forms-editor' => 'modules/print-forms/js/editor.min.js',
         ],
     ],

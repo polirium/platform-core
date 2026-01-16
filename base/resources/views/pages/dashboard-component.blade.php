@@ -164,3 +164,30 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            // Function to run initialization safely
+            const runInit = () => {
+                if (typeof initWidgetSortable === 'function') {
+                    initWidgetSortable();
+                }
+            };
+
+            // Init on load if needed
+            runInit();
+
+            // Listen for edit mode change
+            Livewire.on('editModeChanged', () => {
+                // Small delay to allow DOM to update
+                setTimeout(runInit, 50);
+            });
+
+            // Listen for layout updates (adding/removing widgets)
+            Livewire.on('layoutUpdated', () => {
+                setTimeout(runInit, 50);
+            });
+        });
+    </script>
+@endpush
