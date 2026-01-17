@@ -6,6 +6,9 @@
     contextY: 0,
     selectedItem: null,
     selectedType: null,
+    selectedIsImage: false,
+    activeItemId: null,
+    activeType: null,
     showSidebar: false,
     sidebarItem: null,
     sidebarType: null,
@@ -139,8 +142,9 @@ class="media-manager">
                             @foreach($folders as $folder)
                                 <div class="media-grid-item folder-item"
                                      wire:dblclick="navigateToFolder('{{ $folder['path'] }}')"
-                                     @click="showSidebar = true; sidebarItem = '{{ $folder['path'] }}'; sidebarType = 'folder'; $wire.loadFolderDetails('{{ $folder['path'] }}')"
-                                     @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = '{{ $folder['path'] }}'; selectedType = 'folder'">
+                                     @click="showSidebar = true; sidebarType = 'folder'; $wire.loadFolderDetails('{{ $folder['path'] }}'); activeItemId = '{{ $folder['path'] }}'; activeType = 'folder'"
+                                     @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = '{{ $folder['path'] }}'; selectedType = 'folder'; selectedIsImage = false"
+                                     :class="{ 'active': activeItemId === '{{ $folder['path'] }}' && activeType === 'folder' }">
                                     <div class="media-thumbnail">
                                         {!! tabler_icon('folder', ['class' => 'icon-folder']) !!}
                                     </div>
@@ -164,10 +168,11 @@ class="media-manager">
                             {{-- Files --}}
                             @foreach($mediaItems as $item)
                                 <div class="media-grid-item {{ in_array($item->id, $selectedMedia) ? 'selected' : '' }}"
+                                     :class="{ 'active': activeItemId === {{ $item->id }} && activeType === 'file' }"
                                      data-media-id="{{ $item->id }}"
                                      data-url="{{ $item->getUrl() }}"
-                                     @click="showSidebar = true; sidebarType = 'file'; $wire.loadMediaDetails({{ $item->id }})"
-                                     @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = {{ $item->id }}; selectedType = 'file'">
+                                     @click="showSidebar = true; sidebarType = 'file'; $wire.loadMediaDetails({{ $item->id }}); activeItemId = {{ $item->id }}; activeType = 'file'"
+                                     @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = {{ $item->id }}; selectedType = 'file'; selectedIsImage = {{ $item->is_image ? 'true' : 'false' }}">
 
                                     <label class="media-checkbox" @click.stop>
                                         <input type="checkbox" class="form-check-input"
@@ -259,7 +264,7 @@ class="media-manager">
 
                             @forelse($mediaItems as $item)
                                 <tr @click="$wire.loadMediaDetails({{ $item->id }}); showSidebar = true"
-                                    @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = {{ $item->id }}; selectedType = 'file'"
+                                    @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = {{ $item->id }}; selectedType = 'file'; selectedIsImage = {{ $item->is_image ? 'true' : 'false' }}"
                                     class="media-list-item cursor-pointer {{ in_array($item->id, $selectedMedia) ? 'table-primary' : '' }}">
                                     <td @click.stop>
                                         <label class="media-checkbox">

@@ -537,11 +537,12 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
     }
   }
 
-  // Selected state
-  &.selected {
-    border-color: var(--media-primary);
-    background: var(--media-primary-light);
-    box-shadow: $media-shadow-primary;
+  // Selected or Active state
+  &.selected,
+  &.active {
+    border: 2px solid var(--tblr-primary); // Thicker border
+    background: var(--tblr-bg-surface-secondary); // Gentle background highlight
+    box-shadow: 0 0 0 2px rgba(var(--tblr-primary-rgb), 0.1); // Optional glow
 
     .media-checkbox {
       background: var(--media-primary);

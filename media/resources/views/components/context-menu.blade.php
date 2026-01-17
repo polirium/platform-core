@@ -16,20 +16,24 @@
                     <span class="menu-text">{{ __('core/media::media.details') }}</span>
                 </div>
 
-                <div class="context-menu-item" @click="$wire.openPreviewModal(selectedItem); contextMenu = false">
-                    <span class="menu-icon">{!! tabler_icon('eye', ['class' => 'icon']) !!}</span>
-                    <span class="menu-text">{{ __('core/media::media.view_image') }}</span>
-                </div>
+                <template x-if="selectedIsImage">
+                    <div class="context-menu-item" @click="$wire.openPreviewModal(selectedItem); contextMenu = false">
+                        <span class="menu-icon">{!! tabler_icon('eye', ['class' => 'icon']) !!}</span>
+                        <span class="menu-text">{{ __('core/media::media.view_image') }}</span>
+                    </div>
+                </template>
             </div>
 
             <div class="context-menu-divider"></div>
 
             {{-- Edit Group --}}
             <div class="context-menu-section">
-                <div class="context-menu-item" @click="$wire.openImageEditor(selectedItem); contextMenu = false">
-                    <span class="menu-icon">{!! tabler_icon('photo-edit', ['class' => 'icon']) !!}</span>
-                    <span class="menu-text">{{ __('core/media::media.edit_image') }}</span>
-                </div>
+                <template x-if="selectedIsImage">
+                    <div class="context-menu-item" @click="$wire.openImageEditor(selectedItem); contextMenu = false">
+                        <span class="menu-icon">{!! tabler_icon('photo-edit', ['class' => 'icon']) !!}</span>
+                        <span class="menu-text">{{ __('core/media::media.edit_image') }}</span>
+                    </div>
+                </template>
 
                 <div class="context-menu-item" @click="renamingId = selectedItem; renamingType = 'file'; contextMenu = false; setTimeout(() => { let input = document.querySelector('input[data-rename-input=\'true\']:not([style*=\'display: none\'])'); if(input) { input.focus(); input.select(); } }, 100)">
                     <span class="menu-icon">{!! tabler_icon('edit', ['class' => 'icon']) !!}</span>
