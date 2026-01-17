@@ -72,6 +72,11 @@ return [
         'alias' => 'core/base::branch.modal.modal-create-branch-taking-address',
         'description' => 'Modal create branch taking address',
     ],
+    'branch-filter-sidebar' => [
+        'class' => \Polirium\Core\Base\Http\Livewire\Branch\FilterSidebarComponent::class,
+        'alias' => 'core/base::branch.filter-sidebar',
+        'description' => 'Branch Filter Sidebar',
+    ],
     // End Chi nhánh
 
     // Thương hiệu
@@ -85,6 +90,11 @@ return [
         'alias' => 'core/base::brand.modal.modal-create-brand',
         'description' => 'Modal create brand',
     ],
+    'brand-filter-sidebar' => [
+        'class' => \Polirium\Core\Base\Http\Livewire\Brand\FilterSidebarComponent::class,
+        'alias' => 'core/base::brand.filter-sidebar',
+        'description' => 'Brand Filter Sidebar',
+    ],
     // End Thương hiệu
 
     // Phân quyền
@@ -97,6 +107,11 @@ return [
         'class' => ModalCreateRoleComponent::class,
         'alias' => 'core/base::roles.modal.modal-create-role',
         'description' => 'Modal create role',
+    ],
+    'role-filter-sidebar' => [
+        'class' => \Polirium\Core\Base\Http\Livewire\Roles\FilterSidebarComponent::class,
+        'alias' => 'core/base::roles.filter-sidebar',
+        'description' => 'Role Filter Sidebar',
     ],
     // End Phân quyền
 
@@ -118,5 +133,10 @@ return [
         'class' => \Polirium\Core\Base\Http\Livewire\Table\ActivityLogTable::class,
         'alias' => 'core-base-activity-log-table',
         'description' => 'Activity Log Table',
+    ],
+    'activity-log-filter-sidebar' => [
+        'class' => \Polirium\Core\Base\Http\Livewire\Table\ActivityLogFilterSidebarComponent::class,
+        'alias' => 'core/base::activity-log.filter-sidebar',
+        'description' => 'Activity Log Filter Sidebar',
     ],
 ];

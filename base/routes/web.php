@@ -120,6 +120,23 @@ Route::middleware(['web', 'auth'])
             return view('core/base::modules.index');
         })->name('modules.index')->middleware('can:modules.index');
 
+        Route::get('/modules/{name}/image', function ($name) {
+            $modulePath = platform_path("modules/{$name}");
+            // Check for common image files
+            $files = ['screenshot.png', 'screenshot.jpg', 'preview.png', 'image.png'];
+
+            foreach ($files as $file) {
+                 $path = "{$modulePath}/{$file}";
+                 if (file_exists($path)) {
+                     return response()->file($path);
+                 }
+            }
+
+            // Return default placeholder if specific image not found?
+            // For now 404
+            abort(404);
+        })->name('modules.image');
+
         /**
          * Activity Log
          */

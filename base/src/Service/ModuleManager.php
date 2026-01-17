@@ -38,7 +38,7 @@ class ModuleManager
             }
 
             // Get module info
-            $moduleData = $this->parseComposerJson($composer, $folder, $moduleDir);
+            $moduleData = $this->parseModuleData($composer, $folder, $moduleDir);
             if (!$moduleData) {
                 continue;
             }
@@ -59,6 +59,8 @@ class ModuleManager
                     'provider' => $moduleData['provider'],
                     'path' => $moduleData['path'],
                     'dependencies' => $moduleData['dependencies'],
+                    'author' => $moduleData['author'],
+                    'image' => $moduleData['image'],
                 ]);
                 $discovered[] = $existing;
             }
@@ -72,9 +74,9 @@ class ModuleManager
     }
 
     /**
-     * Parse composer.json to extract module info.
+     * Parse module data from composer.json and module.json
      */
-    protected function parseComposerJson(array $composer, string $folder, string $path): ?array
+    protected function parseModuleData(array $composer, string $folder, string $path): ?array
     {
         // Get PSR-4 namespace
         $namespace = null;
@@ -92,16 +94,34 @@ class ModuleManager
             return null;
         }
 
+        // Parse Author from composer
+        $author = 'Polyx'; // Default
+        if (isset($composer['authors']) && is_array($composer['authors'])) {
+             $authors = array_map(function($a) {
+                 return $a['name'] ?? '';
+             }, $composer['authors']);
+             $author = implode(', ', array_filter($authors));
+        }
+
+        // Check for module.json
+        $moduleJson = [];
+        $moduleJsonFile = $path . '/module.json';
+        if (file_exists($moduleJsonFile)) {
+            $moduleJson = json_decode(file_get_contents($moduleJsonFile), true) ?? [];
+        }
+
         return [
             'name' => $folder,
-            'display_name' => $composer['description'] ?? ucfirst(str_replace('-', ' ', $folder)),
-            'description' => $composer['description'] ?? null,
-            'version' => $composer['version'] ?? '1.0.0',
+            'display_name' => $moduleJson['name'] ?? ($composer['description'] ?? ucfirst(str_replace('-', ' ', $folder))),
+            'description' => $moduleJson['description'] ?? ($composer['description'] ?? null),
+            'version' => $moduleJson['version'] ?? ($composer['version'] ?? '1.0.0'),
             'namespace' => $namespace,
             'provider' => $provider,
             'path' => $path,
             'status' => Module::STATUS_PENDING,
             'dependencies' => $composer['require'] ?? null,
+            'author' => $moduleJson['author'] ?? $author,
+            'image' => $moduleJson['image'] ?? "/admin/modules/{$folder}/image",
         ];
     }
 
@@ -136,8 +156,17 @@ class ModuleManager
     public function enable(string $name): bool
     {
         $module = Module::where('name', $name)->first();
-        if (!$module || !$module->isInstalled()) {
+
+        if (!$module) {
             return false;
+        }
+
+        // If not installed (Pending), try to install first
+        if (!$module->isInstalled()) {
+            if (!$this->install($name)) {
+                return false;
+            }
+            $module->refresh();
         }
 
         $module->update(['status' => Module::STATUS_ACTIVE]);
@@ -249,5 +278,80 @@ class ModuleManager
         foreach ($activeModules as $module) {
             $this->loadModule($module);
         }
+    }
+
+    /**
+     * Download module as ZIP.
+     */
+    public function download(string $name): ?string
+    {
+        $module = Module::where('name', $name)->first();
+        if (!$module) {
+            return null;
+        }
+
+        $modulePath = $module->path;
+        if (!is_dir($modulePath)) {
+            return null;
+        }
+
+        $fileName = $name . '-' . ($module->version ?? '1.0.0') . '.zip';
+        $zipPath = storage_path('app/' . $fileName);
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($modulePath),
+                \RecursiveIteratorIterator::LEAVES_ONLY
+            );
+
+            foreach ($files as $name => $file) {
+                if (!$file->isDir()) {
+                    $filePath = $file->getRealPath();
+                    $relativePath = $module->name . '/' . substr($filePath, strlen($modulePath) + 1);
+                    $zip->addFile($filePath, $relativePath);
+                }
+            }
+
+            $zip->close();
+            return $zipPath;
+        }
+
+        return null;
+    }
+    /**
+     * Delete a module safely (move to #delete folder).
+     */
+    public function delete(string $name): bool
+    {
+        $module = Module::where('name', $name)->first();
+        if (!$module) {
+            return false;
+        }
+
+        $modulePath = $module->path;
+        if (!is_dir($modulePath)) {
+            // If folder doesn't exist, just delete from DB
+            $module->delete();
+            return true;
+        }
+
+        // Create #delete directory if not exists
+        $deleteDir = platform_path('modules/#delete');
+        if (!is_dir($deleteDir)) {
+            mkdir($deleteDir, 0755, true);
+        }
+
+        // Move module to #delete folder with timestamp
+        $timestamp = date('Y-m-d_H-i-s');
+        $newPath = $deleteDir . '/' . $name . '_' . $timestamp;
+
+        if (rename($modulePath, $newPath)) {
+            // Re-run discover to update DB/Cache
+            $this->discover();
+            return true;
+        }
+
+        return false;
     }
 }

@@ -7,21 +7,36 @@
     @endpush
     @endonce
 
+    <div class="page-header d-print-none">
+        <div class="container-xl">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h2 class="page-title">
+                        {{ __('core/base::general.user_management') }}
+                    </h2>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <div class="crm-users-page">
         <!-- Main Content Card -->
         <div class="crm-main-card">
             <!-- Card Header -->
-            <div class="crm-card-header">
+            <div class="crm-card-header d-flex justify-content-between align-items-center">
                 <div class="crm-card-title">
                     <div class="crm-card-title-icon">
                         {!! tabler_icon('users', ['class' => 'ti']) !!}
                     </div>
                     <h2>{{ __('core/base::general.user_list') }}</h2>
                 </div>
-                <button type="button" class="crm-btn-primary" onclick="Livewire.dispatch('show-modal-create-user');">
-                    {!! tabler_icon('plus', ['class' => 'ti']) !!}
-                    {{ __('core/base::general.add_user') }}
-                </button>
+                <div class="card-actions">
+                    <button type="button" class="btn btn-primary" onclick="Livewire.dispatch('show-modal-create-user');">
+                        {!! tabler_icon('plus', ['class' => 'icon']) !!}
+                        {{ __('core/base::general.add_user') }}
+                    </button>
+                </div>
             </div>
 
             <!-- User Table -->

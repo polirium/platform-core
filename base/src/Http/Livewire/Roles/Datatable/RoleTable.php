@@ -134,17 +134,19 @@ final class RoleTable extends BaseTable
 
         if (auth()->user()->can('roles.edit')) {
             $actions[] = Button::add('edit')
-                ->slot(tabler_icon('edit', ['class' => 'icon']))
-                ->class('btn btn-ghost-primary btn-icon btn-sm')
+                ->slot(tabler_icon('pencil', ['class' => 'icon']))
+                ->class('btn btn-primary btn-icon btn-sm me-1')
                 ->attributes(['aria-label' => trans('core/base::general.edit')])
+                ->tooltip(trans('core/base::general.edit'))
                 ->dispatch('show-modal-create-role', ['id' => $row->id]);
         }
 
         if (auth()->user()->can('roles.delete')) {
             $actions[] = Button::add('delete')
                 ->slot(tabler_icon('trash', ['class' => 'icon']))
-                ->class('btn btn-ghost-danger btn-icon btn-sm')
+                ->class('btn btn-outline-danger btn-icon btn-sm')
                 ->attributes(['aria-label' => trans('core/base::general.delete')])
+                ->tooltip(trans('core/base::general.delete'))
                 ->dispatch('show-modal-delete-role', ['id' => $row->id]);
         }
 

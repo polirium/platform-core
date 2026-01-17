@@ -38,12 +38,21 @@ class MenuServiceProvider extends ServiceProvider
 
                 $menuData = $this->getMenus[$element];
 
-                // Make Parent Menu with permission data
-                $item = $menu->add($menuData['name'], [
-                    'route' => $menuData['route'],
+                $options = [
                     'id' => $menuData['id'],
                     'icon' => $menuData['icon'] ?? '',
-                ]);
+                ];
+
+                if (!empty($menuData['route'])) {
+                    $options['route'] = $menuData['route'];
+                } elseif (!empty($menuData['url'])) {
+                    $options['url'] = $menuData['url'];
+                } else {
+                    $options['url'] = 'javascript:void(0);';
+                }
+
+                // Make Parent Menu with permission data
+                $item = $menu->add($menuData['name'], $options);
 
                 // Attach permission data to menu item
                 if (!empty($menuData['permission'])) {
@@ -67,12 +76,21 @@ class MenuServiceProvider extends ServiceProvider
 
             $menuData = $this->getMenus[$subElement];
 
+            $options = [
+                'id' => $menuData['id'],
+                'icon' => $menuData['icon'] ?? '',
+            ];
+
+            if (!empty($menuData['route'])) {
+                $options['route'] = $menuData['route'];
+            } elseif (!empty($menuData['url'])) {
+                $options['url'] = $menuData['url'];
+            } else {
+                $options['url'] = 'javascript:void(0);';
+            }
+
             $item = $menu->find($menuData['parent'])
-                ->add($menuData['name'], [
-                    'route' => $menuData['route'],
-                    'id' => $menuData['id'],
-                    'icon' => $menuData['icon'] ?? '',
-                ]);
+                ->add($menuData['name'], $options);
 
             // Attach permission data to menu item
             if (!empty($menuData['permission'])) {

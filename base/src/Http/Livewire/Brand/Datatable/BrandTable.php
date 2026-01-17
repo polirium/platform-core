@@ -82,7 +82,7 @@ final class BrandTable extends BaseTable
             Column::make(trans('Người tạo'), 'user_name')->sortable()->searchable(),
             Column::make(trans('Note'), 'note')->sortable()->searchable(),
             // Column::make(trans('Trạng thái'), 'status_name')->sortable()->searchable(),
-            Column::action('Action'),
+            Column::action(trans('core/base::general.action')),
         ];
     }
 
@@ -115,7 +115,7 @@ final class BrandTable extends BaseTable
             Button::add('edit')
                 ->slot(tabler_icon('pencil', ['class' => 'icon']))
                 ->id()
-                ->class('btn btn-ghost-primary btn-icon btn-sm')
+                ->class('btn btn-primary btn-icon btn-sm me-1')
                 ->attributes(['aria-label' => trans('core/base::general.edit')])
                 ->tooltip(trans('core/base::general.edit'))
                 ->dispatch('show-modal-create-brand', ['id' => $row->id]),
@@ -123,7 +123,7 @@ final class BrandTable extends BaseTable
             Button::add('delete')
                 ->slot(tabler_icon('trash', ['class' => 'icon']))
                 ->id()
-                ->class('btn btn-ghost-danger btn-icon btn-sm')
+                ->class('btn btn-outline-danger btn-icon btn-sm')
                 ->attributes(['aria-label' => trans('core/base::general.delete')])
                 ->tooltip(trans('core/base::general.delete'))
                 ->confirm(trans('core/base::general.delete_confirm'))

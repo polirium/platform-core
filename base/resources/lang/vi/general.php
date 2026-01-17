@@ -34,7 +34,7 @@ return [
     'new_this_month' => 'Mới tháng này',
 
     // Actions
-    'action' => 'Action',
+    'action' => 'Thao tác',
     'save' => 'Lưu',
     'saving' => 'Đang lưu...',
     'edit' => 'Sửa',
@@ -66,9 +66,14 @@ return [
     'click_to_change_image' => 'Bấm để đổi ảnh',
     'click_or_drag_image' => 'Bấm hoặc kéo ảnh vào đây',
     'change' => 'Đổi',
+    'import_excel' => 'Nhập Excel',
 
     // Layout
     'list' => 'Danh sách',
+    'filter' => 'Bộ lọc',
+    'search_by_name' => 'Tìm kiếm theo tên',
+    'filter_active' => 'Đang lọc',
+    'clear_filter' => 'Xóa bộ lọc',
     'grid' => 'Lưới',
     'details' => 'Chi tiết',
     'custom_mode' => 'Chế độ tùy chỉnh',
@@ -148,6 +153,12 @@ return [
 
     // Activity Log
     'activity_log' => 'Lịch sử hoạt động',
+    'filter_by_user' => 'Lọc theo người dùng',
+    'all_users' => 'Tất cả người dùng',
+    'filter_by_action' => 'Lọc theo hành động',
+    'all_actions' => 'Tất cả hành động',
+    'about_activity_log' => 'Về lịch sử hoạt động',
+    'activity_log_description' => 'Xem chi tiết các hoạt động đã diễn ra trong hệ thống.',
 
     // Branch
     'branch' => 'Chi nhánh',

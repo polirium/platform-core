@@ -16,6 +16,8 @@ class Module extends BaseModel
         'path',
         'status',
         'dependencies',
+        'author',
+        'image',
     ];
 
     protected $casts = [

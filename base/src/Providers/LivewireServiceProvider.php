@@ -15,7 +15,9 @@ class LivewireServiceProvider extends ServiceProvider
         $components = $this->getLivewireComponent();
 
         foreach ($components as $component) {
-            Livewire::component($component['alias'], $component['class']);
+            if (isset($component['alias']) && isset($component['class'])) {
+                Livewire::component($component['alias'], $component['class']);
+            }
         }
     }
 }

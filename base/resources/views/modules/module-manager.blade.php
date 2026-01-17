@@ -13,162 +13,285 @@
         </div>
     @endif
 
-    <div class="card">
-        <div class="card-header">
-            <div class="d-flex align-items-center gap-3">
-                <span class="avatar avatar-sm bg-primary-lt">
-                    {!! tabler_icon('package', ['class' => 'icon']) !!}
-                </span>
-                <h3 class="card-title mb-0">{{ __('core/base::general.module_manager') }}</h3>
-            </div>
-            <div class="card-actions">
-                <x-ui::button color="primary" icon="refresh" wire:click="discover" wire:loading.attr="disabled">
-                    <span wire:loading.remove wire:target="discover">
-                        {{ __('core/base::general.scan_modules') }}
-                    </span>
-                    <span wire:loading wire:target="discover">
-                        <span class="spinner-border spinner-border-sm me-1"></span> {{ __('core/base::general.scanning') }}
-                    </span>
-                </x-ui::button>
-            </div>
+    {{-- Header --}}
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+            <h2 class="page-title mb-1">{{ __('core/base::general.modules') }}</h2>
+            <p class="text-muted small mb-0">{{ __('Quản lý và kích hoạt/vô hiệu hóa các module hệ thống') }}</p>
         </div>
-        <div class="card-body">
-            @if($modules->isEmpty())
-                <div class="empty">
-                    <div class="empty-icon">
-                        <i class="ti ti-package-off" style="font-size: 3rem;"></i>
-                    </div>
-                    <p class="empty-title">{{ __('core/base::general.no_modules') }}</p>
-                    <p class="empty-subtitle text-muted">
-                        {{ __('core/base::general.add_module_and_scan') }}
-                    </p>
-                </div>
-            @else
-                <div class="table-responsive">
-                    <table class="table table-vcenter card-table">
-                        <thead>
-                            <tr>
-                                <th>{{ __('core/base::general.module') }}</th>
-                                <th>{{ __('core/base::general.version') }}</th>
-                                <th>{{ __('core/base::general.status') }}</th>
-                                <th class="w-1">{{ __('core/base::general.actions') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($modules as $module)
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <span class="avatar avatar-sm bg-blue-lt me-2">
-                                                <i class="ti ti-package"></i>
-                                            </span>
-                                            <div>
-                                                <div class="font-weight-medium">{{ $module->display_name }}</div>
-                                                <div class="text-muted small">{{ $module->name }}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-azure-lt">{{ $module->version ?? '1.0.0' }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-{{ $module->status_color }}-lt">
-                                            {{ $module->status_label }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-list flex-nowrap">
-                                            @if($module->status === 'pending')
-                                                <x-ui::button color="success" size="sm" icon="download"
-                                                        wire:click="install('{{ $module->name }}')"
-                                                        wire:loading.attr="disabled"
-                                                        title="{{ __('core/base::general.install_module') }}">
-                                                    {{ __('core/base::general.install') }}
-                                                </x-ui::button>
-                                            @elseif($module->status === 'installed')
-                                                <x-ui::button color="primary" size="sm" icon="player-play"
-                                                        wire:click="enable('{{ $module->name }}')"
-                                                        wire:loading.attr="disabled"
-                                                        title="{{ __('core/base::general.activate_module') }}">
-                                                    {{ __('core/base::general.activate') }}
-                                                </x-ui::button>
-                                            @elseif($module->status === 'active')
-                                                <x-ui::button color="warning" size="sm" icon="player-pause"
-                                                        wire:click="disable('{{ $module->name }}')"
-                                                        wire:loading.attr="disabled"
-                                                        title="{{ __('core/base::general.disable_module') }}">
-                                                    {{ __('core/base::general.disable') }}
-                                                </x-ui::button>
-                                            @elseif($module->status === 'disabled')
-                                                <x-ui::button color="primary" size="sm" icon="player-play"
-                                                        wire:click="enable('{{ $module->name }}')"
-                                                        wire:loading.attr="disabled"
-                                                        title="{{ __('core/base::general.reactivate_module') }}">
-                                                    {{ __('core/base::general.reactivate') }}
-                                                </x-ui::button>
-                                            @endif
-
-                                            @if($module->status !== 'pending')
-                                                <x-ui::button color="danger" size="sm" icon="trash" :outline="true"
-                                                        wire:click="uninstall('{{ $module->name }}')"
-                                                        wire:loading.attr="disabled"
-                                                        wire:confirm="{{ __('core/base::general.confirm_uninstall') }}"
-                                                        title="{{ __('core/base::general.uninstall_module') }}">
-                                                    {{ __('core/base::general.remove') }}
-                                                </x-ui::button>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
+        <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-primary" wire:click="$dispatch('open-upload-modal')">
+                {!! tabler_icon('upload', ['class' => 'icon']) !!}
+                {{ __('Upload Module') }}
+            </button>
+            <button class="btn btn-dark" wire:click="discover">
+                {!! tabler_icon('refresh', ['class' => 'icon']) !!}
+                {{ __('Refresh') }}
+            </button>
         </div>
     </div>
 
-    <!-- Module Info Modal -->
-    @if($selectedModule)
-        <x-ui::modal id="module-info-modal" :header="$selectedModule->display_name" class="modal-lg">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('core/base::general.name') }}</label>
-                        <div class="form-control-plaintext">{{ $selectedModule->name }}</div>
-                    </div>
+    {{-- Filter Bar --}}
+    <div class="card mb-3">
+        <div class="card-body p-2">
+            <div class="d-flex align-items-center justify-content-between">
+                {{-- Bulk Actions --}}
+                <div class="d-flex align-items-center gap-2">
+                    @if(count($selected) > 0)
+                        <div class="dropdown">
+                            <button class="btn btn-ghost-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                {{ __('Đã chọn') }} ({{ count($selected) }})
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="#" wire:click.prevent="bulkActivate">
+                                        {!! tabler_icon('check', ['class' => 'icon icon-sm me-2 text-success']) !!}
+                                        {{ __('Kích hoạt') }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" wire:click.prevent="bulkDeactivate">
+                                        {!! tabler_icon('x', ['class' => 'icon icon-sm me-2 text-warning']) !!}
+                                        {{ __('Vô hiệu hóa') }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    @else
+                        <span class="text-muted ms-2 small">{{ count($modules) }} {{ __('modules') }}</span>
+                    @endif
                 </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('core/base::general.version') }}</label>
-                        <div class="form-control-plaintext">{{ $selectedModule->version ?? '1.0.0' }}</div>
+
+                {{-- Search & View Toggle --}}
+                <div class="d-flex align-items-center gap-2">
+                    <div class="input-icon">
+                        <span class="input-icon-addon">
+                            {!! tabler_icon('search', ['class' => 'icon']) !!}
+                        </span>
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="{{ __('Search...') }}"
+                            wire:model.live.debounce.300ms="search"
+                        >
                     </div>
-                </div>
-                <div class="col-12">
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('core/base::general.description') }}</label>
-                        <div class="form-control-plaintext">{{ $selectedModule->description ?? __('core/base::general.no_description') }}</div>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('core/base::general.namespace') }}</label>
-                        <div class="form-control-plaintext"><code>{{ $selectedModule->namespace }}</code></div>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('core/base::general.provider') }}</label>
-                        <div class="form-control-plaintext"><code>{{ $selectedModule->provider }}</code></div>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('core/base::general.folder_path') }}</label>
-                        <div class="form-control-plaintext"><code>{{ $selectedModule->path }}</code></div>
+                    <div class="btn-group">
+                        <button class="btn btn-icon {{ $viewMode === 'list' ? 'btn-dark active' : 'btn-ghost-secondary' }}" wire:click="setViewMode('list')">
+                            {!! tabler_icon('list', ['class' => 'icon']) !!}
+                        </button>
+                        <button class="btn btn-icon {{ $viewMode === 'grid' ? 'btn-dark active' : 'btn-ghost-secondary' }}" wire:click="setViewMode('grid')">
+                            {!! tabler_icon('layout-grid', ['class' => 'icon']) !!}
+                        </button>
                     </div>
                 </div>
             </div>
-        </x-ui::modal>
+        </div>
+    </div>
+
+    @if($modules->isEmpty())
+         <div class="empty">
+            <div class="empty-icon">
+                <i class="ti ti-package-off" style="font-size: 3rem;"></i>
+            </div>
+            <p class="empty-title">{{ __('core/base::general.no_modules') }}</p>
+            <p class="empty-subtitle text-muted">
+                {{ __('core/base::general.add_module_and_scan') }}
+            </p>
+        </div>
+    @else
+        @if($viewMode === 'list')
+            {{-- LIST VIEW --}}
+            <div class="card">
+                <div class="list-group list-group-flush">
+                    {{-- Header Row --}}
+                    <div class="list-group-item bg-dark-lt d-none d-md-block py-2">
+                        <div class="row align-items-center text-uppercase small text-muted font-weight-bold">
+                            <div class="col-auto w-1"></div> {{-- Checkbox spacer --}}
+                            <div class="col-4">{{ __('MODULE') }}</div>
+                            <div class="col-4">{{ __('DESCRIPTION') }}</div>
+                            <div class="col-1">{{ __('STATUS') }}</div>
+                            <div class="col-2">{{ __('VERSION') }}</div>
+                            <div class="col-auto ms-auto">{{ __('ACTIONS') }}</div>
+                        </div>
+                    </div>
+
+                    @foreach($modules as $module)
+                        <div class="list-group-item p-3 {{ in_array($module->name, $selected) ? 'bg-indigo-lt' : '' }}">
+                            <div class="row align-items-center">
+                                {{-- Checkbox --}}
+                                <div class="col-auto">
+                                    <input class="form-check-input" type="checkbox" wire:model.live="selected" value="{{ $module->name }}">
+                                </div>
+
+                                {{-- Module Info --}}
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center">
+                                        <span class="avatar avatar-md bg-dark-lt rounded me-3" style="{{ $module->image ? 'background-image: url('.$module->image.')' : '' }}">
+                                            @if(!$module->image)
+                                                {!! tabler_icon('package', ['class' => 'icon icon-lg text-white']) !!}
+                                            @endif
+                                        </span>
+                                        <div>
+                                            <div class="font-weight-bold d-flex align-items-center gap-2">
+                                                {{ $module->display_name }}
+                                            </div>
+                                            <div class="text-muted small mt-1">{{ $module->namespace }}</div>
+
+                                            {{-- Inline Actions --}}
+                                            <div class="mt-2 small">
+                                                @if($module->isActive())
+                                                    <a href="#" class="text-warning me-2 text-decoration-none" wire:click.prevent="disable('{{ $module->name }}')">
+                                                        {{ __('Deactivate') }}
+                                                    </a>
+                                                @else
+                                                    <a href="#" class="text-success me-2 text-decoration-none" wire:click.prevent="enable('{{ $module->name }}')">
+                                                        {{ __('Activate') }}
+                                                    </a>
+                                                @endif
+
+                                                <span class="text-secondary opacity-25">|</span>
+
+                                                <a href="#" class="text-info mx-2 text-decoration-none" wire:click.prevent="download('{{ $module->name }}')">
+                                                    {{ __('Download') }}
+                                                </a>
+
+                                                <span class="text-secondary opacity-25">|</span>
+
+                                                <a href="#" class="text-danger ms-2 text-decoration-none" wire:click.prevent="delete('{{ $module->name }}')" wire:confirm="{{ __('core/base::general.confirm_uninstall') }}">
+                                                    {{ __('Delete') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- Description --}}
+                                <div class="col-md-4">
+                                    <p class="text-muted small mb-0 text-truncate" style="max-width: 350px;" title="{{ $module->description }}">
+                                        {{ $module->description ?? __('No description') }}
+                                    </p>
+                                </div>
+
+                                {{-- Status --}}
+                                <div class="col-md-1">
+                                    @if($module->isActive())
+                                        <span class="badge bg-success-lt">{{ __('Active') }}</span>
+                                    @else
+                                        <span class="badge bg-secondary-lt">{{ __('Inactive') }}</span>
+                                    @endif
+                                </div>
+
+                                {{-- Version & Author --}}
+                                <div class="col-md-2">
+                                    <div class="font-weight-medium">{{ $module->version ?? '1.0.0' }}</div>
+                                    <div class="text-muted small">{{ __('By') }} {{ $module->author ?? 'Unknown' }}</div>
+                                </div>
+
+                                {{-- Toggle Switch --}}
+                                <div class="col-auto ms-auto">
+                                    <label class="form-check form-switch m-0">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            {{ $module->isActive() ? 'checked' : '' }}
+                                            wire:click="toggleStatus('{{ $module->name }}')"
+                                        >
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @else
+            {{-- GRID VIEW --}}
+            <div class="row row-cards">
+                @foreach($modules as $module)
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card card-stacked">
+                            @if($module->image)
+                                <div class="img-responsive img-responsive-21x9 card-img-top" style="background-image: url({{ $module->image }})"></div>
+                            @endif
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    @if(!$module->image)
+                                        <span class="avatar me-3 bg-blue-lt">
+                                            {!! tabler_icon('package', ['class' => 'icon']) !!}
+                                        </span>
+                                    @endif
+                                    <div>
+                                        <h3 class="card-title mb-1">{{ $module->display_name }}</h3>
+                                        <div class="text-muted small">{{ $module->namespace }}</div>
+                                    </div>
+                                    <div class="ms-auto">
+                                        <label class="form-check form-switch m-0">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                {{ $module->isActive() ? 'checked' : '' }}
+                                                wire:click="toggleStatus('{{ $module->name }}')"
+                                            >
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="text-muted text-truncate mb-3" title="{{ $module->description }}">
+                                    {{ $module->description ?? __('No description') }}
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="text-muted small">
+                                        {{ __('v') }}{{ $module->version ?? '1.0.0' }} &bull; {{ $module->author ?? 'Polyx' }}
+                                    </div>
+                                    <div class="ms-auto">
+                                        @if($module->isActive())
+                                            <span class="badge bg-success-lt">{{ __('Active') }}</span>
+                                        @else
+                                            <span class="badge bg-secondary-lt">{{ __('Inactive') }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex">
+                                    @if($module->isActive())
+                                        <a href="#" class="btn btn-link link-secondary" wire:click.prevent="disable('{{ $module->name }}')">{{ __('Deactivate') }}</a>
+                                    @else
+                                        <a href="#" class="btn btn-link link-primary" wire:click.prevent="enable('{{ $module->name }}')">{{ __('Activate') }}</a>
+                                    @endif
+                                    <a href="#" class="btn btn-link link-danger ms-auto" wire:click.prevent="delete('{{ $module->name }}')" wire:confirm="{{ __('core/base::general.confirm_uninstall') }}">{{ __('Delete') }}</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     @endif
+
+    {{-- Upload Modal --}}
+    <x-ui::modal id="upload-module-modal" :title="__('Upload Module')" class="modal-dialog-centered">
+        <form wire:submit.prevent="uploadModule">
+            <div class="mb-3">
+                <label class="form-label">{{ __('Select Module ZIP file') }}</label>
+                <input type="file" class="form-control" wire:model="moduleFile" accept=".zip">
+                @error('moduleFile') <span class="text-danger small">{{ $message }}</span> @enderror
+            </div>
+
+            <div class="text-muted small mb-3">
+                <p class="mb-1">{{ __('Instructions:') }}</p>
+                <ul class="ps-3 mb-0">
+                    <li>{{ __('File type must be .zip') }}</li>
+                    <li>{{ __('Maximum size: 50MB') }}</li>
+                    <li>{{ __('Structure: The ZIP should contain the module folder at the root.') }}</li>
+                </ul>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-ghost-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                    <span wire:loading wire:target="uploadModule" class="spinner-border spinner-border-sm me-1"></span>
+                    {{ __('Upload & Install') }}
+                </button>
+            </div>
+        </form>
+    </x-ui::modal>
 </div>

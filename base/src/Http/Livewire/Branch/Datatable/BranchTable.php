@@ -93,7 +93,7 @@ final class BranchTable extends BaseTable
             Column::make(trans('Điện thoại'), 'phone')->sortable()->searchable(),
             Column::make(trans('SL người dùng'), 'amount')->sortable()->searchable(),
             Column::make(trans('Trạng thái'), 'status_name')->sortable()->searchable(),
-            Column::action('Action'),
+            Column::action(trans('core/base::general.action')),
         ];
     }
 
@@ -116,10 +116,11 @@ final class BranchTable extends BaseTable
 
         // Edit button
         $actions[] = Button::add('edit')
-            ->slot(tabler_icon('edit', ['class' => 'icon']))
+            ->slot(tabler_icon('pencil', ['class' => 'icon']))
             ->id()
-            ->class('btn btn-ghost-primary btn-icon btn-sm')
+            ->class('btn btn-primary btn-icon btn-sm me-1')
             ->attributes(['aria-label' => trans('core/base::general.edit')])
+            ->tooltip(trans('core/base::general.edit'))
             ->dispatch('show-modal-create-branch', ['id' => $row->id]);
 
         // Toggle status button - shows action to take (opposite of current status)
@@ -127,11 +128,11 @@ final class BranchTable extends BaseTable
         $toggleIcon = $row->status ? 'player-pause' : 'player-play';
         $toggleColor = $row->status ? 'warning' : 'success';
         $toggleLabel = $row->status ? trans('core/base::general.deactivate') : trans('core/base::general.activate');
-
+        // Changed from btn-ghost-* to btn-outline-* for visibility
         $actions[] = Button::add('toggle-status')
             ->slot(tabler_icon($toggleIcon, ['class' => 'icon', 'width' => 16, 'height' => 16]))
             ->id()
-            ->class('btn btn-ghost-' . $toggleColor . ' btn-icon btn-sm p-1')
+            ->class('btn btn-outline-' . $toggleColor . ' btn-icon btn-sm')
             ->attributes(['aria-label' => $toggleLabel, 'title' => $toggleLabel])
             ->tooltip($toggleLabel)
             ->dispatch('toggleActive', ['id' => $row->id, 'status' => $row->status ? 0 : 1]);

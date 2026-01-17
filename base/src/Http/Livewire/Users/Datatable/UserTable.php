@@ -124,7 +124,7 @@ final class UserTable extends BaseTable
             Column::make(__('Ngày tạo'), 'created_at_formatted', 'created_at')
                 ->sortable(),
 
-            Column::action(__('Thao tác')),
+            Column::action(trans('core/base::general.action')),
         ];
     }
 
@@ -174,43 +174,47 @@ final class UserTable extends BaseTable
 
         // Detail action
         $actions[] = Button::add('detail')
-            ->slot('<i class="ti ti-eye"></i>')
+            ->slot(tabler_icon('eye', ['class' => 'icon']))
             ->id()
-            ->class('crm-action-btn')
+            ->class('btn btn-info btn-icon btn-sm me-1')
             ->attributes([
                 'onclick' => "Livewire.dispatch('show-modal-detail-user', {id: {$row->id}});",
                 'title' => __('Chi tiết'),
-            ]);
+            ])
+            ->tooltip(__('Chi tiết'));
 
         if (auth()->user()->can('users.edit')) {
             $actions[] = Button::add('edit')
-                ->slot('<i class="ti ti-edit"></i>')
+                ->slot(tabler_icon('pencil', ['class' => 'icon']))
                 ->id()
-                ->class('crm-action-btn')
+                ->class('btn btn-primary btn-icon btn-sm me-1')
                 ->attributes([
                     'onclick' => "Livewire.dispatch('show-modal-edit-user', {id: {$row->id}});",
                     'title' => __('Sửa'),
-                ]);
+                ])
+                ->tooltip(__('Sửa'));
         }
 
         if (auth()->user()->can('users.delete')) {
             $actions[] = Button::add('delete')
-                ->slot('<i class="ti ti-trash"></i>')
+                ->slot(tabler_icon('trash', ['class' => 'icon']))
                 ->id()
-                ->class('crm-action-btn')
+                ->class('btn btn-outline-danger btn-icon btn-sm me-1')
                 ->attributes([
                     'onclick' => "Livewire.dispatch('show-modal-delete-user', {id: {$row->id}});",
                     'title' => __('Xóa'),
-                ]);
+                ])
+                ->tooltip(__('Xóa'));
         }
 
         if (auth()->user()->can('users.impersonate') && $row->id !== auth()->id() && $row->canBeImpersonated()) {
             $actions[] = Button::add('impersonate')
-                ->slot('<i class="ti ti-login"></i>')
+                ->slot(tabler_icon('login', ['class' => 'icon']))
                 ->id()
-                ->class('crm-action-btn')
+                ->class('btn btn-warning btn-icon btn-sm')
                 ->route('impersonate', ['id' => $row->id])
-                ->attributes(['title' => __('Đăng nhập')]);
+                ->attributes(['title' => __('Đăng nhập')])
+                ->tooltip(__('Đăng nhập'));
         }
 
         return $actions;

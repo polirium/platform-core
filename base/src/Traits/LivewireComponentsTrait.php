@@ -23,7 +23,18 @@ trait LivewireComponentsTrait
     {
         $components = [];
 
+        $activeModules = [];
+        $checkActive = $type === 'modules' && \Illuminate\Support\Facades\Schema::hasTable('modules');
+
+        if ($checkActive) {
+            $activeModules = \Polirium\Core\Base\Http\Models\Module::active()->pluck('name')->all();
+        }
+
         foreach (BaseHelper::scanFolder(platform_path($type)) as $module) {
+            if ($checkActive && ! in_array($module, $activeModules)) {
+                continue;
+            }
+
             $configuration = [];
 
             // Always read from file first to get latest components
