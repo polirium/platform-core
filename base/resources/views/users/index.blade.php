@@ -1,12 +1,6 @@
 <x-ui.layouts::app>
     <x-slot:title>{{ __('core/base::general.user_management') }}</x-slot:title>
 
-    @once
-    @push('styles')
-    <link rel="stylesheet" href="{{ asset('vendor/polirium/core/ui/css/crm-users.css') }}">
-    @endpush
-    @endonce
-
     <div class="page-header d-print-none">
         <div class="container-xl">
             <div class="row g-2 align-items-center">

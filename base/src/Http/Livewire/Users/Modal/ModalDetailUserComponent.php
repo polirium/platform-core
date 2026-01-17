@@ -66,4 +66,10 @@ class ModalDetailUserComponent extends Component
 
         $this->dispatch('poli.modal', ['modal-detail-user', 'show']);
     }
+
+    #[On('close-modal-detail-user')]
+    public function closeDetailModal()
+    {
+        $this->dispatch('poli.modal', ['modal-detail-user', 'hide']);
+    }
 }
