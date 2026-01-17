@@ -94,7 +94,14 @@ class Assets
      */
     public function get(string $path): string
     {
-        return asset($this->basePath . '/' . ltrim($path, '/'));
+        $assetPath = $this->basePath . '/' . ltrim($path, '/');
+
+        // Add version for app.min.css to force reload
+        if (str_contains($path, 'app.min.css')) {
+            return asset($assetPath) . '?v=' . filemtime(public_path($assetPath));
+        }
+
+        return asset($assetPath);
     }
 
     /**

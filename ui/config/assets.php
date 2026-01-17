@@ -82,6 +82,7 @@ return [
             'sortable' => 'core/ui/libs/sortablejs/Sortable.min.js',
             'dashboard' => 'core/ui/js/dashboard.min.js',
             'print-forms-editor' => 'modules/print-forms/js/editor.min.js',
+            'media-manager' => 'core/media/js/media-manager.js',
         ],
     ],
 ];

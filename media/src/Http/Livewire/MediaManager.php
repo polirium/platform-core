@@ -67,6 +67,7 @@ class MediaManager extends Component
 
     public function mount()
     {
+        \Assets::loadJs('media-manager');
         $this->viewMode = session('media_view_mode', 'grid');
         $this->loadFolders();
         $this->updateBreadcrumbs();
@@ -219,11 +220,19 @@ class MediaManager extends Component
     }
 
     // Rename
-    public function openRenameModal($id, $name, $type)
+    public function openRenameModal($id, $type)
     {
         $this->renameItemId = $id;
-        $this->renameItemName = $type === 'folder' ? $name : pathinfo($name, PATHINFO_FILENAME);
         $this->renameItemType = $type;
+
+        // Get name from id/path
+        if ($type === 'folder') {
+            $this->renameItemName = basename($id);
+        } else {
+            $media = Media::find($id);
+            $this->renameItemName = $media ? $media->name : '';
+        }
+
         $this->showRenameModal = true;
         $this->hideContextMenu();
     }
