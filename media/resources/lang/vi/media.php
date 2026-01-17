@@ -48,6 +48,10 @@ return [
     'folder_name' => 'Tên folder',
     'directory' => 'Thư mục',
     'url' => 'URL',
+    'items' => 'mục',
+    'path' => 'Đường dẫn',
+    'modified_at' => 'Ngày sửa:',
+    'dimensions' => 'Kích thước:',
 
     // Messages
     'no_files' => 'Chưa có file nào',

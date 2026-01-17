@@ -35,6 +35,8 @@ class MediaManager extends Component
     public $showDetailsModal = false;
     public $showUploadModal = false;
     public $showImageEditor = false;
+    public $showPreviewModal = false;
+    public $previewMedia = null;
 
     // Modal data
     public $newFolderName = '';
@@ -42,6 +44,7 @@ class MediaManager extends Component
     public $renameItemName = '';
     public $renameItemType = '';
     public $selectedMediaDetails = null;
+    public $selectedFolderDetails = null;
 
     // Image editor - store ID only for Livewire compatibility
     public $editingImageId = null;
@@ -67,7 +70,6 @@ class MediaManager extends Component
 
     public function mount()
     {
-        \Assets::loadJs('media-manager');
         $this->viewMode = session('media_view_mode', 'grid');
         $this->loadFolders();
         $this->updateBreadcrumbs();
@@ -146,33 +148,68 @@ class MediaManager extends Component
     }
 
     // Folder operations
-    public function openCreateFolderModal()
+    public function createDefaultFolder()
     {
-        $this->newFolderName = '';
-        $this->showCreateFolderModal = true;
-    }
-
-    public function createFolder()
-    {
-        $this->validate([
-            'newFolderName' => 'required|string|max:255|regex:/^[a-zA-Z0-9_\-\s]+$/',
-        ], [
-            'newFolderName.regex' => 'Tên folder chỉ được chứa chữ cái, số, dấu gạch ngang và gạch dưới.',
-        ]);
-
         $disk = config('media.default_disk', 'public');
-        $path = $this->currentFolder ? $this->currentFolder . '/' . $this->newFolderName : $this->newFolderName;
+        $baseName = 'New Folder';
+        $name = $baseName;
+        $counter = 1;
 
-        if (Storage::disk($disk)->exists($path)) {
-            $this->addError('newFolderName', 'Folder đã tồn tại.');
-            return;
+        $path = $this->currentFolder ? $this->currentFolder . '/' . $name : $name;
+
+        while (Storage::disk($disk)->exists($path)) {
+            $name = $baseName . ' (' . $counter . ')';
+            $path = $this->currentFolder ? $this->currentFolder . '/' . $name : $name;
+            $counter++;
         }
 
         Storage::disk($disk)->makeDirectory($path);
-        $this->showCreateFolderModal = false;
-        $this->newFolderName = '';
         $this->loadFolders();
-        session()->flash('success', 'Đã tạo folder thành công!');
+
+        // Return the path of the new folder to trigger inline rename
+        $this->dispatch('trigger-rename', folder: $path, type: 'folder');
+        session()->flash('success', 'Đã tạo folder mới!');
+    }
+
+    public function updateItemName($id, $type, $newName)
+    {
+        $newName = trim($newName);
+        if (empty($newName)) return;
+
+        // Validation: simple regex for folder/filenames
+        if (!preg_match('/^[a-zA-Z0-9_\-\s\(\)\.]+$/', $newName)) {
+             $this->addError('rename', 'Tên không hợp lệ');
+             return;
+        }
+
+        $disk = config('media.default_disk', 'public');
+
+        if ($type === 'folder') {
+            $oldPath = $id;
+            $parentPath = dirname($oldPath);
+            // Handle root folder case where dirname is '.'
+            $parentPath = $parentPath === '.' ? '' : $parentPath;
+
+            $newPath = ($parentPath ? $parentPath . '/' : '') . $newName;
+
+            if ($oldPath === $newPath) return;
+
+            if (Storage::disk($disk)->exists($newPath)) {
+                $this->addError('rename', 'Tên đã tồn tại');
+                return;
+            }
+
+            Storage::disk($disk)->move($oldPath, $newPath);
+            $this->loadFolders();
+        } else {
+            $media = Media::find($id);
+            if ($media) {
+                if ($media->name === $newName) return;
+
+                $media->name = $newName;
+                $media->save();
+            }
+        }
     }
 
     // Upload
@@ -377,6 +414,35 @@ class MediaManager extends Component
     public function loadMediaDetails($id)
     {
         $this->selectedMediaDetails = Media::find($id);
+        $this->selectedFolderDetails = null;
+    }
+
+    public function loadFolderDetails($path)
+    {
+        $disk = config('media.default_disk', 'public');
+
+        // Basic info
+        $name = basename($path);
+        $lastModifiedTimestamp = Storage::disk($disk)->lastModified($path);
+        $lastModified = $lastModifiedTimestamp ? date('d/m/Y H:i', $lastModifiedTimestamp) : '-';
+
+        // Count items (non-recursive for performance)
+        $files = Storage::disk($disk)->files($path);
+        $directories = Storage::disk($disk)->directories($path);
+        $itemCount = count($files) + count($directories);
+
+        // Calculate size (this can be slow for large folders, so maybe just count is enough for now)
+        // For OS-like feel, usually size is calculated on demand or cached.
+        // We will stick to item count for speed.
+
+        $this->selectedFolderDetails = [
+            'name' => $name,
+            'path' => $path,
+            'last_modified' => $lastModified,
+            'item_count' => $itemCount,
+            'type' => 'Folder'
+        ];
+        $this->selectedMediaDetails = null;
     }
 
     // Details modal (legacy)
@@ -414,6 +480,22 @@ class MediaManager extends Component
         $this->editingImageId = null;
         $this->resizeWidth = null;
         $this->resizeHeight = null;
+    }
+
+    // Preview Modal
+    public function openPreviewModal($id)
+    {
+        $this->previewMedia = Media::find($id);
+        if ($this->previewMedia) {
+            $this->showPreviewModal = true;
+            $this->hideContextMenu();
+        }
+    }
+
+    public function closePreviewModal()
+    {
+        $this->showPreviewModal = false;
+        $this->previewMedia = null;
     }
 
     public function resizeImage()

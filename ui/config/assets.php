@@ -64,6 +64,7 @@ return [
             'social' => 'core/ui/css/polirium-social.min.css',
             'dropzone' => 'core/ui/libs/dropzone/dist/dropzone.css',
             'print-forms-editor' => 'modules/print-forms/css/editor.min.css',
+            // 'media-manager' => 'core/media/css/media-manager.css',
         ],
 
         /*
@@ -82,7 +83,7 @@ return [
             'sortable' => 'core/ui/libs/sortablejs/Sortable.min.js',
             'dashboard' => 'core/ui/js/dashboard.min.js',
             'print-forms-editor' => 'modules/print-forms/js/editor.min.js',
-            'media-manager' => 'core/media/js/media-manager.js',
+            // 'media-manager' => 'core/media/js/media-manager.js',
         ],
     ],
 ];

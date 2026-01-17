@@ -58,7 +58,7 @@
                 color="secondary"
                 size="sm"
                 icon="folder-plus"
-                wire:click="openCreateFolderModal"
+                wire:click="createDefaultFolder"
                 :outline="true">
                 {{ __('core/media::media.create_folder') }}
             </x-ui::button>

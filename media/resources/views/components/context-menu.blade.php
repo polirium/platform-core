@@ -16,7 +16,7 @@
                     <span class="menu-text">{{ __('core/media::media.details') }}</span>
                 </div>
 
-                <div class="context-menu-item" @click="window.open(document.querySelector(`[data-media-id='${selectedItem}']`)?.dataset.url || '', '_blank'); contextMenu = false">
+                <div class="context-menu-item" @click="$wire.openPreviewModal(selectedItem); contextMenu = false">
                     <span class="menu-icon">{!! tabler_icon('eye', ['class' => 'icon']) !!}</span>
                     <span class="menu-text">{{ __('core/media::media.view_image') }}</span>
                 </div>
@@ -31,7 +31,7 @@
                     <span class="menu-text">{{ __('core/media::media.edit_image') }}</span>
                 </div>
 
-                <div class="context-menu-item" @click="$wire.openRenameModal(selectedItem, 'file'); contextMenu = false">
+                <div class="context-menu-item" @click="renamingId = selectedItem; renamingType = 'file'; contextMenu = false; setTimeout(() => { let input = document.querySelector('input[data-rename-input=\'true\']:not([style*=\'display: none\'])'); if(input) { input.focus(); input.select(); } }, 100)">
                     <span class="menu-icon">{!! tabler_icon('edit', ['class' => 'icon']) !!}</span>
                     <span class="menu-text">{{ __('core/media::media.rename') }}</span>
                 </div>
@@ -82,7 +82,7 @@
             <div class="context-menu-divider"></div>
 
             <div class="context-menu-section">
-                <div class="context-menu-item" @click="$wire.openRenameModal(selectedItem, 'folder'); contextMenu = false">
+                <div class="context-menu-item" @click="renamingId = selectedItem; renamingType = 'folder'; contextMenu = false; setTimeout(() => { let input = document.querySelector('input[data-rename-input=\'true\']:not([style*=\'display: none\'])'); if(input) { input.focus(); input.select(); } }, 100)">
                     <span class="menu-icon">{!! tabler_icon('edit', ['class' => 'icon']) !!}</span>
                     <span class="menu-text">{{ __('core/media::media.rename') }}</span>
                 </div>

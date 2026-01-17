@@ -45,6 +45,19 @@ class MediaServiceProvider extends PoliriumBaseServiceProvider
         if (config('media-library.media_model') === \Spatie\MediaLibrary\MediaCollections\Models\Media::class) {
             config(['media-library.media_model' => Media::class]);
         }
+
+        // Register assets
+        if (file_exists(__DIR__ . '/../../config/assets.php')) {
+            $assets = require __DIR__ . '/../../config/assets.php';
+
+            if (!empty($assets['css'])) {
+                \Polirium\Core\UI\Facades\Assets::addOptionalCss($assets['css']);
+            }
+
+            if (!empty($assets['js'])) {
+                \Polirium\Core\UI\Facades\Assets::addOptionalJs($assets['js']);
+            }
+        }
     }
 
     /**

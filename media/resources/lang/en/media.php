@@ -48,6 +48,10 @@ return [
     'folder_name' => 'Folder Name',
     'directory' => 'Directory',
     'url' => 'URL',
+    'items' => 'items',
+    'path' => 'Path',
+    'modified_at' => 'Modified At:',
+    'dimensions' => 'Dimensions:',
 
     // Messages
     'no_files' => 'No files',

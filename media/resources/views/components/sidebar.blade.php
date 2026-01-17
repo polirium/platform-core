@@ -1,7 +1,15 @@
-@props(['selectedMedia'])
+@props(['selectedMedia' => null, 'selectedFolder' => null])
 
 {{-- Sidebar Panel --}}
-<div class="media-sidebar" x-show="showSidebar" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-x-0" x-transition:leave-end="opacity-0 translate-x-4">
+<div class="media-sidebar"
+     x-show="showSidebar"
+     x-cloak
+     x-transition:enter="transition transform ease-out duration-300"
+     x-transition:enter-start="translate-x-full"
+     x-transition:enter-end="translate-x-0"
+     x-transition:leave="transition transform ease-in duration-200"
+     x-transition:leave-start="translate-x-0"
+     x-transition:leave-end="translate-x-full">
     {{-- Sidebar Header --}}
     <div class="media-sidebar-header">
         <h6 class="media-sidebar-title">{{ __('core/media::media.details') }}</h6>
@@ -10,91 +18,148 @@
         </button>
     </div>
 
-    @if($selectedMedia)
-        {{-- Preview --}}
-        <div class="sidebar-preview">
-            @if(str_starts_with($selectedMedia->mime_type, 'image/'))
-                <img src="{{ $selectedMedia->getUrl() }}" class="sidebar-preview-img" alt="{{ $selectedMedia->name }}">
-            @elseif(str_starts_with($selectedMedia->mime_type, 'video/'))
-                <video src="{{ $selectedMedia->getUrl() }}" class="sidebar-preview-video" controls></video>
-            @else
-                <div class="sidebar-preview-file">
-                    {!! tabler_icon('file', ['class' => 'icon-file']) !!}
+    {{-- Loading Overlay --}}
+    <div class="sidebar-loading-overlay" wire:loading.flex wire:target="loadMediaDetails, loadFolderDetails">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+
+    <div class="sidebar-content">
+        @if($selectedMedia)
+            {{-- Preview Area --}}
+            <div class="sidebar-preview-container">
+                <div class="sidebar-preview-wrapper">
+                    @if(str_starts_with($selectedMedia->mime_type, 'image/'))
+                        <img src="{{ $selectedMedia->getUrl() }}" class="sidebar-preview-img" alt="{{ $selectedMedia->name }}">
+                    @elseif(str_starts_with($selectedMedia->mime_type, 'video/'))
+                        <video src="{{ $selectedMedia->getUrl() }}" class="sidebar-preview-video" controls></video>
+                    @else
+                        <div class="sidebar-preview-file">
+                            {!! tabler_icon('file', ['class' => 'icon-xl']) !!}
+                        </div>
+                    @endif
                 </div>
-            @endif
-        </div>
-
-        {{-- Info --}}
-        <div class="sidebar-info">
-            <div class="info-row">
-                <span class="info-label">{{ __('core/media::media.name') }}</span>
-                <span class="info-value">{{ $selectedMedia->name }}</span>
             </div>
 
-            <div class="info-row">
-                <span class="info-label">{{ __('core/media::media.file_name') }}</span>
-                <span class="info-value info-value-mono">{{ $selectedMedia->file_name }}</span>
-            </div>
-
-            <div class="info-row">
-                <span class="info-label">{{ __('core/media::media.type') }}</span>
-                <span class="info-value">{{ $selectedMedia->mime_type }}</span>
-            </div>
-
-            <div class="info-row">
-                <span class="info-label">{{ __('core/media::media.size') }}</span>
-                <span class="info-value">{{ $selectedMedia->formatted_size }}</span>
-            </div>
-
-            @if(str_starts_with($selectedMedia->mime_type, 'image/') && $selectedMedia->custom_properties)
-                <div class="info-row">
-                    <span class="info-label">{{ __('core/media::media.image_size') }}</span>
-                    <span class="info-value">{{ $selectedMedia->custom_properties['width'] ?? '?' }} x {{ $selectedMedia->custom_properties['height'] ?? '?' }} px</span>
+            {{-- File Header --}}
+            <div class="sidebar-header-info">
+                <h4 class="file-name" title="{{ $selectedMedia->name }}">{{ $selectedMedia->name }}</h4>
+                <div class="file-meta text-muted">
+                    <span class="badge bg-secondary-lt">{{ $selectedMedia->mime_type }}</span>
+                    <span class="mx-1">&bull;</span>
+                    <span>{{ $selectedMedia->formatted_size }}</span>
                 </div>
-            @endif
-
-            <div class="info-row">
-                <span class="info-label">{{ __('core/media::media.directory') }}</span>
-                <span class="info-value">{{ $selectedMedia->collection_name ?: 'uploads' }}</span>
             </div>
 
-            <div class="info-row">
-                <span class="info-label">{{ __('core/media::media.uploaded_at') }}</span>
-                <span class="info-value">{{ $selectedMedia->created_at->format('d/m/Y H:i') }}</span>
+            {{-- Properties List --}}
+            <div class="sidebar-properties">
+                <div class="property-item">
+                    <span class="property-label">{{ __('core/media::media.file_name') }}</span>
+                    <span class="property-value font-monospace" title="{{ $selectedMedia->file_name }}">{{ $selectedMedia->file_name }}</span>
+                </div>
+
+                @if(str_starts_with($selectedMedia->mime_type, 'image/') && $selectedMedia->custom_properties)
+                <div class="property-item">
+                    <span class="property-label">{{ __('core/media::media.dimensions') }}</span>
+                    <span class="property-value">{{ $selectedMedia->custom_properties['width'] ?? '-' }} &times; {{ $selectedMedia->custom_properties['height'] ?? '-' }} px</span>
+                </div>
+                @endif
+
+                <div class="property-item">
+                    <span class="property-label">{{ __('core/media::media.uploaded_at') }}</span>
+                    <span class="property-value">{{ $selectedMedia->created_at->format('d/m/Y H:i') }}</span>
+                </div>
+
+                <div class="property-item property-url">
+                    <span class="property-label">{{ __('core/media::media.url') }}</span>
+                    <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" value="{{ $selectedMedia->getUrl() }}" readonly>
+                        <button class="btn btn-icon" type="button" onclick="navigator.clipboard.writeText('{{ $selectedMedia->getUrl() }}')" title="{{ __('core/media::media.copy_url') }}">
+                            {!! tabler_icon('copy', ['class' => 'icon']) !!}
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        {{-- URL Copy --}}
-        <div class="sidebar-url-copy">
-            <label class="sidebar-label">{{ __('core/media::media.url') }}</label>
-            <div class="url-copy-group">
-                <input type="text" class="form-control form-control-sm url-input" value="{{ $selectedMedia->getUrl() }}" readonly>
-                <button type="button" class="btn-copy-url" onclick="navigator.clipboard.writeText('{{ $selectedMedia->getUrl() }}')" title="{{ __('core/media::media.copy_url') }}">
-                    {!! tabler_icon('copy', ['class' => 'icon']) !!}
-                </button>
+            {{-- Actions --}}
+            <div class="sidebar-actions mt-auto">
+                <div class="d-grid gap-2">
+                    <a href="{{ $selectedMedia->getUrl() }}" target="_blank" class="btn btn-outline-primary w-100">
+                        {!! tabler_icon('external-link', ['class' => 'icon']) !!} {{ __('core/media::media.open_new_tab') }}
+                    </a>
+
+                    @if(str_starts_with($selectedMedia->mime_type, 'image/'))
+                        <button type="button" class="btn btn-outline-secondary w-100" wire:click="openImageEditor({{ $selectedMedia->id }})">
+                            {!! tabler_icon('photo-edit', ['class' => 'icon']) !!} {{ __('core/media::media.edit_image') }}
+                        </button>
+                    @endif
+
+                    <button type="button" class="btn btn-outline-danger w-100" wire:click="deleteItem({{ $selectedMedia->id }}, 'file')" wire:confirm="{{ __('core/media::media.confirm_delete') }}">
+                        {!! tabler_icon('trash', ['class' => 'icon']) !!} {{ __('core/media::media.delete') }}
+                    </button>
+                </div>
             </div>
-        </div>
+        @elseif($selectedFolder)
+            {{-- Folder Info --}}
+            <div class="sidebar-preview-container">
+                <div class="sidebar-preview-wrapper">
+                    <div class="sidebar-preview-file folder-preview">
+                        {!! tabler_icon('folder', ['class' => 'icon-folder-lg']) !!}
+                    </div>
+                </div>
+            </div>
 
-        {{-- Actions --}}
-        <div class="sidebar-actions">
-            <x-ui::button color="secondary" size="sm" icon="external-link" :outline="true" href="{{ $selectedMedia->getUrl() }}" target="_blank" class="w-100">
-                {{ __('core/media::media.open_new_tab') }}
-            </x-ui::button>
+            {{-- Folder Header --}}
+            <div class="sidebar-header-info">
+                <h4 class="file-name" title="{{ $selectedFolder['name'] }}">{{ $selectedFolder['name'] }}</h4>
+                <div class="file-meta text-muted">
+                    <span>{{ __('core/media::media.folder') }}</span>
+                    <span class="mx-1">&bull;</span>
+                    <span>{{ $selectedFolder['item_count'] }} {{ __('core/media::media.items') }}</span>
+                </div>
+            </div>
 
-            @if(str_starts_with($selectedMedia->mime_type, 'image/'))
-                <x-ui::button color="secondary" size="sm" icon="photo-edit" :outline="true" wire:click="openImageEditor({{ $selectedMedia->id }})" class="w-100">
-                    {{ __('core/media::media.edit_image') }}
-                </x-ui::button>
-            @endif
+            {{-- Folder Properties --}}
+            <div class="sidebar-properties">
+                <div class="property-item">
+                    <span class="property-label">{{ __('core/media::media.name') }}</span>
+                    <span class="property-value font-monospace">{{ $selectedFolder['name'] }}</span>
+                </div>
 
-            <x-ui::button color="danger" size="sm" icon="trash" :outline="true" wire:click="deleteItem({{ $selectedMedia->id }}, 'file')" wire:confirm="{{ __('core/media::media.confirm_delete') }}" class="w-100">
-                {{ __('core/media::media.delete') }}
-            </x-ui::button>
-        </div>
-    @else
-        <div class="sidebar-empty">
-            {!! tabler_icon('photo', ['class' => 'icon-empty']) !!}
-            <p class="sidebar-empty-text">{{ __('core/media::media.select_file_details') }}</p>
-        </div>
-    @endif
+                <div class="property-item">
+                    <span class="property-label">{{ __('core/media::media.path') }}</span>
+                    <span class="property-value font-monospace">{{ $selectedFolder['path'] ?: '/' }}</span>
+                </div>
+
+                <div class="property-item">
+                    <span class="property-label">{{ __('core/media::media.modified_at') }}</span>
+                    <span class="property-value">{{ $selectedFolder['last_modified'] }}</span>
+                </div>
+            </div>
+
+            {{-- Actions --}}
+            <div class="sidebar-actions mt-auto">
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-primary w-100" wire:click="navigateToFolder('{{ $selectedFolder['path'] }}')">
+                        {!! tabler_icon('folder-open', ['class' => 'icon']) !!} {{ __('core/media::media.open') }}
+                    </button>
+
+                    <button type="button" class="btn btn-outline-secondary w-100" wire:click="openRenameModal('{{ $selectedFolder['path'] }}', 'folder')">
+                        {!! tabler_icon('edit', ['class' => 'icon']) !!} {{ __('core/media::media.rename') }}
+                    </button>
+
+                    <button type="button" class="btn btn-outline-danger w-100" wire:click="deleteItem('{{ $selectedFolder['path'] }}', 'folder')" wire:confirm="{{ __('core/media::media.confirm_delete_folder') }}">
+                        {!! tabler_icon('trash', ['class' => 'icon']) !!} {{ __('core/media::media.delete') }}
+                    </button>
+                </div>
+            </div>
+
+        @else
+            <div class="sidebar-empty">
+                <div class="empty-icon-wrapper">
+                    {!! tabler_icon('photo', ['class' => 'icon-empty']) !!}
+                </div>
+                <p class="sidebar-empty-text text-muted">{{ __('core/media::media.select_file_details') }}</p>
+            </div>
+        @endif
+    </div>
 </div>

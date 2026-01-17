@@ -33,6 +33,9 @@ class MediaController extends Controller
      */
     public function index(Request $request)
     {
+        \Polirium\Core\UI\Facades\Assets::loadJs(['media-manager']);
+        \Polirium\Core\UI\Facades\Assets::loadCss(['media-manager']);
+
         return view('core/media::index');
     }
 

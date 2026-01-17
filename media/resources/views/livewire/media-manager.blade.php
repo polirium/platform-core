@@ -8,9 +8,22 @@
     selectedType: null,
     showSidebar: false,
     sidebarItem: null,
-    sidebarType: null
+    sidebarType: null,
+    renamingId: null,
+    renamingType: null
 }"
-@click="if(!$event.target.closest('.media-context-menu') && !$event.target.closest('.media-grid-item') && !$event.target.closest('.folder-item')) { contextMenu = false }"
+@trigger-rename.window="
+    renamingId = $event.detail.folder;
+    renamingType = $event.detail.type;
+    setTimeout(() => {
+        let input = $el.querySelector('input[data-rename-input=\'true\']');
+        if(input) { input.focus(); input.select(); }
+    }, 100);
+"
+@click="
+    if(!$event.target.closest('.media-context-menu') && !$event.target.closest('.media-grid-item') && !$event.target.closest('.folder-item') && !$event.target.closest('.media-list-item')) { contextMenu = false }
+    if(!$event.target.closest('.media-sidebar') && !$event.target.closest('.media-grid-item') && !$event.target.closest('.folder-item') && !$event.target.closest('.media-list-item')) { showSidebar = false }
+"
 @keydown.escape.window="contextMenu = false; showSidebar = false"
 class="media-manager">
 
@@ -99,77 +112,99 @@ class="media-manager">
 
             {{-- Content Area --}}
             @if($viewMode === 'grid')
-                <div class="media-grid">
-                    {{-- Back Button --}}
-                    @if($currentFolder)
-                        <div class="media-grid-item media-back-btn" wire:click="navigateUp">
-                            <div class="media-thumbnail">
-                                {!! tabler_icon('arrow-left', ['class' => 'icon-back']) !!}
+                <div class="media-grid-container px-3">
+                    @if($mediaItems->isEmpty() && count($folders) === 0 && !$currentFolder)
+                        <div class="media-empty">
+                            <div class="media-empty-icon">
+                                {!! tabler_icon('photo', ['class' => 'icon']) !!}
                             </div>
-                            <div class="media-info">
-                                <div class="media-name">{{ __('core/media::media.back') }}</div>
-                            </div>
+                            <p class="media-empty-title">{{ __('core/media::media.no_files') }}</p>
+                            <p class="media-empty-subtitle">{{ __('core/media::media.no_files_hint') }}</p>
+                        </div>
+                    @else
+                        <div class="media-grid">
+                            {{-- Back Button --}}
+                            @if($currentFolder)
+                                <div class="media-grid-item media-back-btn" wire:click="navigateUp">
+                                    <div class="media-thumbnail">
+                                        {!! tabler_icon('arrow-left', ['class' => 'icon-back']) !!}
+                                    </div>
+                                    <div class="media-info">
+                                        <div class="media-name">{{ __('core/media::media.back') }}</div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Folders --}}
+                            @foreach($folders as $folder)
+                                <div class="media-grid-item folder-item"
+                                     wire:dblclick="navigateToFolder('{{ $folder['path'] }}')"
+                                     @click="showSidebar = true; sidebarItem = '{{ $folder['path'] }}'; sidebarType = 'folder'; $wire.loadFolderDetails('{{ $folder['path'] }}')"
+                                     @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = '{{ $folder['path'] }}'; selectedType = 'folder'">
+                                    <div class="media-thumbnail">
+                                        {!! tabler_icon('folder', ['class' => 'icon-folder']) !!}
+                                    </div>
+                                    <div class="media-info">
+                                        <div x-show="renamingId !== '{{ $folder['path'] }}' || renamingType !== 'folder'" class="media-name" title="{{ $folder['name'] }}">{{ Str::limit($folder['name'], 12) }}</div>
+                                        <input x-show="renamingId === '{{ $folder['path'] }}' && renamingType === 'folder'"
+                                               data-rename-input="true"
+                                               type="text"
+                                               class="form-control form-control-sm text-center p-0 h-auto"
+                                               value="{{ $folder['name'] }}"
+                                               @click.stop
+                                               @dblclick.stop
+                                               @keydown.enter="$el.blur()"
+                                               @keydown.escape="renamingId = null"
+                                               @blur="$wire.updateItemName('{{ $folder['path'] }}', 'folder', $el.value); renamingId = null">
+                                        <div class="media-meta">{{ __('core/media::media.folder') }}</div>
+                                    </div>
+                                </div>
+                            @endforeach
+
+                            {{-- Files --}}
+                            @foreach($mediaItems as $item)
+                                <div class="media-grid-item {{ in_array($item->id, $selectedMedia) ? 'selected' : '' }}"
+                                     data-media-id="{{ $item->id }}"
+                                     data-url="{{ $item->getUrl() }}"
+                                     @click="showSidebar = true; sidebarType = 'file'; $wire.loadMediaDetails({{ $item->id }})"
+                                     @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = {{ $item->id }}; selectedType = 'file'">
+
+                                    <label class="media-checkbox" @click.stop>
+                                        <input type="checkbox" class="form-check-input"
+                                               {{ in_array($item->id, $selectedMedia) ? 'checked' : '' }}
+                                               wire:click="toggleSelect({{ $item->id }})">
+                                    </label>
+
+                                    <div class="media-thumbnail">
+                                        @if($item->is_image)
+                                            <img src="{{ $item->getUrl() }}" alt="{{ $item->name }}" loading="lazy">
+                                        @elseif($item->is_video)
+                                            {!! tabler_icon('video', ['class' => 'icon-media']) !!}
+                                        @elseif($item->is_document)
+                                            {!! tabler_icon('file-text', ['class' => 'icon-media']) !!}
+                                        @else
+                                            {!! tabler_icon('file', ['class' => 'icon-media']) !!}
+                                        @endif
+                                    </div>
+
+                                    <div class="media-info">
+                                        <div x-show="renamingId !== {{ $item->id }} || renamingType !== 'file'" class="media-name" title="{{ $item->file_name }}">{{ Str::limit($item->name, 12) }}</div>
+                                        <input x-show="renamingId === {{ $item->id }} && renamingType === 'file'"
+                                               data-rename-input="true"
+                                               type="text"
+                                               class="form-control form-control-sm text-center p-0 h-auto"
+                                               value="{{ $item->name }}"
+                                               @click.stop
+                                               @dblclick.stop
+                                               @keydown.enter="$el.blur()"
+                                               @keydown.escape="renamingId = null"
+                                               @blur="$wire.updateItemName({{ $item->id }}, 'file', $el.value); renamingId = null">
+                                        <div class="media-meta">{{ $item->formatted_size }}</div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     @endif
-
-                    {{-- Folders --}}
-                    @foreach($folders as $folder)
-                        <div class="media-grid-item folder-item"
-                             wire:dblclick="navigateToFolder('{{ $folder['path'] }}')"
-                             @click="showSidebar = true; sidebarItem = '{{ $folder['path'] }}'; sidebarType = 'folder'"
-                             @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = '{{ $folder['path'] }}'; selectedType = 'folder'">
-                            <div class="media-thumbnail">
-                                {!! tabler_icon('folder', ['class' => 'icon-folder']) !!}
-                            </div>
-                            <div class="media-info">
-                                <div class="media-name" title="{{ $folder['name'] }}">{{ Str::limit($folder['name'], 12) }}</div>
-                                <div class="media-meta">{{ __('core/media::media.folder') }}</div>
-                            </div>
-                        </div>
-                    @endforeach
-
-                    {{-- Files --}}
-                    @forelse($mediaItems as $item)
-                        <div class="media-grid-item {{ in_array($item->id, $selectedMedia) ? 'selected' : '' }}"
-                             data-media-id="{{ $item->id }}"
-                             data-url="{{ $item->getUrl() }}"
-                             @click="showSidebar = true; sidebarType = 'file'; $wire.loadMediaDetails({{ $item->id }})"
-                             @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = {{ $item->id }}; selectedType = 'file'">
-
-                            <label class="media-checkbox" @click.stop>
-                                <input type="checkbox" class="form-check-input"
-                                       {{ in_array($item->id, $selectedMedia) ? 'checked' : '' }}
-                                       wire:click="toggleSelect({{ $item->id }})">
-                            </label>
-
-                            <div class="media-thumbnail">
-                                @if($item->is_image)
-                                    <img src="{{ $item->getUrl() }}" alt="{{ $item->name }}" loading="lazy">
-                                @elseif($item->is_video)
-                                    {!! tabler_icon('video', ['class' => 'icon-media']) !!}
-                                @elseif($item->is_document)
-                                    {!! tabler_icon('file-text', ['class' => 'icon-media']) !!}
-                                @else
-                                    {!! tabler_icon('file', ['class' => 'icon-media']) !!}
-                                @endif
-                            </div>
-
-                            <div class="media-info">
-                                <div class="media-name" title="{{ $item->file_name }}">{{ Str::limit($item->name, 12) }}</div>
-                                <div class="media-meta">{{ $item->formatted_size }}</div>
-                            </div>
-                        </div>
-                    @empty
-                        @if(count($folders) === 0 && !$currentFolder)
-                            <div class="media-empty">
-                                <div class="media-empty-icon">
-                                    {!! tabler_icon('photo', ['class' => 'icon']) !!}
-                                </div>
-                                <p class="media-empty-title">{{ __('core/media::media.no_files') }}</p>
-                                <p class="media-empty-subtitle">{{ __('core/media::media.no_files_hint') }}</p>
-                            </div>
-                        @endif
-                    @endforelse
                 </div>
             @else
                 {{-- List View --}}
@@ -178,6 +213,13 @@ class="media-manager">
                         <thead>
                             <tr>
                                 <th style="width: 40px;"></th>
+                            <tr>
+                                <th style="width: 20px;">
+                                    <label class="form-check m-0">
+                                        <input type="checkbox" class="form-check-input" wire:click="selectAll">
+                                    </label>
+                                </th>
+                                <th style="width: 50px;"></th> {{-- Thumbnail --}}
                                 <th>{{ __('core/media::media.name') }}</th>
                                 <th>{{ __('core/media::media.type') }}</th>
                                 <th>{{ __('core/media::media.size') }}</th>
@@ -197,12 +239,17 @@ class="media-manager">
 
                             @foreach($folders as $folder)
                                 <tr wire:dblclick="navigateToFolder('{{ $folder['path'] }}')"
+                                    @click="showSidebar = true; sidebarType = 'folder'; $wire.loadFolderDetails('{{ $folder['path'] }}')"
                                     @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = '{{ $folder['path'] }}'; selectedType = 'folder'"
-                                    class="cursor-pointer">
+                                    class="media-list-item cursor-pointer">
                                     <td></td>
                                     <td>
-                                        {!! tabler_icon('folder', ['class' => 'icon-folder me-2']) !!}
-                                        {{ $folder['name'] }}
+                                        <div class="media-list-thumbnail folder-thumbnail">
+                                            {!! tabler_icon('folder', ['class' => 'icon-folder']) !!}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="font-weight-medium">{{ $folder['name'] }}</div>
                                     </td>
                                     <td class="text-muted">{{ __('core/media::media.folder') }}</td>
                                     <td>-</td>
@@ -213,20 +260,38 @@ class="media-manager">
                             @forelse($mediaItems as $item)
                                 <tr @click="$wire.loadMediaDetails({{ $item->id }}); showSidebar = true"
                                     @contextmenu.prevent="contextMenu = true; contextX = $event.clientX; contextY = $event.clientY; selectedItem = {{ $item->id }}; selectedType = 'file'"
-                                    class="cursor-pointer {{ in_array($item->id, $selectedMedia) ? 'table-primary' : '' }}">
+                                    class="media-list-item cursor-pointer {{ in_array($item->id, $selectedMedia) ? 'table-primary' : '' }}">
                                     <td @click.stop>
-                                        <input type="checkbox" class="form-check-input"
-                                               {{ in_array($item->id, $selectedMedia) ? 'checked' : '' }}
-                                               wire:click="toggleSelect({{ $item->id }})">
+                                        <label class="media-checkbox">
+                                            <input type="checkbox" class="form-check-input"
+                                                   {{ in_array($item->id, $selectedMedia) ? 'checked' : '' }}
+                                                   wire:click="toggleSelect({{ $item->id }})">
+                                        </label>
                                     </td>
-                                    <td>{{ $item->name }}</td>
+                                    <td>
+                                        <div class="media-list-thumbnail">
+                                            @if($item->is_image)
+                                                <img src="{{ $item->getUrl() }}" alt="{{ $item->name }}" loading="lazy">
+                                            @elseif($item->is_video)
+                                                {!! tabler_icon('video', ['class' => 'icon-media']) !!}
+                                            @elseif($item->is_document)
+                                                {!! tabler_icon('file-text', ['class' => 'icon-media']) !!}
+                                            @else
+                                                {!! tabler_icon('file', ['class' => 'icon-media']) !!}
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="font-weight-medium">{{ $item->name }}</div>
+                                        <div class="text-muted small d-block d-md-none">{{ $item->formatted_size }}</div>
+                                    </td>
                                     <td class="text-muted">{{ $item->mime_type }}</td>
-                                    <td class="text-muted">{{ $item->formatted_size }}</td>
-                                    <td class="text-muted">{{ $item->created_at->format('d/m/Y H:i') }}</td>
+                                    <td>{{ $item->formatted_size }}</td>
+                                    <td>{{ $item->created_at->format('d/m/Y') }}</td>
                                 </tr>
                             @empty
                                 @if(count($folders) === 0)
-                                    <tr><td colspan="5" class="text-center text-muted py-4">{{ __('core/media::media.no_data') }}</td></tr>
+                                    <tr><td colspan="6" class="text-center text-muted py-4">{{ __('core/media::media.no_data') }}</td></tr>
                                 @endif
                             @endforelse
                         </tbody>
@@ -241,7 +306,10 @@ class="media-manager">
         </div>
 
         {{-- Right Sidebar --}}
-        @include('core/media::components.sidebar', ['selectedMedia' => $selectedMediaDetails])
+        @include('core/media::components.sidebar', [
+            'selectedMedia' => $selectedMediaDetails,
+            'selectedFolder' => $selectedFolderDetails
+        ])
     </div>
 
     {{-- Context Menu --}}
@@ -251,4 +319,7 @@ class="media-manager">
     @include('core/media::components.modals.create-folder')
     @include('core/media::components.modals.rename')
     @include('core/media::components.modals.image-editor')
+    @include('core/media::components.modals.preview')
+</div>
+
 </div>
