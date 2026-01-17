@@ -113,6 +113,8 @@ return [
     'no_results' => 'Không tìm thấy kết quả',
     'leave_blank_to_keep' => 'Để trống nếu không muốn đổi',
     'max_2mb' => 'Tối đa 2MB',
+    'note_placeholder' => 'Nhập ghi chú...',
+    'note_placeholder' => 'Nhập ghi chú...',
 
     // Roles & Permissions
     'role' => 'Vai trò',

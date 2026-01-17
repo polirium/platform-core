@@ -102,6 +102,7 @@ return [
     'no_results' => 'No results found',
     'leave_blank_to_keep' => 'Leave blank to keep current',
     'max_2mb' => 'Max 2MB',
+    'note_placeholder' => 'Enter note...',
 
     // Roles & Permissions
     'role' => 'Role',
