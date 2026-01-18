@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Polirium\Core\Media\Contracts\MediaServiceInterface;
 use Polirium\Core\Media\Models\Media;
 use Polirium\Core\Media\Repositories\MediaRepository;
+use Polirium\Core\Media\Services\SvgSanitizer;
 use Spatie\MediaLibrary\HasMedia;
 
 class MediaService implements MediaServiceInterface
@@ -76,6 +77,12 @@ class MediaService implements MediaServiceInterface
 
         // Store file in the folder being viewed
         $path = $file->storeAs($directory, $filename, $disk);
+
+        // Sanitize SVG files to remove malicious scripts
+        if (strtolower($file->getClientOriginalExtension()) === 'svg' ||
+            $file->getMimeType() === 'image/svg+xml') {
+            $this->sanitizeSvgFile(\Storage::disk($disk)->path($path));
+        }
 
         // Create media record directly
         $media = new Media();
@@ -490,5 +497,24 @@ class MediaService implements MediaServiceInterface
         ];
 
         return $mimeMap[$mimeType] ?? 'bin';
+    }
+
+    /**
+     * Sanitize an SVG file to remove malicious scripts.
+     *
+     * @param string $filePath
+     * @return bool
+     */
+    protected function sanitizeSvgFile(string $filePath): bool
+    {
+        try {
+            $sanitizer = new SvgSanitizer();
+            return $sanitizer->sanitizeFile($filePath);
+        } catch (\Exception $e) {
+            \Log::warning('SVG sanitization failed: ' . $e->getMessage(), [
+                'file' => $filePath
+            ]);
+            return false;
+        }
     }
 }

@@ -59,11 +59,20 @@ class MediaServeController extends Controller
         $fullPath = Storage::disk($disk)->path($path);
         $mimeType = $media->mime_type ?? mime_content_type($fullPath);
 
-        return response()->file($fullPath, [
+        // Build headers
+        $headers = [
             'Content-Type' => $mimeType,
             'Cache-Control' => 'public, max-age=31536000, immutable',
             'X-Content-Type-Options' => 'nosniff',
-        ]);
+        ];
+
+        // Add extra security headers for SVG files to prevent script execution
+        if ($mimeType === 'image/svg+xml') {
+            $headers['Content-Security-Policy'] = "default-src 'none'; style-src 'unsafe-inline'; sandbox";
+            $headers['X-XSS-Protection'] = '1; mode=block';
+        }
+
+        return response()->file($fullPath, $headers);
     }
 
     /**
