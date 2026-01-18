@@ -52,10 +52,14 @@ class MediaService implements MediaServiceInterface
         // Extract metadata
         $metadata = $this->uploadService->extractMetadata($file);
 
-        // Prepare options - extract only base collection name (first part of path)
-        $rawCollection = $options['collection'] ?? config('media.default_collection', 'default');
-        $collectionParts = explode('/', $rawCollection);
-        $collection = $collectionParts[0] ?: 'uploads'; // First part only (e.g., 'uploads' not 'uploads/2025/12')
+        // Use the FULL collection path as directory (matches view folder structure)
+        // e.g., 'projects/2024' stays as 'projects/2024', not just 'projects'
+        $collection = $options['collection'] ?? config('media.default_collection', 'default');
+
+        // Default to 'uploads' if empty
+        if (empty($collection) || $collection === 'default') {
+            $collection = 'uploads';
+        }
 
         $disk = $options['disk'] ?? config('media.default_disk', 'public');
         $name = $options['name'] ?? pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
@@ -63,14 +67,14 @@ class MediaService implements MediaServiceInterface
         // Generate unique filename
         $filename = $this->uploadService->generateUniqueFilename($file, $options);
 
-        // Create directory if not exists
-        $directory = $collection . '/' . date('Y/m');
+        // Use collection path directly as directory (NO date-based subfolder)
+        $directory = $collection;
         $storagePath = \Storage::disk($disk)->path($directory);
         if (!is_dir($storagePath)) {
             mkdir($storagePath, 0755, true);
         }
 
-        // Store file
+        // Store file in the folder being viewed
         $path = $file->storeAs($directory, $filename, $disk);
 
         // Create media record directly
@@ -78,7 +82,7 @@ class MediaService implements MediaServiceInterface
         $media->model_type = 'Polirium\Core\Media\Models\Media';
         $media->model_id = 0;
         $media->uuid = Str::uuid()->toString();
-        $media->collection_name = $collection;
+        $media->collection_name = $collection; // Store FULL folder path
         $media->name = $name;
         $media->file_name = $filename;
         $media->mime_type = $file->getMimeType();

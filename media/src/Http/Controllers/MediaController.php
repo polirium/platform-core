@@ -40,6 +40,16 @@ class MediaController extends Controller
     }
 
     /**
+     * Display media settings page.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function settings()
+    {
+        return view('core/media::settings');
+    }
+
+    /**
      * Store a newly uploaded media.
      *
      * @param UploadMediaRequest $request

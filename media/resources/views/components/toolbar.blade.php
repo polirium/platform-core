@@ -56,7 +56,6 @@
             {{-- New Folder --}}
             <x-ui::button
                 color="secondary"
-                size="sm"
                 icon="folder-plus"
                 wire:click="createDefaultFolder"
                 :outline="true">
@@ -66,7 +65,6 @@
             {{-- Upload --}}
             <x-ui::button
                 color="primary"
-                size="sm"
                 icon="upload"
                 onclick="document.getElementById('media-upload-input').click()">
                 {{ __('core/media::media.upload') }}
@@ -87,6 +85,29 @@
                     title="{{ __('core/media::media.list') }}">
                 {!! tabler_icon('list', ['class' => 'icon']) !!}
             </button>
+        </div>
+
+        {{-- Divider --}}
+        <div class="toolbar-divider"></div>
+
+        {{-- Trash Toggle --}}
+        <div class="toolbar-trash">
+            <button type="button"
+                    wire:click="toggleTrash"
+                    class="viewmode-btn {{ $this->showTrash ? 'active trash-active' : '' }}"
+                    title="{{ $this->showTrash ? 'Quay lại' : 'Thùng rác' }}">
+                {!! tabler_icon($this->showTrash ? 'arrow-left' : 'trash', ['class' => 'icon']) !!}
+            </button>
+            @if($this->showTrash)
+                <button type="button"
+                        wire:click="emptyTrash"
+                        wire:confirm="Xác nhận xóa vĩnh viễn TẤT CẢ file trong thùng rác?"
+                        class="btn btn-danger btn-sm ms-2"
+                        title="Dọn sạch thùng rác">
+                    {!! tabler_icon('trash-x', ['class' => 'icon']) !!}
+                    <span class="d-none d-md-inline">Dọn sạch</span>
+                </button>
+            @endif
         </div>
     </div>
 </div>

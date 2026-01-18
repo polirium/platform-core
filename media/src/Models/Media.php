@@ -2,11 +2,13 @@
 
 namespace Polirium\Core\Media\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Media extends BaseMedia
 {
+    use SoftDeletes;
     /**
      * The attributes that should be cast.
      *
@@ -143,6 +145,34 @@ class Media extends BaseMedia
     public function getPublicUrl(string $conversion = ''): string
     {
         return $this->getUrl($conversion);
+    }
+
+    /**
+     * Get the secure URL for the media (through controller, not direct storage).
+     *
+     * @return string
+     */
+    public function getSecureUrl(): string
+    {
+        $extension = pathinfo($this->file_name, PATHINFO_EXTENSION);
+        return route('media.serve', [
+            'slug' => $this->uuid,
+            'extension' => $extension
+        ]);
+    }
+
+    /**
+     * Get the secure download URL for the media.
+     *
+     * @return string
+     */
+    public function getSecureDownloadUrl(): string
+    {
+        $extension = pathinfo($this->file_name, PATHINFO_EXTENSION);
+        return route('media.download.secure', [
+            'slug' => $this->uuid,
+            'extension' => $extension
+        ]);
     }
 
     /**

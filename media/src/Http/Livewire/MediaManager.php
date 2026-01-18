@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Storage;
 use Polirium\Core\Media\Models\Media;
+use Polirium\Core\Media\Models\MediaFolder;
 use Polirium\Core\Media\Services\MediaService;
 
 class MediaManager extends Component
@@ -19,6 +20,7 @@ class MediaManager extends Component
     public $perPage = 30;
     public $selectedMedia = [];
     public $viewMode = 'grid';
+    public $showTrash = false; // Toggle trash view
 
     // Folder management
     public $currentFolder = '';
@@ -77,38 +79,77 @@ class MediaManager extends Component
 
     public function loadFolders()
     {
-        $disk = config('media.default_disk', 'public');
-        $basePath = $this->currentFolder ?: '';
+        // Root folder is 'uploads' - all media content is under this
+        $rootPath = 'uploads';
 
-        $allDirectories = Storage::disk($disk)->directories($basePath);
+        if ($this->showTrash) {
+            // In trash view, load trashed folders from DB
+            $this->folders = $this->loadTrashFolders();
+            return;
+        }
 
-        // Hide system folders at root level
-        $hiddenFolders = ['uploads', 'default', 'livewire-tmp'];
+        // Load folders from database
+        if (empty($this->currentFolder) || $this->currentFolder === 'uploads') {
+            // At root level - get root folders from DB
+            $dbFolders = MediaFolder::root()->get();
+        } else {
+            // In a subfolder - get children from DB
+            $parent = MediaFolder::where('path', $this->currentFolder)->first();
+            $dbFolders = $parent ? $parent->children : collect();
+        }
 
-        $this->folders = collect($allDirectories)
-            ->filter(function ($dir) use ($hiddenFolders, $basePath) {
-                // Only hide at root level
-                if (empty($basePath)) {
-                    return !in_array(basename($dir), $hiddenFolders);
-                }
-                return true;
-            })
-            ->map(function ($dir) {
-                return [
-                    'name' => basename($dir),
-                    'path' => $dir,
-                    'type' => 'folder',
-                ];
-            })->toArray();
+        $this->folders = $dbFolders->map(function ($folder) {
+            return [
+                'id' => $folder->id,
+                'name' => $folder->name,
+                'path' => $folder->path,
+                'type' => 'folder',
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Load trashed folders from database.
+     * Returns folders at the current level that are in trash.
+     */
+    public function loadTrashFolders()
+    {
+        // Load trashed folders from database
+        if (empty($this->currentFolder) || $this->currentFolder === 'uploads') {
+            // At root level - get trashed root folders
+            $trashedFolders = MediaFolder::onlyTrashed()->root()->get();
+        } else {
+            // In a subfolder - get trashed children
+            // First check if parent exists (may be trashed or not)
+            $parent = MediaFolder::withTrashed()->where('path', $this->currentFolder)->first();
+            $trashedFolders = $parent
+                ? MediaFolder::onlyTrashed()->where('parent_id', $parent->id)->get()
+                : collect();
+        }
+
+        return $trashedFolders->map(function ($folder) {
+            return [
+                'id' => $folder->id,
+                'name' => $folder->name,
+                'path' => $folder->path,
+                'type' => 'folder',
+                'trashed' => true,
+            ];
+        })->toArray();
     }
 
     public function updateBreadcrumbs()
     {
         $this->breadcrumbs = [];
-        if ($this->currentFolder) {
+        if ($this->currentFolder && $this->currentFolder !== 'uploads') {
             $parts = explode('/', $this->currentFolder);
             $path = '';
             foreach ($parts as $part) {
+                // Skip "uploads" in breadcrumb display - it's the root represented by home icon
+                if ($part === 'uploads') {
+                    $path = 'uploads';
+                    continue;
+                }
                 $path = $path ? $path . '/' . $part : $part;
                 $this->breadcrumbs[] = [
                     'name' => $part,
@@ -155,15 +196,35 @@ class MediaManager extends Component
         $name = $baseName;
         $counter = 1;
 
-        $path = $this->currentFolder ? $this->currentFolder . '/' . $name : $name;
+        // Determine parent folder
+        $parentFolder = null;
+        if (!empty($this->currentFolder) && $this->currentFolder !== 'uploads') {
+            $parentFolder = MediaFolder::where('path', $this->currentFolder)->first();
+        }
 
-        while (Storage::disk($disk)->exists($path)) {
+        // Build path
+        $basePath = $this->currentFolder ?: 'uploads';
+        $path = $basePath . '/' . $name;
+
+        // Check for existing folders (by path in DB)
+        while (MediaFolder::where('path', $path)->exists()) {
             $name = $baseName . ' (' . $counter . ')';
-            $path = $this->currentFolder ? $this->currentFolder . '/' . $name : $name;
+            $path = $basePath . '/' . $name;
             $counter++;
         }
 
-        Storage::disk($disk)->makeDirectory($path);
+        // Create folder record in DB
+        $folder = MediaFolder::create([
+            'name' => $name,
+            'path' => $path,
+            'parent_id' => $parentFolder?->id,
+        ]);
+
+        // Create physical directory
+        if (!Storage::disk($disk)->exists($path)) {
+            Storage::disk($disk)->makeDirectory($path);
+        }
+
         $this->loadFolders();
 
         // Return the path of the new folder to trigger inline rename
@@ -185,21 +246,46 @@ class MediaManager extends Component
         $disk = config('media.default_disk', 'public');
 
         if ($type === 'folder') {
-            $oldPath = $id;
-            $parentPath = dirname($oldPath);
-            // Handle root folder case where dirname is '.'
-            $parentPath = $parentPath === '.' ? '' : $parentPath;
+            // Find folder by path in DB
+            $folder = MediaFolder::where('path', $id)->first();
+            if (!$folder) return;
 
-            $newPath = ($parentPath ? $parentPath . '/' : '') . $newName;
+            $oldPath = $folder->path;
+            $parentPath = dirname($oldPath);
+            $parentPath = $parentPath === '.' ? 'uploads' : $parentPath;
+
+            $newPath = $parentPath . '/' . $newName;
 
             if ($oldPath === $newPath) return;
 
-            if (Storage::disk($disk)->exists($newPath)) {
+            // Check if new path already exists
+            if (MediaFolder::where('path', $newPath)->exists()) {
                 $this->addError('rename', 'Tên đã tồn tại');
                 return;
             }
 
-            Storage::disk($disk)->move($oldPath, $newPath);
+            // Update DB record
+            $folder->name = $newName;
+            $folder->path = $newPath;
+            $folder->save();
+
+            // Update all child folders' paths
+            $this->updateChildFolderPaths($folder, $oldPath, $newPath);
+
+            // Update all files in this folder
+            Media::where('collection_name', $oldPath)->update(['collection_name' => $newPath]);
+            Media::where('collection_name', 'like', $oldPath . '/%')
+                ->get()
+                ->each(function ($file) use ($oldPath, $newPath) {
+                    $file->collection_name = str_replace($oldPath, $newPath, $file->collection_name);
+                    $file->save();
+                });
+
+            // Rename physical directory
+            if (Storage::disk($disk)->exists($oldPath)) {
+                Storage::disk($disk)->move($oldPath, $newPath);
+            }
+
             $this->loadFolders();
         } else {
             $media = Media::find($id);
@@ -209,6 +295,31 @@ class MediaManager extends Component
                 $media->name = $newName;
                 $media->save();
             }
+        }
+    }
+
+    /**
+     * Recursively update child folder paths when parent is renamed.
+     */
+    protected function updateChildFolderPaths(MediaFolder $folder, string $oldPath, string $newPath)
+    {
+        foreach ($folder->children as $child) {
+            $child->path = str_replace($oldPath, $newPath, $child->path);
+            $child->save();
+            $this->updateChildFolderPaths($child, $oldPath, $newPath);
+        }
+    }
+
+    /**
+     * Recursively update child folder paths when parent is moved.
+     */
+    protected function updateMovedFolderPaths(int $parentId, string $oldPath, string $newPath)
+    {
+        $children = MediaFolder::where('parent_id', $parentId)->get();
+        foreach ($children as $child) {
+            $child->path = str_replace($oldPath, $newPath, $child->path);
+            $child->save();
+            $this->updateMovedFolderPaths($child->id, $oldPath, $newPath);
         }
     }
 
@@ -320,6 +431,11 @@ class MediaManager extends Component
             $mediaService->delete($id);
             session()->flash('success', 'Đã xóa file!');
         }
+
+        // Clear selection on backend
+        $this->selectedMedia = [];
+        // Dispatch event to clear selection on frontend (Alpine)
+        $this->dispatch('selection-cleared');
     }
 
     public function deleteSelected()
@@ -328,24 +444,249 @@ class MediaManager extends Component
             return;
         }
 
-        $mediaService = app(MediaService::class);
-        $mediaService->deleteMultiple($this->selectedMedia);
+        $fileCount = 0;
+        $folderCount = 0;
+
+        foreach ($this->selectedMedia as $id) {
+            // Handle Folders (prefixed with 'folder:')
+            if (is_string($id) && str_starts_with($id, 'folder:')) {
+                $folderPath = trim(substr($id, 7), '/');
+
+                // Find folder in DB and soft delete it
+                $folder = MediaFolder::where('path', $folderPath)->first();
+                if ($folder) {
+                    // Soft delete folder and all its children recursively
+                    $this->softDeleteFolderRecursive($folder);
+                    $folderCount++;
+                }
+            }
+            // Handle Files (numeric IDs) - SOFT DELETE ONLY
+            elseif (is_numeric($id)) {
+                $media = Media::find($id);
+                if ($media) {
+                    $media->delete(); // Soft delete
+                    $fileCount++;
+                }
+            }
+        }
+
         $this->selectedMedia = [];
-        session()->flash('success', 'Đã xóa các file đã chọn!');
+        $this->loadFolders();
+        $this->dispatch('selection-cleared');
+
+        $message = [];
+        if ($fileCount > 0) $message[] = "{$fileCount} file";
+        if ($folderCount > 0) $message[] = "{$folderCount} folder";
+        session()->flash('success', 'Đã xóa ' . implode(' và ', $message) . '!');
+    }
+
+    /**
+     * Recursively soft delete folder and all its contents.
+     */
+    protected function softDeleteFolderRecursive(MediaFolder $folder)
+    {
+        // Soft delete all child folders recursively
+        foreach ($folder->children as $child) {
+            $this->softDeleteFolderRecursive($child);
+        }
+
+        // Soft delete all files in this folder
+        Media::where('collection_name', $folder->path)->delete();
+
+        // Soft delete the folder itself
+        $folder->delete();
     }
 
     // Cut - add to clipboard
-    public function cut($id = null)
+    public function cut($ids = null)
     {
-        if ($id) {
-            $this->clipboard = [$id];
+        if ($ids !== null) {
+            // Ensure $ids is always an array
+            $this->clipboard = is_array($ids) ? $ids : [$ids];
         } else {
             $this->clipboard = $this->selectedMedia;
         }
         $this->clipboardFolder = $this->currentFolder;
         $this->selectedMedia = [];
+        $this->dispatch('selection-cleared'); // Sync with frontend
         $this->hideContextMenu();
-        session()->flash('info', count($this->clipboard) . ' file đã được cắt. Chọn thư mục đích và nhấn Dán.');
+        session()->flash('info', count($this->clipboard) . ' file đã được cắt. Vào thư mục đích và chuột phải -> Dán.');
+    }
+
+    // Move selected items to a specific folder (Drag & Drop)
+    public function moveSelectedTo($targetPath)
+    {
+        if (empty($this->selectedMedia)) {
+            return;
+        }
+
+        // Clean target path
+        $targetPath = trim($targetPath, '/');
+        $targetPath = $targetPath === '' ? '' : $targetPath;
+
+        $disk = config('media.default_disk', 'public');
+        $storage = Storage::disk($disk);
+        $movedCount = 0;
+
+        foreach ($this->selectedMedia as $id) {
+            // Handle Files (Int ID)
+            if (is_numeric($id)) {
+                $media = Media::find($id);
+                if ($media) {
+                    try {
+                        if ($media->collection_name === $targetPath) continue;
+
+                        $oldPath = $media->getPath();
+                        // Desired: "Folder/File.ext" (No date structure)
+                        $newPath = ($targetPath ? $targetPath . '/' : '') . $media->file_name;
+
+                        // Collision check & Auto-rename
+                        if ($storage->exists($newPath)) {
+                            $nameInfo = pathinfo($media->file_name);
+                            $counter = 1;
+                            while ($storage->exists($newPath)) {
+                                $newFileName = $nameInfo['filename'] . " ($counter)." . $nameInfo['extension'];
+                                $newPath = ($targetPath ? $targetPath . '/' : '') . $newFileName;
+                                $counter++;
+                            }
+                            // Update filename in DB model to match new physical name
+                            $media->file_name = basename($newPath); // This will be saved below
+                        }
+
+                        // Move physical file
+                        if ($storage->exists($oldPath)) {
+                            $storage->move($oldPath, $newPath);
+                        }
+
+                        // Update DB
+                        $media->collection_name = $targetPath;
+
+                        // FIX 404: Override default date-based getPath() by saving explicit path
+                        $customProperties = $media->custom_properties;
+                        $customProperties['file_path'] = $newPath;
+                        $media->custom_properties = $customProperties;
+
+                        $media->save(); // Saves new collection_name and potentially new file_name and properties
+                    } catch (\Exception $e) {
+                         \Log::error("File move failed ID $id: " . $e->getMessage());
+                    }
+                }
+            }
+            // Handle Folders (prefixed with 'folder:')
+            elseif (is_string($id) && str_starts_with($id, 'folder:')) {
+                $oldFolderPath = trim(substr($id, 7), '/'); // Remove 'folder:' prefix
+                if ($oldFolderPath === $targetPath) continue; // Move to self?
+
+                // Prevent circular move (Parent into Child)
+                // If Target STARTS WITH Source, it's invalid.
+                // e.g. Source: "A", Target: "A/B". Moving A into B is impossible.
+                if ($targetPath === $oldFolderPath || str_starts_with($targetPath . '/', $oldFolderPath . '/')) {
+                    session()->flash('error', "Không thể di chuyển folder '$oldFolderPath' vào bên trong chính nó.");
+                    continue;
+                }
+
+                $folderName = basename($oldFolderPath);
+                $newFolderPath = ($targetPath ? $targetPath . '/' : '') . $folderName;
+
+                try {
+                    // Collision check (Folders)
+                    if ($storage->exists($newFolderPath)) {
+                         // Auto-rename folder? Or fail? OS usually merges or renames.
+                         // Let's auto-rename for safety.
+                        $counter = 1;
+                        while ($storage->exists($newFolderPath)) {
+                            $newFolderName = $folderName . " ($counter)";
+                            $newFolderPath = ($targetPath ? $targetPath . '/' : '') . $newFolderName;
+                            $counter++;
+                        }
+                    }
+
+                    // Move physical directory
+                    $physicalMoveExisted = false;
+                    if ($storage->exists($oldFolderPath)) {
+                        $storage->move($oldFolderPath, $newFolderPath);
+                        $physicalMoveExisted = true;
+                    } elseif ($storage->exists($newFolderPath)) {
+                        // RECOVERY MODE:
+                        // Source missing, but Destination exists?
+                        // It means a previous move likely crashed before DB update.
+                        // We proceed to update DB to sync state.
+                        $physicalMoveExisted = true;
+                    }
+
+                    if ($physicalMoveExisted) {
+                        // Update MediaFolder record in DB
+                        $folder = MediaFolder::where('path', $oldFolderPath)->first();
+                        if ($folder) {
+                            // Find new parent folder
+                            $newParent = $targetPath ? MediaFolder::where('path', $targetPath)->first() : null;
+
+                            // Update folder record
+                            $folder->path = $newFolderPath;
+                            $folder->name = basename($newFolderPath);
+                            $folder->parent_id = $newParent?->id;
+                            $folder->save();
+
+                            // Update all child folder paths recursively
+                            $this->updateMovedFolderPaths($folder->id, $oldFolderPath, $newFolderPath);
+                        }
+
+                        // Update DB References for files directly in this folder
+                        $directFiles = Media::where('collection_name', $oldFolderPath)->get();
+                        foreach($directFiles as $file) {
+                             $file->collection_name = $newFolderPath;
+
+                             // Calculate new file path by replacing old folder path with new one
+                             $oldFilePath = $file->getPath(); // Gets current path (may include date subfolders)
+                             // Replace the folder prefix in the path
+                             if (str_starts_with($oldFilePath, $oldFolderPath . '/')) {
+                                 $newFilePath = $newFolderPath . substr($oldFilePath, strlen($oldFolderPath));
+                             } else {
+                                 // Fallback: just put file directly in new folder
+                                 $newFilePath = $newFolderPath . '/' . $file->file_name;
+                             }
+
+                             $customProperties = $file->custom_properties ?? [];
+                             $customProperties['file_path'] = $newFilePath;
+                             $file->custom_properties = $customProperties;
+                             $file->save();
+                        }
+
+                        // 2. Files in sub-folders (Recursive update)
+                        $subFiles = Media::where('collection_name', 'like', $oldFolderPath . '/%')->get();
+                        foreach($subFiles as $file) {
+                             // Update collection_name: e.g. 1/sub -> 2/1/sub
+                             $newCollectionName = $newFolderPath . substr($file->collection_name, strlen($oldFolderPath));
+                             $file->collection_name = $newCollectionName;
+
+                             // Calculate new file path
+                             $oldFilePath = $file->getPath();
+                             if (str_starts_with($oldFilePath, $oldFolderPath . '/')) {
+                                 $newFilePath = $newFolderPath . substr($oldFilePath, strlen($oldFolderPath));
+                             } else {
+                                 $newFilePath = $newCollectionName . '/' . $file->file_name;
+                             }
+
+                             $customProperties = $file->custom_properties ?? [];
+                             $customProperties['file_path'] = $newFilePath;
+                             $file->custom_properties = $customProperties;
+                             $file->save();
+                        }
+
+                        $movedCount++;
+                    }
+                } catch (\Exception $e) {
+                    \Log::error("Folder move failed PATH $id: " . $e->getMessage());
+                }
+            }
+        }
+
+        // Finalize
+        session()->flash('success', 'Đã di chuyển thành công!');
+        $this->loadFolders(); // FORCE REFRESH FOLDERS
+        $this->selectedMedia = [];
+        $this->dispatch('selection-cleared');
+        $this->dropTarget = null; // Sync back to frontend if needed
     }
 
     // Paste - move files from clipboard to current folder
@@ -367,13 +708,24 @@ class MediaManager extends Component
                     // Get current file path
                     $oldPath = $media->getPath();
 
-                    // Create new path
-                    $newDirectory = $targetFolder . '/' . date('Y/m');
-                    $newPath = $newDirectory . '/' . $media->file_name;
+                    // Create new path (direct in target folder, no date subdirectory)
+                    $newPath = ($targetFolder ? $targetFolder . '/' : '') . $media->file_name;
+
+                    // Collision check & Auto-rename
+                    if (Storage::disk($disk)->exists($newPath)) {
+                        $nameInfo = pathinfo($media->file_name);
+                        $counter = 1;
+                        while (Storage::disk($disk)->exists($newPath)) {
+                            $newFileName = $nameInfo['filename'] . " ($counter)." . ($nameInfo['extension'] ?? '');
+                            $newPath = ($targetFolder ? $targetFolder . '/' : '') . $newFileName;
+                            $counter++;
+                        }
+                        $media->file_name = basename($newPath);
+                    }
 
                     // Ensure target directory exists
-                    if (!Storage::disk($disk)->exists($newDirectory)) {
-                        Storage::disk($disk)->makeDirectory($newDirectory);
+                    if ($targetFolder && !Storage::disk($disk)->exists($targetFolder)) {
+                        Storage::disk($disk)->makeDirectory($targetFolder);
                     }
 
                     // Move the physical file
@@ -719,25 +1071,38 @@ class MediaManager extends Component
 
     protected function getMediaQuery()
     {
-        $query = Media::query()->orderBy('created_at', 'desc');
+        // Use onlyTrashed() if viewing trash, otherwise exclude trashed
+        $query = $this->showTrash
+            ? Media::onlyTrashed()->orderBy('deleted_at', 'desc')
+            : Media::query()->orderBy('created_at', 'desc');
 
         // Filter by current folder/collection
-        // At root level, show files with 'uploads' collection or no specific collection
-        // In a folder, show files with that folder as collection
-        if ($this->currentFolder) {
-            $query->where('collection_name', $this->currentFolder);
-        } else {
-            // At root, only show files in 'uploads' or 'default' collection
-            // Don't show files that belong to other folders/collections
-            $disk = config('media.default_disk', 'public');
-            $existingFolders = \Storage::disk($disk)->directories();
-
-            // Exclude files that are in specific folders
-            if (!empty($existingFolders)) {
-                $query->where(function($q) use ($existingFolders) {
+        if ($this->showTrash) {
+            // Trash view: filter by folder (same as normal view)
+            if ($this->currentFolder) {
+                $query->where('collection_name', $this->currentFolder);
+            } else {
+                // At root, show files in 'uploads', 'default', or empty collection
+                $query->where(function($q) {
                     $q->whereIn('collection_name', ['uploads', 'default', ''])
                       ->orWhereNull('collection_name');
                 });
+            }
+        } else {
+            // Normal view: filter by folder
+            if ($this->currentFolder) {
+                $query->where('collection_name', $this->currentFolder);
+            } else {
+                // At root, only show files in 'uploads' or 'default' collection
+                $disk = config('media.default_disk', 'public');
+                $existingFolders = \Storage::disk($disk)->directories();
+
+                if (!empty($existingFolders)) {
+                    $query->where(function($q) use ($existingFolders) {
+                        $q->whereIn('collection_name', ['uploads', 'default', ''])
+                          ->orWhereNull('collection_name');
+                    });
+                }
             }
         }
 
@@ -768,6 +1133,216 @@ class MediaManager extends Component
         return $query;
     }
 
+    // === TRASH MANAGEMENT ===
+
+    public function toggleTrash()
+    {
+        $this->showTrash = !$this->showTrash;
+        $this->selectedMedia = [];
+        $this->currentFolder = ''; // Reset to root when switching views
+        $this->resetPage();
+    }
+
+    public function restoreItem($id, $type = 'file')
+    {
+        if ($type === 'folder') {
+            $folder = MediaFolder::onlyTrashed()->find($id);
+            if ($folder) {
+                $this->restoreFolderRecursive($folder);
+                session()->flash('success', 'Đã khôi phục folder thành công!');
+            }
+        } else {
+            $media = Media::onlyTrashed()->find($id);
+            if ($media) {
+                $media->restore();
+                session()->flash('success', 'Đã khôi phục file thành công!');
+            }
+        }
+        $this->loadFolders();
+    }
+
+    /**
+     * Recursively restore folder and all its contents.
+     */
+    protected function restoreFolderRecursive(MediaFolder $folder)
+    {
+        // Restore the folder first
+        $folder->restore();
+
+        // Restore all files in this folder
+        Media::onlyTrashed()->where('collection_name', $folder->path)->restore();
+
+        // Restore child folders recursively
+        $trashedChildren = MediaFolder::onlyTrashed()->where('parent_id', $folder->id)->get();
+        foreach ($trashedChildren as $child) {
+            $this->restoreFolderRecursive($child);
+        }
+    }
+
+    public function restoreSelected()
+    {
+        if (empty($this->selectedMedia)) {
+            return;
+        }
+
+        $fileCount = 0;
+        $folderCount = 0;
+
+        foreach ($this->selectedMedia as $id) {
+            if (is_string($id) && str_starts_with($id, 'folder:')) {
+                $folderPath = trim(substr($id, 7), '/');
+                $folder = MediaFolder::onlyTrashed()->where('path', $folderPath)->first();
+                if ($folder) {
+                    $this->restoreFolderRecursive($folder);
+                    $folderCount++;
+                }
+            } elseif (is_numeric($id)) {
+                $media = Media::onlyTrashed()->find($id);
+                if ($media) {
+                    $media->restore();
+                    $fileCount++;
+                }
+            }
+        }
+
+        $this->selectedMedia = [];
+        $this->loadFolders();
+
+        $message = [];
+        if ($fileCount > 0) $message[] = "{$fileCount} file";
+        if ($folderCount > 0) $message[] = "{$folderCount} folder";
+        session()->flash('success', 'Đã khôi phục ' . implode(' và ', $message) . '!');
+    }
+
+    public function forceDeleteItem($id, $type = 'file')
+    {
+        $disk = config('media.default_disk', 'public');
+
+        if ($type === 'folder') {
+            $folder = MediaFolder::onlyTrashed()->find($id);
+            if ($folder) {
+                $this->forceDeleteFolderRecursive($folder);
+                session()->flash('success', 'Đã xóa vĩnh viễn folder!');
+            }
+        } else {
+            $media = Media::onlyTrashed()->find($id);
+            if ($media) {
+                $path = $media->getPath();
+                if (Storage::disk($disk)->exists($path)) {
+                    Storage::disk($disk)->delete($path);
+                }
+                $media->forceDelete();
+                session()->flash('success', 'Đã xóa vĩnh viễn file!');
+            }
+        }
+        $this->loadFolders();
+    }
+
+    /**
+     * Recursively force delete folder and all its contents.
+     */
+    protected function forceDeleteFolderRecursive(MediaFolder $folder)
+    {
+        $disk = config('media.default_disk', 'public');
+
+        // Force delete child folders recursively
+        $trashedChildren = MediaFolder::onlyTrashed()->where('parent_id', $folder->id)->get();
+        foreach ($trashedChildren as $child) {
+            $this->forceDeleteFolderRecursive($child);
+        }
+
+        // Force delete all files in this folder
+        $trashedFiles = Media::onlyTrashed()->where('collection_name', $folder->path)->get();
+        foreach ($trashedFiles as $file) {
+            $path = $file->getPath();
+            if (Storage::disk($disk)->exists($path)) {
+                Storage::disk($disk)->delete($path);
+            }
+            $file->forceDelete();
+        }
+
+        // Delete physical directory if exists
+        if (Storage::disk($disk)->exists($folder->path)) {
+            Storage::disk($disk)->deleteDirectory($folder->path);
+        }
+
+        // Force delete the folder record
+        $folder->forceDelete();
+    }
+
+    public function forceDeleteSelected()
+    {
+        if (empty($this->selectedMedia)) {
+            return;
+        }
+
+        $disk = config('media.default_disk', 'public');
+        $fileCount = 0;
+        $folderCount = 0;
+
+        foreach ($this->selectedMedia as $id) {
+            if (is_string($id) && str_starts_with($id, 'folder:')) {
+                $folderPath = trim(substr($id, 7), '/');
+                $folder = MediaFolder::onlyTrashed()->where('path', $folderPath)->first();
+                if ($folder) {
+                    $this->forceDeleteFolderRecursive($folder);
+                    $folderCount++;
+                }
+            } elseif (is_numeric($id)) {
+                $media = Media::onlyTrashed()->find($id);
+                if ($media) {
+                    $path = $media->getPath();
+                    if (Storage::disk($disk)->exists($path)) {
+                        Storage::disk($disk)->delete($path);
+                    }
+                    $media->forceDelete();
+                    $fileCount++;
+                }
+            }
+        }
+
+        $this->selectedMedia = [];
+        $this->loadFolders();
+
+        $message = [];
+        if ($fileCount > 0) $message[] = "{$fileCount} file";
+        if ($folderCount > 0) $message[] = "{$folderCount} folder";
+        session()->flash('success', 'Đã xóa vĩnh viễn ' . implode(' và ', $message) . '!');
+    }
+
+    public function emptyTrash()
+    {
+        $disk = config('media.default_disk', 'public');
+        $fileCount = 0;
+        $folderCount = 0;
+
+        // Force delete all trashed files
+        $trashedMedia = Media::onlyTrashed()->get();
+        foreach ($trashedMedia as $media) {
+            $path = $media->getPath();
+            if (Storage::disk($disk)->exists($path)) {
+                Storage::disk($disk)->delete($path);
+            }
+            $media->forceDelete();
+            $fileCount++;
+        }
+
+        // Force delete all trashed folders
+        $trashedFolders = MediaFolder::onlyTrashed()->get();
+        foreach ($trashedFolders as $folder) {
+            if (Storage::disk($disk)->exists($folder->path)) {
+                Storage::disk($disk)->deleteDirectory($folder->path);
+            }
+            $folder->forceDelete();
+            $folderCount++;
+        }
+
+        $message = [];
+        if ($fileCount > 0) $message[] = "{$fileCount} file";
+        if ($folderCount > 0) $message[] = "{$folderCount} folder";
+        session()->flash('success', 'Đã dọn sạch thùng rác (' . implode(' và ', $message) . ')!');
+    }
+
     public function render()
     {
         $media = $this->getMediaQuery()->paginate($this->perPage);
@@ -776,10 +1351,14 @@ class MediaManager extends Component
         $disk = config('media.default_disk', 'public');
         $allFolders = Storage::disk($disk)->allDirectories();
 
+        // Get trash folders if in trash view
+        $trashFolders = $this->showTrash ? $this->loadTrashFolders() : [];
+
         return view('core/media::livewire.media-manager', [
             'mediaItems' => $media,
             'allFolders' => $allFolders,
             'editingImage' => $this->editingImage,
+            'trashFolders' => $trashFolders,
         ]);
     }
 }

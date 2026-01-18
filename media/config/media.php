@@ -66,6 +66,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Maximum Files Per Upload
+    |--------------------------------------------------------------------------
+    |
+    | Maximum number of files allowed in a single upload batch.
+    |
+    */
+    'max_files_per_upload' => env('MEDIA_MAX_FILES_PER_UPLOAD', 20),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Blocked Extensions (Security)
+    |--------------------------------------------------------------------------
+    |
+    | These extensions are ALWAYS blocked for security reasons.
+    | Cannot be overridden by user settings.
+    |
+    */
+    'blocked_extensions' => [
+        'php', 'phtml', 'php3', 'php4', 'php5', 'php7', 'php8', 'phar',
+        'exe', 'sh', 'bat', 'cmd', 'com', 'scr', 'msi', 'dll',
+        'pl', 'cgi', 'py', 'rb', 'htaccess', 'htpasswd', 'asp', 'aspx', 'jsp'
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Image Conversions
     |--------------------------------------------------------------------------
     |

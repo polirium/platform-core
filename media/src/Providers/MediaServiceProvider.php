@@ -26,6 +26,14 @@ class MediaServiceProvider extends PoliriumBaseServiceProvider
             ->loadTranslations()
             ->loadMigrations();
 
+        // Register commands
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                \Polirium\Core\Media\Console\Commands\CleanupOrphanedMedia::class,
+                \Polirium\Core\Media\Console\Commands\SyncMediaFolders::class,
+            ]);
+        }
+
         // Load helpers
         if (file_exists(__DIR__ . '/../../helpers/media_helpers.php')) {
             require_once __DIR__ . '/../../helpers/media_helpers.php';
@@ -58,6 +66,83 @@ class MediaServiceProvider extends PoliriumBaseServiceProvider
                 \Polirium\Core\UI\Facades\Assets::addOptionalJs($assets['js']);
             }
         }
+
+        // Register Media Settings to Settings Sidebar
+        $this->registerSettings();
+    }
+
+    /**
+     * Register Media settings to the global Settings page.
+     */
+    protected function registerSettings(): void
+    {
+        if (!class_exists(\Polirium\Core\Settings\Facades\SettingRegistry::class)) {
+            return;
+        }
+
+        \Polirium\Core\Settings\Facades\SettingRegistry::group('media', [
+                'title' => 'Cài đặt Media',
+                'icon' => 'photo',
+                'description' => 'Cấu hình upload file và quản lý media'
+            ])
+            ->add('max_file_size', [
+                'type' => 'number',
+                'label' => 'Dung lượng tối đa (MB)',
+                'description' => 'Kích thước file upload tối đa (megabytes)',
+                'default' => 10,
+                'required' => true,
+                'validation' => ['required', 'integer', 'min:1', 'max:500'],
+                'attributes' => ['min' => 1, 'max' => 500]
+            ])
+            ->add('max_files_per_upload', [
+                'type' => 'number',
+                'label' => 'Số file tối đa mỗi lần',
+                'description' => 'Số lượng file tối đa cho phép upload một lần',
+                'default' => 20,
+                'required' => true,
+                'validation' => ['required', 'integer', 'min:1', 'max:100'],
+                'attributes' => ['min' => 1, 'max' => 100]
+            ])
+            ->add('allowed_image_extensions', [
+                'type' => 'text',
+                'label' => 'Định dạng hình ảnh',
+                'description' => 'Các định dạng hình ảnh được phép (phân cách bằng dấu phẩy)',
+                'default' => 'jpg,jpeg,png,gif,webp,svg,bmp,ico',
+                'validation' => ['required', 'string']
+            ])
+            ->add('allowed_document_extensions', [
+                'type' => 'text',
+                'label' => 'Định dạng tài liệu',
+                'description' => 'Các định dạng tài liệu được phép (phân cách bằng dấu phẩy)',
+                'default' => 'pdf,doc,docx,xls,xlsx,ppt,pptx,txt,csv',
+                'validation' => ['required', 'string']
+            ])
+            ->add('allowed_video_extensions', [
+                'type' => 'text',
+                'label' => 'Định dạng video',
+                'description' => 'Các định dạng video được phép (phân cách bằng dấu phẩy)',
+                'default' => 'mp4,avi,mov,wmv,flv,mkv,webm',
+                'validation' => ['required', 'string']
+            ])
+            ->add('allowed_audio_extensions', [
+                'type' => 'text',
+                'label' => 'Định dạng audio',
+                'description' => 'Các định dạng audio được phép (phân cách bằng dấu phẩy)',
+                'default' => 'mp3,wav,ogg,wma,aac',
+                'validation' => ['required', 'string']
+            ])
+            ->add('optimize_images', [
+                'type' => 'checkbox',
+                'label' => 'Tối ưu hình ảnh',
+                'description' => 'Tự động nén và tối ưu hình ảnh khi upload',
+                'default' => true
+            ])
+            ->add('generate_thumbnails', [
+                'type' => 'checkbox',
+                'label' => 'Tạo thumbnail',
+                'description' => 'Tự động tạo thumbnail cho hình ảnh',
+                'default' => true
+            ]);
     }
 
     /**

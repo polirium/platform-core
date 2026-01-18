@@ -65,20 +65,115 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
 
 // ============================================
 // Layout Structure
-// ============================================
+// ============================================// Main Layout
 .media-layout {
   display: flex;
+  height: calc(100vh - 200px); // Adjust based on your header/toolbar height
+  min-height: 500px;
   position: relative;
-  flex: 1;
-  overflow: hidden;
+  overflow: hidden; // Prevent outer scroll
 }
 
+// Drop Overlay for OS file drag-drop
+.drop-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(37, 99, 235, 0.1);
+  backdrop-filter: blur(4px);
+  border: 3px dashed var(--media-primary);
+  border-radius: $media-border-radius;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  .drop-overlay-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--media-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: white;
+    padding: 2rem 3rem;
+    border-radius: $media-border-radius;
+    box-shadow: $media-shadow-lg;
+
+    .icon {
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+}
+
+// Upload Progress Overlay
+.upload-progress-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-progress-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  padding: 2.5rem 3rem;
+  border-radius: $media-border-radius;
+  box-shadow: $media-shadow-lg;
+  text-align: center;
+
+  .upload-progress-spinner {
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+    }
+  }
+
+  .upload-progress-text {
+    strong {
+      font-size: 1.1rem;
+      color: var(--media-text-light);
+    }
+
+    small {
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+// Content Area
 .media-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  overflow-y: auto;
+  overflow-y: auto; // Content scrolls internally
+  padding: 1.5rem;
+  transition: margin-right $media-transition;
+  position: relative; // For marquee positioning context if needed (though marquee is fixed)
+
+  // Ensure it fills space so clicks register for Marquee
+  min-height: 100%;
+  cursor: default; // avoid text select cursor
+
+  &.sidebar-open {
+    margin-right: $media-sidebar-width;
+  }
   overflow-x: hidden;
 
   // Smoothly limit the width of the content area when sidebar is open
@@ -168,13 +263,11 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
 
       & + .breadcrumb-item {
         &::before {
-          content: "";
-          width: 4px;
-          height: 4px;
-          background: var(--tblr-muted);
-          border-radius: 50%;
+          content: "›";
+          font-size: 1rem;
+          color: var(--tblr-muted);
           margin: 0 0.5rem;
-          opacity: 0.5;
+          opacity: 0.6;
         }
       }
     }
@@ -380,6 +473,49 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
       margin-left: -1px;
     }
   }
+
+  // Trash Toggle - Standalone Button
+  .toolbar-trash {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .viewmode-btn {
+      background: var(--tblr-body-bg);
+      border: 1px solid var(--tblr-border-color);
+      padding: 0.5rem 0.625rem;
+      color: var(--tblr-muted);
+      transition: $media-transition-fast;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 6px;
+      min-width: 38px;
+      height: 38px;
+
+      .icon {
+        width: 16px;
+        height: 16px;
+        stroke-width: 1.5;
+      }
+
+      &:hover {
+        background: var(--tblr-tertiary-bg);
+        color: var(--tblr-body-color);
+      }
+
+      &.trash-active {
+        background: #dc3545;
+        border-color: #dc3545;
+        color: #fff;
+
+        .icon {
+          stroke-width: 1.8;
+        }
+      }
+    }
+  }
 }
 
 // ============================================
@@ -539,7 +675,9 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
 
   // Selected or Active state
   &.selected,
-  &.active {
+  &.active,
+  &.drop-active {
+    // Drop target highlight
     border: 2px solid var(--tblr-primary); // Thicker border
     background: var(--tblr-bg-surface-secondary); // Gentle background highlight
     box-shadow: 0 0 0 2px rgba(var(--tblr-primary-rgb), 0.1); // Optional glow
@@ -565,6 +703,96 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
     height: 20px;
     border-radius: 4px;
     transition: $media-transition-fast;
+  }
+}
+
+// Marquee Selection Box
+.selection-marquee {
+  position: fixed;
+  border: 1px solid #206bc4; // Standard Blue
+  background: rgba(32, 107, 196, 0.2); // Semi-transparent blue
+  z-index: 10000; // Increase Z-Index to be safe
+  pointer-events: none;
+  display: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+// Toast Notifications - Modern OS-like Style
+.media-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 10px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 0.9rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: toastSlideIn 0.3s ease-out;
+
+  .toast-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+
+    .icon {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2.5;
+    }
+  }
+
+  .toast-message {
+    white-space: nowrap;
+  }
+
+  &.media-toast-success {
+    background: rgba(16, 185, 129, 0.95);
+    color: white;
+
+    .toast-icon {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  &.media-toast-error {
+    background: rgba(239, 68, 68, 0.95);
+    color: white;
+
+    .toast-icon {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  &.media-toast-info {
+    background: rgba(37, 99, 235, 0.95);
+    color: white;
+
+    .toast-icon {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
 }
 
@@ -1119,6 +1347,28 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
 
         .menu-text {
           color: var(--media-danger);
+        }
+      }
+    }
+
+    &.context-menu-success {
+      .menu-icon {
+        color: #10b981;
+      }
+
+      &:hover {
+        background: rgba(16, 185, 129, 0.08);
+
+        &::before {
+          background: #10b981;
+        }
+
+        .menu-icon {
+          color: #10b981;
+        }
+
+        .menu-text {
+          color: #10b981;
         }
       }
     }
