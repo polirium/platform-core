@@ -14,7 +14,7 @@
     {{-- Thumbnail --}}
     <div class="media-thumbnail">
         @if(str_starts_with($media->mime_type, 'image/'))
-            <img src="{{ $media->getUrl() }}" alt="{{ $media->name }}" loading="lazy">
+            <img src="{{ $media->getSecureUrl() }}" alt="{{ $media->name }}" loading="lazy">
         @elseif(str_starts_with($media->mime_type, 'video/'))
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-primary"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
         @elseif(str_starts_with($media->mime_type, 'audio/'))

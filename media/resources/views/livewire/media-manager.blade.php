@@ -410,7 +410,7 @@ class="media-manager">
                                      @dragstart="handleDragStart({{ $item->id }}, 'file')"
                                      @dragend="dropTarget = null; draggingItems = []"
                                      data-media-id="{{ $item->id }}"
-                                     data-url="{{ $item->getUrl() }}"
+                                     data-url="{{ $item->getSecureUrl() }}"
                                      @click="
                                          selectItem({{ $item->id }}, $event);
                                          // Only load sidebar if clicking on a different file
@@ -439,7 +439,7 @@ class="media-manager">
 
                                      <div class="media-thumbnail">
                                         @if($item->is_image)
-                                            <img src="{{ $item->getUrl() }}" alt="{{ $item->name }}" loading="lazy">
+                                            <img src="{{ $item->getSecureUrl() }}" alt="{{ $item->name }}" loading="lazy">
                                         @elseif($item->is_video)
                                             {!! tabler_icon('video', ['class' => 'icon-media']) !!}
                                         @elseif($item->is_document)
@@ -529,7 +529,7 @@ class="media-manager">
                                     <td>
                                         <div class="media-list-thumbnail">
                                             @if($item->is_image)
-                                                <img src="{{ $item->getUrl() }}" alt="{{ $item->name }}" loading="lazy">
+                                                <img src="{{ $item->getSecureUrl() }}" alt="{{ $item->name }}" loading="lazy">
                                             @elseif($item->is_video)
                                                 {!! tabler_icon('video', ['class' => 'icon-media']) !!}
                                             @elseif($item->is_document)

@@ -1,7 +1,7 @@
 {{-- Image Editor Modal --}}
 @if($showImageEditor && $editingImage)
     <div class="modal modal-blur fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.85);"
-         x-data="imageEditor({{ $editingImageId }}, '{{ $editingImage->getUrl() }}?t={{ now()->timestamp }}')"
+         x-data="imageEditor({{ $editingImageId }}, '{{ $editingImage->getSecureUrl() }}?t={{ now()->timestamp }}')"
          x-init="init()">
         <div class="modal-dialog modal-xl modal-dialog-centered" @click.stop>
             <div class="modal-content">

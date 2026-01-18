@@ -6,17 +6,17 @@
 
                 <div class="modal-body p-0 text-center d-flex align-items-center justify-content-center" style="height: 100vh;">
                     @if($previewMedia->is_image)
-                        <img src="{{ $previewMedia->getUrl() }}" alt="{{ $previewMedia->name }}" style="max-height: 90vh; max-width: 90vw; object-fit: contain;">
+                        <img src="{{ $previewMedia->getSecureUrl() }}" alt="{{ $previewMedia->name }}" style="max-height: 90vh; max-width: 90vw; object-fit: contain;">
                     @elseif($previewMedia->is_video)
-                        <video src="{{ $previewMedia->getUrl() }}" controls autoplay style="max-height: 90vh; max-width: 90vw;"></video>
+                        <video src="{{ $previewMedia->getSecureUrl() }}" controls autoplay style="max-height: 90vh; max-width: 90vw;"></video>
                     @elseif($previewMedia->is_audio)
-                        <audio src="{{ $previewMedia->getUrl() }}" controls autoplay></audio>
+                        <audio src="{{ $previewMedia->getSecureUrl() }}" controls autoplay></audio>
                     @else
                         <div class="text-white">
                             {!! tabler_icon('file', ['class' => 'icon-xl mb-3', 'style' => 'width: 64px; height: 64px;']) !!}
                             <h3>{{ $previewMedia->name }}</h3>
                             <div class="mt-3">
-                                <a href="{{ $previewMedia->getUrl() }}" target="_blank" class="btn btn-primary">
+                                <a href="{{ $previewMedia->getSecureUrl() }}" target="_blank" class="btn btn-primary">
                                     {{ __('core/media::media.download') }}
                                 </a>
                             </div>

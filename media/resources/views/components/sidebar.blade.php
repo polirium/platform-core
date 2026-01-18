@@ -29,9 +29,9 @@
             <div class="sidebar-preview-container">
                 <div class="sidebar-preview-wrapper">
                     @if(str_starts_with($selectedMedia->mime_type, 'image/'))
-                        <img src="{{ $selectedMedia->getUrl() }}" class="sidebar-preview-img" alt="{{ $selectedMedia->name }}">
+                        <img src="{{ $selectedMedia->getSecureUrl() }}" class="sidebar-preview-img" alt="{{ $selectedMedia->name }}">
                     @elseif(str_starts_with($selectedMedia->mime_type, 'video/'))
-                        <video src="{{ $selectedMedia->getUrl() }}" class="sidebar-preview-video" controls></video>
+                        <video src="{{ $selectedMedia->getSecureUrl() }}" class="sidebar-preview-video" controls></video>
                     @else
                         <div class="sidebar-preview-file">
                             {!! tabler_icon('file', ['class' => 'icon-xl']) !!}
@@ -72,8 +72,8 @@
                 <div class="property-item property-url">
                     <span class="property-label">{{ __('core/media::media.url') }}</span>
                     <div class="input-group input-group-sm">
-                        <input type="text" class="form-control" value="{{ $selectedMedia->getUrl() }}" readonly>
-                        <button class="btn btn-icon" type="button" onclick="navigator.clipboard.writeText('{{ $selectedMedia->getUrl() }}')" title="{{ __('core/media::media.copy_url') }}">
+                        <input type="text" class="form-control" value="{{ $selectedMedia->getSecureUrl() }}" readonly>
+                        <button class="btn btn-icon" type="button" onclick="navigator.clipboard.writeText('{{ $selectedMedia->getSecureUrl() }}')" title="{{ __('core/media::media.copy_url') }}">
                             {!! tabler_icon('copy', ['class' => 'icon']) !!}
                         </button>
                     </div>
@@ -83,7 +83,7 @@
             {{-- Actions --}}
             <div class="sidebar-actions mt-auto">
                 <div class="d-grid gap-2">
-                    <a href="{{ $selectedMedia->getUrl() }}" target="_blank" class="btn btn-outline-primary w-100">
+                    <a href="{{ $selectedMedia->getSecureUrl() }}" target="_blank" class="btn btn-outline-primary w-100">
                         {!! tabler_icon('external-link', ['class' => 'icon']) !!} {{ __('core/media::media.open_new_tab') }}
                     </a>
 
