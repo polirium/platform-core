@@ -1,0 +1,629 @@
+// ============================================
+// Media Manager - Mobile Specific Styles
+// Created: 2026-01-26
+// ============================================
+
+// Mobile Breakpoints
+$mobile-breakpoint: 768px;
+$mobile-small-breakpoint: 576px;
+
+// ============================================
+// Mobile Sidebar - Bottom Sheet Pattern
+// ============================================
+@media (max-width: $mobile-breakpoint) {
+  .media-sidebar {
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 85vh;
+    max-height: 600px;
+    border-left: none;
+    border-top: 1px solid var(--tblr-border-color);
+    border-radius: 20px 20px 0 0;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    // When open, slide up
+    &[x-show="true"],
+    &[style*="display: block"],
+    &[style*="display: block;"] {
+      transform: translateY(0);
+    }
+
+    // Add handle for bottom sheet
+    &::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 4px;
+      background: var(--tblr-border-color);
+      border-radius: 2px;
+      z-index: 11;
+    }
+
+    .media-sidebar-header {
+      padding-top: 1.5rem; // Extra padding for handle
+      min-height: 60px;
+    }
+
+    .sidebar-preview-wrapper {
+      height: 150px; // Smaller on mobile
+    }
+  }
+
+  // Backdrop overlay for mobile sidebar
+  .media-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1039;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+
+    &[x-show="true"],
+    &[style*="display: block"] {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  // Lock body scroll when sidebar is open
+  body.sidebar-open {
+    overflow: hidden;
+  }
+}
+
+// ============================================
+// Mobile Toolbar - Bottom Bar Pattern
+// ============================================
+@media (max-width: $mobile-breakpoint) {
+  // Desktop toolbar - hide on mobile
+  // Ensure desktop toolbar is hidden
+  .media-manager-toolbar {
+    display: none !important;
+  }
+
+  // Mobile Bottom Toolbar
+  .media-mobile-toolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    z-index: 1000;
+    background: var(--tblr-card-bg);
+    border-top: 1px solid var(--tblr-border-color);
+    border-bottom: none;
+    padding: 0.75rem 1rem;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+    justify-content: space-around;
+    gap: 0.5rem;
+
+    // Show only icon buttons
+    > * {
+      height: auto;
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    // Style icon buttons for bottom bar
+    .viewmode-btn,
+    button {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .icon {
+        width: 24px;
+        height: 24px;
+        stroke-width: 1.5;
+      }
+    }
+  }
+
+  // Mobile breadcrumb - separate, scrollable horizontally
+  .media-mobile-breadcrumb {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--tblr-card-bg);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-crumb {
+      display: flex;
+      align-items: center;
+      font-size: 0.875rem;
+      color: var(--tblr-body-color);
+
+      &::after {
+        content: "/";
+        margin-left: 0.5rem;
+        color: var(--tblr-muted);
+      }
+
+      &:last-child::after {
+        display: none;
+      }
+
+      button {
+        background: transparent;
+        border: none;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        color: var(--tblr-body-color);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.15s ease;
+
+        &:hover {
+          background: var(--tblr-tertiary-bg);
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
+      }
+    }
+  }
+
+  // Add padding to content for bottom bar
+  .media-content {
+    padding-bottom: 80px; // Space for bottom bar
+  }
+}
+
+// ============================================
+// Mobile Search Overlay
+// ============================================
+@media (max-width: $mobile-breakpoint) {
+  .media-mobile-search-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--tblr-card-bg);
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &[x-show="true"],
+    &[style*="display: block"] {
+      transform: translateY(0);
+    }
+
+    .search-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      .search-back-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        border: none;
+        background: var(--tblr-tertiary-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+
+        .icon {
+          width: 24px;
+          height: 24px;
+        }
+      }
+
+      .search-input-wrapper {
+        flex: 1;
+        position: relative;
+
+        .form-control {
+          width: 100%;
+          height: 48px;
+          border-radius: 12px;
+          padding-left: 3rem;
+          font-size: 1rem;
+        }
+
+        .search-icon {
+          position: absolute;
+          left: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 20px;
+          height: 20px;
+          color: var(--tblr-muted);
+        }
+      }
+    }
+
+    .search-filters {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+
+      .filter-chip {
+        padding: 0.625rem 1rem;
+        border-radius: 20px;
+        border: 1px solid var(--tblr-border-color);
+        background: var(--tblr-body-bg);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s ease;
+
+        &.active {
+          background: var(--tblr-primary);
+          border-color: var(--tblr-primary);
+          color: white;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// Mobile Grid - CSS Grid Responsive
+// ============================================
+@media (max-width: $mobile-small-breakpoint) {
+  .media-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .media-grid-item,
+  .folder-item {
+    max-width: none;
+    min-width: 0;
+  }
+
+  .media-thumbnail {
+    padding: 0.75rem;
+
+    .icon-folder {
+      width: 60px;
+      height: 60px;
+    }
+
+    .icon-media {
+      width: 40px;
+      height: 40px;
+    }
+  }
+
+  .media-info {
+    padding: 0.5rem 0.625rem;
+  }
+
+  .media-name {
+    font-size: 0.7rem;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    line-height: 1.3;
+    max-height: 2.6em; // 2 lines
+  }
+
+  .media-meta {
+    font-size: 0.65rem;
+  }
+
+  // Smaller checkbox on mobile
+  .media-checkbox {
+    width: 18px;
+    height: 18px;
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+}
+
+// ============================================
+// Touch Target Enhancements
+// ============================================
+@media (max-width: $mobile-breakpoint) {
+  // Ensure all interactive elements meet 44x44px minimum
+  .breadcrumb-btn,
+  .viewmode-btn,
+  .overlay-btn,
+  .sidebar-close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  // Larger touch areas for grid items
+  .media-grid-item,
+  .folder-item {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    // Active state feedback
+    &:active {
+      transform: scale(0.97);
+      transition: transform 0.1s ease;
+    }
+  }
+
+  // Context menu - larger touch targets
+  .context-menu-item {
+    padding: 1rem;
+    min-height: 48px;
+
+    .menu-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .menu-text {
+      font-size: 1rem;
+    }
+  }
+
+  // Toast notifications - adjust for mobile
+  .media-toast {
+    top: auto;
+    bottom: 100px; // Above bottom bar
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+    border-radius: 12px;
+  }
+
+  @keyframes toastSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+// ============================================
+// Mobile Selection Bar
+// ============================================
+@media (max-width: $mobile-breakpoint) {
+  .media-selection-bar {
+    position: fixed;
+    bottom: 80px; // Above toolbar
+    left: 1rem;
+    right: 1rem;
+    margin: 0;
+    z-index: 999;
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+    .selection-info {
+      font-size: 0.9375rem;
+    }
+
+    .selection-actions {
+      gap: 0.5rem;
+
+      button {
+        min-width: 44px;
+        min-height: 44px;
+      }
+    }
+  }
+
+  .media-clipboard-bar {
+    position: fixed;
+    bottom: 80px;
+    left: 1rem;
+    right: 1rem;
+    margin: 0;
+    z-index: 999;
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .clipboard-actions {
+      gap: 0.5rem;
+    }
+  }
+}
+
+// ============================================
+// Empty State - Mobile Adjustments
+// ============================================
+@media (max-width: $mobile-breakpoint) {
+  .media-empty {
+    padding: 2rem 1rem;
+
+    .media-empty-icon {
+      width: 72px;
+      height: 72px;
+
+      svg {
+        width: 36px;
+        height: 36px;
+      }
+    }
+
+    .media-empty-title {
+      font-size: 1.0625rem;
+    }
+
+    .media-empty-subtitle {
+      font-size: 0.875rem;
+    }
+
+    .media-empty-action {
+      width: 100%;
+      justify-content: center;
+      padding: 1rem;
+    }
+  }
+}
+
+// ============================================
+// Mobile Sidebar Specific Adjustments
+// ============================================
+@media (max-width: $mobile-breakpoint) {
+  .media-sidebar {
+    .sidebar-preview-container {
+      padding: 1rem;
+    }
+
+    .sidebar-header-info {
+      padding: 1rem;
+
+      .file-name {
+        font-size: 1rem;
+      }
+
+      .file-meta {
+        font-size: 0.75rem;
+        flex-wrap: wrap;
+      }
+    }
+
+    .sidebar-properties {
+      padding: 1rem;
+
+      .property-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        margin-bottom: 1rem;
+
+        .property-label {
+          margin-right: 0;
+          font-size: 0.8125rem;
+        }
+
+        .property-value {
+          text-align: left;
+          font-size: 0.875rem;
+        }
+
+        &.property-url {
+          .input-group {
+            .form-control {
+              font-size: 0.8125rem;
+            }
+          }
+        }
+      }
+    }
+
+    .sidebar-actions {
+      padding: 1rem 1rem 2rem;
+
+      .d-grid {
+        gap: 0.75rem;
+      }
+
+      .btn {
+        min-height: 48px;
+        font-size: 0.9375rem;
+      }
+    }
+  }
+}
+
+// ============================================
+// Mobile Context Menu
+// ============================================
+@media (max-width: $mobile-breakpoint) {
+  .media-context-menu {
+    .context-menu-content {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: auto;
+      border-radius: 20px 20px 0 0;
+      max-width: none;
+      border-bottom: none;
+      animation: slideUpMobile 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .context-menu-item {
+      padding: 1rem 1.25rem;
+      min-height: 52px;
+
+      .menu-icon {
+        width: 24px;
+        height: 24px;
+      }
+
+      .menu-text {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  @keyframes slideUpMobile {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+// ============================================
+// Safe Area Support for Notched Devices
+// ============================================
+@supports (padding: max(0px)) {
+  @media (max-width: $mobile-breakpoint) {
+    .media-mobile-toolbar {
+      padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    }
+
+    .media-sidebar {
+      padding-bottom: max(0, env(safe-area-inset-bottom));
+      border-radius: max(20px, calc(20px + env(safe-area-inset-top)))
+        max(20px, calc(20px + env(safe-area-inset-top))) 0 0;
+    }
+
+    .media-content {
+      padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom)));
+    }
+  }
+}

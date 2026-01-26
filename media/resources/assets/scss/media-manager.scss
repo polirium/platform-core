@@ -4,7 +4,7 @@
 // ============================================
 
 // Import Colors if not already available
-@import "cropperjs/dist/cropper.css";
+// @import "cropperjs/dist/cropper.css"; // TODO: cropperjs v2.1.0 doesn't include CSS - needs alternative
 
 :root {
   --media-primary: #2563eb;
@@ -213,7 +213,8 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
 // Toolbar - Modern Design
 // ============================================
 .media-manager-toolbar {
-  display: flex;
+  // Don't override display - let Bootstrap d-none/d-md-flex handle it
+  // Only apply styling when visible
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
@@ -224,6 +225,13 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
   border-radius: $media-border-radius;
   box-shadow: $media-shadow-sm;
   flex-wrap: wrap;
+
+  // Only apply display: flex for desktop toolbar (d-md-flex)
+  @media (min-width: 768px) {
+    &.d-md-flex {
+      display: flex !important;
+    }
+  }
 
   // Left section
   .toolbar-left {
@@ -614,31 +622,33 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
 }
 
 // ============================================
-// Media Grid - Modern Cards
+// Media Grid - Modern Cards (CSS Grid)
 // ============================================
 .media-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: $media-grid-gap;
   padding-bottom: 2rem;
-  // Use negative margin to offset gap on edges if needed, but gap is supported in modern flex
 
-  // Ensure items fill space but don't get too huge
+  // Tablet adjustment
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 14px;
+  }
+
+  // Mobile adjustment
+  @media (max-width: 640px) {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+  }
+
+  // Let grid control item sizing
   .media-grid-item,
   .folder-item {
-    flex: 0 0 $media-item-size; // Don't grow, don't shrink, fixed basis
-    width: $media-item-size;
-    // Removed max/min width complexity to keep them uniform sized like OS
-
-    // Prevent single item on last row from stretching full width
-    // This is the tricky part of Flex vs Grid
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
   }
-}
-
-// Helper to fix last row alignment in flex
-.media-grid::after {
-  content: "";
-  flex: auto;
 }
 
 // Media Card - Modern Design
@@ -651,10 +661,8 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
   overflow: hidden;
   transition: all 0.2s ease;
   user-select: none;
-
-  // Flex constraints
-  // max-width needs to be controlled to prevent super-wide items
-  max-width: 300px;
+  width: auto;
+  min-width: 0; // Allow grid to shrink items
 
   // Smooth hover effect
   &:hover {
@@ -860,6 +868,19 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
   overflow: hidden;
   text-overflow: ellipsis;
   letter-spacing: -0.01em;
+
+  // Mobile: 2 lines for better readability
+  @media (max-width: 640px) {
+    font-size: 0.7rem;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+    line-height: 1.3;
+    max-height: 2.6em; // 2 lines
+  }
 }
 
 .media-meta {
@@ -867,6 +888,10 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
   color: var(--tblr-muted);
   margin-top: 0.25rem;
   font-weight: 500;
+
+  @media (max-width: 640px) {
+    font-size: 0.65rem;
+  }
 }
 
 // Media Overlay Actions
@@ -1605,3 +1630,8 @@ $media-shadow-primary: 0 4px 16px rgba(37, 99, 235, 0.2);
   height: 2rem;
   stroke-width: 1.5;
 }
+
+// ============================================
+// Mobile Specific Styles
+// ============================================
+@import "./media-manager-mobile.scss";

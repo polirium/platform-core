@@ -32,9 +32,10 @@ class MediaServeController extends Controller
             abort(403, 'Forbidden file type');
         }
 
-        // 2. Find media by UUID or ID
+        // 2. Find media by UUID or ID (including trashed for trash view)
         $media = Media::where('uuid', $slug)
             ->orWhere('id', $slug)
+            ->withTrashed()
             ->first();
 
         if (!$media) {
@@ -80,7 +81,7 @@ class MediaServeController extends Controller
      */
     public function serveById(int $id)
     {
-        $media = Media::find($id);
+        $media = Media::withTrashed()->find($id);
 
         if (!$media) {
             abort(404, 'Media not found');
@@ -122,6 +123,7 @@ class MediaServeController extends Controller
 
         $media = Media::where('uuid', $slug)
             ->orWhere('id', $slug)
+            ->withTrashed()
             ->first();
 
         if (!$media) {

@@ -6,8 +6,40 @@
      @click.outside="contextMenu = false"
      @keydown.escape.window="contextMenu = false">
 
-    {{-- File Menu --}}
-    <template x-if="selectedType === 'file'">
+    {{-- Batch Selection Menu (multiple items selected) --}}
+    <template x-if="selectedMediaIds.length > 1">
+        <div class="context-menu-content">
+            <div class="context-menu-section">
+                <div class="context-menu-item" @click="
+                    const hasFolders = selectedMediaIds.some(id => typeof id === 'string' && id.startsWith('folder:'));
+                    const hasFiles = selectedMediaIds.some(id => typeof id === 'number');
+                    const itemType = hasFolders && hasFiles ? 'folders và files' : (hasFolders ? 'folder' : 'files');
+                    if(confirm('Xóa ' + selectedMediaIds.length + ' ' + itemType + '?')) {
+                        $wire.deleteSelected();
+                        contextMenu = false;
+                    }
+                ">
+                    <span class="menu-icon">{!! tabler_icon('trash', ['class' => 'icon']) !!}</span>
+                    <span class="menu-text" x-text="'Xóa ' + selectedMediaIds.length + ' mục'"></span>
+                </div>
+            </div>
+
+            <div class="context-menu-divider"></div>
+
+            <div class="context-menu-section">
+                <div class="context-menu-item" @click="
+                    $wire.cut(selectedMediaIds);
+                    contextMenu = false
+                ">
+                    <span class="menu-icon">{!! tabler_icon('scissors', ['class' => 'icon']) !!}</span>
+                    <span class="menu-text">Cắt</span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    {{-- Single File Menu --}}
+    <template x-if="selectedMediaIds.length <= 1 && selectedType === 'file'">
         <div class="context-menu-content">
             {{-- View/Preview Group --}}
             <div class="context-menu-section">
@@ -84,8 +116,8 @@
         </div>
     </template>
 
-    {{-- Folder Menu --}}
-    <template x-if="selectedType === 'folder'">
+    {{-- Single Folder Menu --}}
+    <template x-if="selectedMediaIds.length <= 1 && selectedType === 'folder'">
         <div class="context-menu-content">
             <div class="context-menu-section">
                 <div class="context-menu-item" @click="$wire.navigateToFolder(selectedItem.replace('folder:', '')); contextMenu = false">
@@ -106,9 +138,15 @@
             <div class="context-menu-divider"></div>
 
             <div class="context-menu-section">
-                <div class="context-menu-item context-menu-danger" @click="if(confirm('{{ __('core/media::media.confirm_delete_folder') }}')) { $wire.deleteItem(selectedItem.replace('folder:', ''), 'folder') }; contextMenu = false">
+                <div class="context-menu-item context-menu-danger" @click="
+                    let ids = selectedMediaIds.length > 0 && selectedMediaIds.includes(selectedItem) ? selectedMediaIds : [selectedItem];
+                    if(confirm(ids.length > 1 ? 'Xóa ' + ids.length + ' folder?' : '{{ __('core/media::media.confirm_delete_folder') }}')) {
+                        if(ids.length > 1) { $wire.deleteSelected() } else { $wire.deleteItem(selectedItem.replace('folder:', ''), 'folder') }
+                    };
+                    contextMenu = false
+                ">
                     <span class="menu-icon">{!! tabler_icon('trash', ['class' => 'icon']) !!}</span>
-                    <span class="menu-text">{{ __('core/media::media.delete') }}</span>
+                    <span class="menu-text" x-text="selectedMediaIds.length > 1 && selectedMediaIds.includes(selectedItem) ? 'Xóa ' + selectedMediaIds.length + ' mục' : '{{ __('core/media::media.delete') }}'"></span>
                 </div>
             </div>
         </div>

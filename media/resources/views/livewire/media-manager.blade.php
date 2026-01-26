@@ -28,6 +28,62 @@
     isDraggingFiles: false,
     dragCounter: 0,
 
+    // Initialize and watch sidebar state
+    init() {
+        // Watch sidebar state for body scroll lock on mobile
+        this.$watch('showSidebar', (value) => {
+            if (window.innerWidth < 768) {
+                if (value) {
+                    document.body.style.overflow = 'hidden';
+                    document.body.classList.add('sidebar-open');
+                } else {
+                    document.body.style.overflow = '';
+                    document.body.classList.remove('sidebar-open');
+                }
+            }
+        });
+    },
+
+    // Long-press selection for mobile
+    longPressTimer: null,
+    longPressDuration: 500, // ms
+
+    handleTouchStart(rawId, event) {
+        // Only start long-press timer on touch devices
+        if (!('ontouchstart' in window)) return;
+
+        this.longPressTimer = setTimeout(() => {
+            // Toggle selection on long press
+            let id = isNaN(rawId) ? rawId : parseInt(rawId);
+
+            if (this.selectedMediaIds.includes(id)) {
+                this.selectedMediaIds = this.selectedMediaIds.filter(i => i !== id);
+            } else {
+                this.selectedMediaIds.push(id);
+            }
+
+            // Haptic feedback if available
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }, this.longPressDuration);
+    },
+
+    handleTouchEnd(event) {
+        if (this.longPressTimer) {
+            clearTimeout(this.longPressTimer);
+            this.longPressTimer = null;
+        }
+    },
+
+    handleTouchMove(event) {
+        // Cancel long press if finger moves
+        if (this.longPressTimer) {
+            clearTimeout(this.longPressTimer);
+            this.longPressTimer = null;
+        }
+    },
+
     handleFileDragEnter(e) {
         e.preventDefault();
         this.dragCounter++;
@@ -163,12 +219,57 @@
     },
 }"
 @trigger-rename.window="
-    renamingId = $event.detail.folder;
-    renamingType = $event.detail.type;
+    // Clear any existing rename state first
+    renamingId = null;
+    renamingType = null;
+
+    // Use $nextTick to wait for DOM update
+    $nextTick(() => {
+        renamingId = $event.detail.folder;
+        renamingType = $event.detail.type;
+
+        // Then wait for input to be visible
+        $nextTick(() => {
+            let inputs = document.querySelectorAll('[data-rename-input]');
+            for (let i = 0; i < inputs.length; i++) {
+                let input = inputs[i];
+                if ($event.detail.type === 'folder' && input.dataset.folderPath === $event.detail.folder) {
+                    // Clear and reset the input value to ensure it's fresh from server
+                    input.value = '';
+                    input.focus();
+                    // Select all text after a small delay to ensure value is loaded
+                    setTimeout(() => {
+                        input.select();
+                    }, 10);
+                    break;
+                }
+                if ($event.detail.type === 'file' && input.dataset.itemId == $event.detail.folder) {
+                    input.value = '';
+                    input.focus();
+                    setTimeout(() => {
+                        input.select();
+                    }, 10);
+                    break;
+                }
+            }
+        });
+    });
+"
+@scroll-to-folder.window="
     setTimeout(() => {
-        let input = $el.querySelector('input[data-rename-input=\'true\']');
-        if(input) { input.focus(); input.select(); }
-    }, 100);
+        const folderPath = $event.detail.folderPath;
+        const folderElement = document.querySelector(`[data-item-id='folder:${folderPath}']`);
+        if (folderElement) {
+            folderElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // On mobile, also scroll the breadcrumb if needed
+            if (window.innerWidth < 768) {
+                const breadcrumb = document.querySelector('.media-mobile-breadcrumb');
+                if (breadcrumb) {
+                    breadcrumb.scrollLeft = breadcrumb.scrollWidth;
+                }
+            }
+        }
+    }, 200);
 "
 @click="
     if(!$event.target.closest('.media-context-menu') && !$event.target.closest('.media-grid-item') && !$event.target.closest('.folder-item') && !$event.target.closest('.media-list-item')) { contextMenu = false }
@@ -217,8 +318,10 @@ class="media-manager">
                 'filterType' => $filterType,
                 'viewMode' => $viewMode,
                 'breadcrumbs' => $breadcrumbs,
-                'currentFolder' => $currentFolder
+                'currentFolder' => $currentFolder,
             ])
+
+
 
             {{-- Clipboard Bar --}}
             @if(count($clipboard) > 0)
@@ -309,6 +412,9 @@ class="media-manager">
                                      @dragover.prevent="if(draggingItems.length > 0 && !draggingItems.includes('folder:{{ $folder['path'] }}')) dropTarget = '{{ $folder['path'] }}'"
                                      @dragleave.prevent="dropTarget = null"
                                      @drop.prevent="handleDrop('{{ $folder['path'] }}')"
+                                     @touchstart="handleTouchStart('folder:{{ $folder['path'] }}', $event)"
+                                     @touchend="handleTouchEnd($event)"
+                                     @touchmove="handleTouchMove($event)"
                                      :class="{
                                          'active': activeItemId === '{{ $folder['path'] }}' && activeType === 'folder',
                                          'drop-active': dropTarget === '{{ $folder['path'] }}',
@@ -339,9 +445,10 @@ class="media-manager">
                                         <div x-show="renamingId !== '{{ $folder['path'] }}' || renamingType !== 'folder'" class="media-name" title="{{ $folder['name'] }}">{{ Str::limit($folder['name'], 12) }}</div>
                                         <input x-show="renamingId === '{{ $folder['path'] }}' && renamingType === 'folder'"
                                                data-rename-input="true"
+                                               data-folder-path="{{ $folder['path'] }}"
                                                type="text"
                                                class="form-control form-control-sm text-center p-0 h-auto"
-                                               value="{{ $folder['name'] }}"
+                                               :value="'{{ $folder['name'] }}'"
                                                @click.stop
                                                @dblclick.stop
                                                @keydown.enter="$el.blur()"
@@ -409,6 +516,9 @@ class="media-manager">
                                      draggable="true"
                                      @dragstart="handleDragStart({{ $item->id }}, 'file')"
                                      @dragend="dropTarget = null; draggingItems = []"
+                                     @touchstart="handleTouchStart({{ $item->id }}, $event)"
+                                     @touchend="handleTouchEnd($event)"
+                                     @touchmove="handleTouchMove($event)"
                                      data-media-id="{{ $item->id }}"
                                      data-url="{{ $item->getSecureUrl() }}"
                                      @click="
@@ -453,6 +563,7 @@ class="media-manager">
                                         <div x-show="renamingId !== {{ $item->id }} || renamingType !== 'file'" class="media-name" title="{{ $item->file_name }}">{{ Str::limit($item->name, 12) }}</div>
                                         <input x-show="renamingId === {{ $item->id }} && renamingType === 'file'"
                                                data-rename-input="true"
+                                               data-item-id="{{ $item->id }}"
                                                type="text"
                                                class="form-control form-control-sm text-center p-0 h-auto"
                                                value="{{ $item->name }}"
