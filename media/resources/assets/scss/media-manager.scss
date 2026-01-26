@@ -3,8 +3,8 @@
 // Last updated: 2026-01-17
 // ============================================
 
-// Import Colors if not already available
-// @import "cropperjs/dist/cropper.css"; // TODO: cropperjs v2.1.0 doesn't include CSS - needs alternative
+// Import CropperJS CSS
+@import "cropperjs/dist/cropper.css";
 
 :root {
   --media-primary: #2563eb;

@@ -99,19 +99,25 @@
             {{-- Actions --}}
             <div class="sidebar-actions mt-auto">
                 <div class="d-grid gap-2">
-                    <a href="{{ $selectedMedia->getSecureUrl() }}" target="_blank" class="btn btn-outline-primary w-100">
-                        {!! tabler_icon('external-link', ['class' => 'icon']) !!} {{ __('core/media::media.open_new_tab') }}
-                    </a>
+                    <div>
+                        <a href="{{ $selectedMedia->getSecureUrl() }}" target="_blank" class="btn btn-outline-primary w-100" wire:key="action-open-{{ $selectedMedia->id }}">
+                            {!! tabler_icon('external-link', ['class' => 'icon']) !!} {{ __('core/media::media.open_new_tab') }}
+                        </a>
+                    </div>
 
                     @if(str_starts_with($selectedMedia->mime_type, 'image/'))
-                        <button type="button" class="btn btn-outline-secondary w-100" wire:click="openImageEditor({{ $selectedMedia->id }})">
-                            {!! tabler_icon('photo-edit', ['class' => 'icon']) !!} {{ __('core/media::media.edit_image') }}
-                        </button>
+                        <div>
+                            <button type="button" class="btn btn-outline-secondary w-100" wire:click.prevent.stop="openImageEditor({{ $selectedMedia->id }})" wire:key="action-edit-{{ $selectedMedia->id }}">
+                                {!! tabler_icon('photo-edit', ['class' => 'icon']) !!} {{ __('core/media::media.edit_image') }}
+                            </button>
+                        </div>
                     @endif
 
-                    <button type="button" class="btn btn-outline-danger w-100" wire:click="deleteItem({{ $selectedMedia->id }}, 'file')" wire:confirm="{{ __('core/media::media.confirm_delete') }}">
-                        {!! tabler_icon('trash', ['class' => 'icon']) !!} {{ __('core/media::media.delete') }}
-                    </button>
+                    <div>
+                        <button type="button" class="btn btn-outline-danger w-100" wire:click.prevent.stop="deleteItem({{ $selectedMedia->id }}, 'file')" wire:confirm="{{ __('core/media::media.confirm_delete') }}" wire:key="action-delete-{{ $selectedMedia->id }}">
+                            {!! tabler_icon('trash', ['class' => 'icon']) !!} {{ __('core/media::media.delete') }}
+                        </button>
+                    </div>
                 </div>
             </div>
         @elseif($selectedFolder)
