@@ -62,6 +62,7 @@ return [
     'save_layout' => 'Lưu bố cục',
     'save_settings' => 'Lưu cài đặt',
     'save_settings_success' => 'Lưu cài đặt thành công',
+    'view' => 'Xem',
     'scan_modules' => 'Quét Module',
     'click_to_change_image' => 'Bấm để đổi ảnh',
     'click_or_drag_image' => 'Bấm hoặc kéo ảnh vào đây',

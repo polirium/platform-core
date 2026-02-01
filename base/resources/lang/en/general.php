@@ -58,6 +58,7 @@ return [
     'quick_actions' => 'Quick Actions',
     'save_layout' => 'Save Layout',
     'save_settings' => 'Save Settings',
+    'view' => 'View',
     'scan_modules' => 'Scan Modules',
     'click_to_change_image' => 'Click to change image',
 
