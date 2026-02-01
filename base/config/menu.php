@@ -27,7 +27,7 @@ return [
         'name' => 'core/base::general.staff',
         'route' => null,
         'icon' => 'eye',
-        'sort' => 7,
+        'sort' => 60,
         'permission' => 'users.view',
     ],
     [
@@ -49,7 +49,7 @@ return [
         'name' => 'core/base::general.settings',
         'route' => null,
         'icon' => 'settings',
-        'sort' => 8,
+        'sort' => 70,
         // Parent menus are auto-hidden if no children are visible
     ],
     [

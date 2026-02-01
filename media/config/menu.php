@@ -7,7 +7,7 @@ return [
         'icon' => 'files',
         'route' => null,
         'parent' => 'root',
-        'sort' => 6,
+        'sort' => 50,
     ],
     [
         'id' => 'media.manager',
