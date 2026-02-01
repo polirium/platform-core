@@ -35,6 +35,7 @@ return [
         'polirium' => 'core/ui/js/polirium.min.js',
         'theme' => 'core/ui/js/theme.min.js',
         'app' => 'core/ui/js/app.min.js',
+        'print-helper' => 'modules/product/js/print-helper.min.js',
     ],
 
     /*
