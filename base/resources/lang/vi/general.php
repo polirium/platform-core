@@ -390,6 +390,8 @@ return [
     'from_name_description' => 'Tên sẽ hiển thị là người gửi',
     'email_signature' => 'Chữ ký Email',
     'email_signature_description' => 'Chữ ký này sẽ được thêm vào cuối tất cả email gửi đi',
+    'session_lifetime' => 'Thời gian phiên đăng nhập (phút)',
+    'session_lifetime_description' => 'Thời gian giữ phiên đăng nhập trước khi hết hạn (mặc định: 120)',
 
     // Menu
     'home' => 'Trang chủ',

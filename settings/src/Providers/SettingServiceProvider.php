@@ -31,6 +31,16 @@ class SettingServiceProvider extends PoliriumBaseServiceProvider
             ->publishAssets();
 
         $this->registerDefaultSettings();
+
+        try {
+            $settings = $this->app['polirium:settings'];
+            $lifetime = $settings->get('general.session_lifetime');
+            if ($lifetime && is_numeric($lifetime) && $lifetime > 0) {
+                config(['session.lifetime' => (int) $lifetime]);
+            }
+        } catch (\Throwable $th) {
+            // Do nothing
+        }
     }
 
     public function provides()
@@ -181,6 +191,14 @@ class SettingServiceProvider extends PoliriumBaseServiceProvider
                     'vi' => 'Vietnamese',
                     'en' => 'English',
                 ],
+            ])
+            ->add('session_lifetime', [
+                'type' => 'number',
+                'label' => 'core/base::general.session_lifetime',
+                'description' => 'core/base::general.session_lifetime_description',
+                'default' => config('session.lifetime'),
+                'required' => true,
+                'validation' => ['required', 'numeric', 'min:1'],
             ]);
     }
 

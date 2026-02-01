@@ -365,6 +365,8 @@ return [
     'email_signature' => 'Email Signature',
     'email_signature_description' => 'This signature will be appended to all outgoing emails',
     'save_settings_success' => 'Settings saved successfully!',
+    'session_lifetime' => 'Session Lifetime (minutes)',
+    'session_lifetime_description' => 'Session lifetime in minutes (default: 120)',
 
     // Menu
     'home' => 'Home',
