@@ -23,7 +23,7 @@
                                                 @if ($children->hasChildren())
                                                     @include('core/ui::components.header.menu-sub-item', ['menu' => $children])
                                                 @else
-                                                    <a class="dropdown-item" href="{{ $children->url() }}">
+                                                    <a class="dropdown-item" href="{{ $children->url() }}" @if(!empty($children->attributes['target'])) target="{{ $children->attributes['target'] }}" @endif>
                                                         @if(!empty($children->attributes['icon']))
                                                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                                                 {{ tabler_icon($children->attributes['icon']) }}

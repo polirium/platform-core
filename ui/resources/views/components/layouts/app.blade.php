@@ -12,7 +12,26 @@
                         <img src="{{ get_logo() }}" width="110" height="32" alt="Tabler" class="navbar-brand-image">
                     </a>
                 </h1>
+
                 <div class="navbar-nav flex-row order-md-last">
+                    {{-- Quick Sales Button --}}
+                    <div class="nav-item dropdown d-none d-md-flex me-3">
+                        <a href="#" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false">
+                            {!! tabler_icon('shopping-cart', ['class' => 'icon me-1']) !!}
+                            {{ __('Bán hàng') }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                            <a class="dropdown-item" href="{{ route('products.payment') }}" target="_blank">
+                                {!! tabler_icon('point', ['class' => 'icon icon-inline me-2']) !!}
+                                {{ __('Bán hàng') }}
+                            </a>
+                            <a class="dropdown-item" href="{{ route('products.payment.v2') }}" target="_blank">
+                                {!! tabler_icon('point', ['class' => 'icon icon-inline me-2']) !!}
+                                {{ __('Bán hàng V2') }}
+                            </a>
+                        </div>
+                    </div>
+
                     <div class="nav-item d-none d-md-flex me-3">
                         <div class="btn-list">
                             @livewire('switch-branch')
