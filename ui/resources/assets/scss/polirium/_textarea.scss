@@ -1,0 +1,107 @@
+// Resizable textarea utilities
+// Cho phép textarea kéo dọc theo ý muốn
+
+.textarea-resizable {
+    &.resize-vertical {
+        resize: vertical;
+        min-height: 32px;
+    }
+
+    &.resize-horizontal {
+        resize: horizontal;
+    }
+
+    &.resize-both {
+        resize: both;
+    }
+
+    &.resize-none {
+        resize: none;
+    }
+}
+
+// Custom grip for resize handle in dark mode
+@media (prefers-color-scheme: dark) {
+    .textarea-resizable {
+        &.resize-vertical,
+        &.resize-both {
+            &::-webkit-resizer {
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+        }
+    }
+}
+
+// Improved textarea focus styles
+.textarea-improved {
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+    &:focus {
+        border-color: var(--tblr-primary);
+        box-shadow: 0 0 0 0.25rem rgba(var(--tblr-primary-rgb), 0.15);
+    }
+}
+
+// Custom drag handle at top-right corner for expanding textarea upward
+.resize-handle-top-right {
+    position: absolute;
+    top: -20px;
+    right: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    cursor: ns-resize;
+    padding: 4px 8px;
+    background: var(--tblr-bg-surface);
+    border: 1px solid var(--tblr-border-color);
+    border-radius: 0 0 6px 6px;
+    color: var(--tblr-muted);
+    user-select: none;
+    transition: all 0.15s ease;
+    z-index: 10;
+
+    &:hover {
+        background: var(--tblr-primary);
+        border-color: var(--tblr-primary);
+        color: #fff;
+
+        .resize-hint {
+            opacity: 1;
+        }
+    }
+
+    &:active {
+        cursor: ns-resizing;
+    }
+
+    svg {
+        transform: rotate(-45deg);
+    }
+
+    .resize-hint {
+        font-size: 0.65rem;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        white-space: nowrap;
+    }
+}
+
+// Order notes specific styles
+.order-notes-section {
+    .accordion-button {
+        &:not(.collapsed) {
+            background-color: var(--tblr-bg-surface);
+        }
+
+        &:focus {
+            box-shadow: none;
+        }
+    }
+
+    .character-counter {
+        font-size: 0.75rem;
+        color: var(--tblr-muted);
+        pointer-events: none;
+    }
+}
