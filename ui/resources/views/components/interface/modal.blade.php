@@ -73,23 +73,25 @@
             e.target.setAttribute('aria-hidden', 'true');
             e.target.removeAttribute('aria-modal');
 
-            // Clean up leftover backdrops
+            // Force cleanup backdrop and body - runs after each modal closes
             setTimeout(function() {
-                const backdrops = document.querySelectorAll('.modal-backdrop');
-                const openModals = document.querySelectorAll('.modal.show');
+                var backdrops = document.querySelectorAll('.modal-backdrop');
+                var openModals = document.querySelectorAll('.modal.show');
 
-                // Remove extra backdrops
-                while (backdrops.length > openModals.length) {
-                    backdrops[backdrops.length - 1].remove();
+                // Remove all extra backdrops
+                for (var i = openModals.length; i < backdrops.length; i++) {
+                    if (backdrops[i]) backdrops[i].remove();
                 }
 
-                // If no modals are open, restore body
+                // If no modals open, cleanup everything
                 if (openModals.length === 0) {
+                    // Remove all remaining backdrops
+                    document.querySelectorAll('.modal-backdrop').forEach(function(b) { b.remove(); });
                     document.body.classList.remove('modal-open');
                     document.body.style.removeProperty('overflow');
                     document.body.style.removeProperty('padding-right');
                 }
-            }, 50);
+            }, 100);
         });
     });
 </script>

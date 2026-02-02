@@ -139,3 +139,57 @@ Livewire.on('poli.modal', (data) => {
         }
     }
 })
+
+// Also listen for 'modal' event (used by some components)
+Livewire.on('modal', (id, action) => {
+    // Handle both array format and direct params
+    let modalId, modalAction;
+    if (Array.isArray(id)) {
+        modalId = id[0];
+        modalAction = id[1] || 'show';
+    } else {
+        modalId = id;
+        modalAction = action || 'show';
+    }
+
+    const modalElement = document.getElementById(modalId);
+    if (!modalElement) {
+        console.error('Modal element not found:', modalId);
+        return;
+    }
+
+    if (modalAction === 'hide') {
+        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+
+        // Force cleanup after hide
+        setTimeout(() => {
+            const backdrops = document.querySelectorAll('.modal-backdrop');
+            const openModals = document.querySelectorAll('.modal.show');
+
+            // Remove extra backdrops
+            while (backdrops.length > openModals.length) {
+                backdrops[backdrops.length - 1].remove();
+            }
+
+            // If no modals open, cleanup body
+            if (openModals.length === 0) {
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('overflow');
+                document.body.style.removeProperty('padding-right');
+            }
+        }, 300);
+    } else {
+        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (!modalInstance) {
+            modalInstance = new bootstrap.Modal(modalElement, {
+                backdrop: true,
+                keyboard: true,
+                focus: true
+            });
+        }
+        modalInstance.show();
+    }
+})
