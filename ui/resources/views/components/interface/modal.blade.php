@@ -47,40 +47,31 @@
 <script>
     // Fix Bootstrap Modal aria-hidden warning
     // The issue: Bootstrap sets aria-hidden before focus is moved out
-        // Robust cleanup using MutationObserver
-        // Watches for changes in body class or child list to ensure consistent state
-        const observer = new MutationObserver(function(mutations) {
-            const openModals = document.querySelectorAll('.modal.show');
-            const backdrops = document.querySelectorAll('.modal-backdrop');
-            const bodyHasModalOpen = document.body.classList.contains('modal-open');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Listen for modal events to manage aria-hidden correctly
+        document.addEventListener('show.bs.modal', function(e) {
+            // Remove aria-hidden immediately when modal starts showing
+            e.target.removeAttribute('aria-hidden');
+        });
 
-            // Scenario 1: No open modals, but body has modal-open class -> FIX IT
-            if (openModals.length === 0 && bodyHasModalOpen) {
-                document.body.classList.remove('modal-open');
-                document.body.style.removeProperty('overflow');
-                document.body.style.removeProperty('padding-right');
-            }
+        document.addEventListener('shown.bs.modal', function(e) {
+            // Ensure aria-hidden is removed and aria-modal is set
+            e.target.removeAttribute('aria-hidden');
+            e.target.setAttribute('aria-modal', 'true');
+        });
 
-            // Scenario 2: No open modals, but backdrops exist -> REMOVE THEM
-            if (openModals.length === 0 && backdrops.length > 0) {
-                backdrops.forEach(b => b.remove());
-            }
-
-            // Scenario 3: Mismatch between open modals and backdrops -> SYNC THEM
-            if (backdrops.length > openModals.length) {
-                // Remove oldest backdrops first (usually they are appended to end, but simpler to remove count diff)
-                // We keep only as many backdrops as open modals
-                for (let i = 0; i < (backdrops.length - openModals.length); i++) {
-                    if (backdrops[i]) backdrops[i].remove();
-                }
+        document.addEventListener('hide.bs.modal', function(e) {
+            // Move focus out before aria-hidden is set
+            const activeElement = document.activeElement;
+            if (e.target.contains(activeElement)) {
+                activeElement.blur();
             }
         });
 
-        observer.observe(document.body, {
-            attributes: true,
-            childList: true,
-            subtree: false,
-            attributeFilter: ['class']
+        document.addEventListener('hidden.bs.modal', function(e) {
+            // Set aria-hidden after modal is fully hidden
+            e.target.setAttribute('aria-hidden', 'true');
+            e.target.removeAttribute('aria-modal');
         });
     });
 </script>

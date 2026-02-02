@@ -87,113 +87,105 @@ const items = {
   //# sourceMappingURL=demo.js.map
 
 
-  //livewire event
-Livewire.on('poli.modal', (data) => {
-    const d = data[0];
-    const id = d[0];
-    const event = d[1] == 'hide' ? 'hide' : 'show';
+// Unified Modal Handler
+const handleModalEvent = (id, action) => {
+    // Determine ID and Action
+    let modalId = id;
+    let modalAction = action || 'show';
 
-    console.log(id, event);
-
-    const modalElement = document.getElementById(id);
-    if (!modalElement) {
-        console.error('Modal element not found:', id);
-        return;
-    }
-
-    if(event == 'show'){
-        // Get existing instance or create new one
-        let modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (!modalInstance) {
-            modalInstance = new bootstrap.Modal(modalElement, {
-                backdrop: true,
-                keyboard: true,
-                focus: true
-            });
-
-            // Add event listeners to fix accessibility issues
-            modalElement.addEventListener('shown.bs.modal', function() {
-                // Remove aria-hidden when modal is fully shown
-                modalElement.removeAttribute('aria-hidden');
-            });
-
-            modalElement.addEventListener('hidden.bs.modal', function() {
-                // Clean up backdrop and body classes
-                const backdrop = document.querySelector('.modal-backdrop');
-                if (backdrop) {
-                    backdrop.remove();
-                }
-                // Remove modal-open class from body if no other modals are open
-                const openModals = document.querySelectorAll('.modal.show');
-                if (openModals.length === 0) {
-                    document.body.classList.remove('modal-open');
-                    document.body.style.removeProperty('padding-right');
-                }
-            });
-        }
-        modalInstance.show();
-    }else if(event == 'hide'){
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-            modalInstance.hide();
-        }
-    }
-})
-
-// Also listen for 'modal' event (used by some components)
-Livewire.on('modal', (id, action) => {
-    // Handle both array format and direct params
-    let modalId, modalAction;
+    // Handle array format often sent by Livewire
     if (Array.isArray(id)) {
         modalId = id[0];
         modalAction = id[1] || 'show';
-    } else {
-        modalId = id;
-        modalAction = action || 'show';
     }
 
+    // Normalize action
+    modalAction = modalAction === 'hide' ? 'hide' : 'show';
+
+    console.log(`Modal Event: ${modalAction} -> ${modalId}`);
+
     const modalElement = document.getElementById(modalId);
+
     if (!modalElement) {
-        console.error('Modal element not found:', modalId);
+        // Critical: If element missing but action is hide, we might have a ghost backdrop
+        if (modalAction === 'hide') {
+            cleanupGhostBackdrops();
+        }
+        console.warn(`Modal element not found: ${modalId}`);
         return;
     }
 
-    if (modalAction === 'hide') {
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-            modalInstance.hide();
-        }
+    const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement, {
+        backdrop: true,
+        keyboard: true,
+        focus: true
+    });
 
-        // Force cleanup after hide
-        setTimeout(() => {
-            const backdrops = document.querySelectorAll('.modal-backdrop');
-            const openModals = document.querySelectorAll('.modal.show');
-            const countToRemove = backdrops.length - openModals.length;
+    if (modalAction === 'show') {
+        modalInstance.show();
+    } else {
+        modalInstance.hide();
+    }
+};
 
-            // Remove extra backdrops (safely)
-            for (let i = 0; i < countToRemove; i++) {
-                // Remove from the end
-                if (backdrops[backdrops.length - 1 - i]) {
-                    backdrops[backdrops.length - 1 - i].remove();
+// Robust Cleanup Function
+const cleanupGhostBackdrops = () => {
+    setTimeout(() => {
+        const openModals = document.querySelectorAll('.modal.show');
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+
+        // Logic: Keep exactly as many backdrops as visible modals
+        const requiredBackdrops = openModals.length;
+        const currentBackdrops = backdrops.length;
+
+        if (currentBackdrops > requiredBackdrops) {
+            console.log('Cleaning up ghost backdrops...');
+            // Remove excess backdrops (from end)
+            for (let i = 0; i < (currentBackdrops - requiredBackdrops); i++) {
+                if (backdrops[currentBackdrops - 1 - i]) {
+                    backdrops[currentBackdrops - 1 - i].remove();
                 }
             }
-
-            // If no modals open, cleanup body
-            if (openModals.length === 0) {
-                document.body.classList.remove('modal-open');
-                document.body.style.removeProperty('overflow');
-                document.body.style.removeProperty('padding-right');
-            }
-        }, 300);
-    } else {
-        let modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (!modalInstance) {
-            modalInstance = new bootstrap.Modal(modalElement, {
-                backdrop: true,
-                keyboard: true,
-                focus: true
-            });
         }
-        modalInstance.show();
+
+        // Deep Clean: If no modals open, ensure body is clean
+        if (requiredBackdrops === 0) {
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+
+            // Safety: Remove ANY remaining backdrops
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        }
+    }, 150); // Small delay to let Bootstrap animations finish
+};
+
+// Register Listeners
+Livewire.on('poli.modal', (data) => handleModalEvent(data, null));
+Livewire.on('modal', (id, action) => handleModalEvent(id, action));
+
+// Hook into Livewire lifecycle to cleanup after DOM updates
+// This fixes case where Livewire removes the modal element from DOM before it hides
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof Livewire !== 'undefined' && Livewire.hook) {
+        Livewire.hook('morph.updated', ({ el, component }) => {
+            // Run cleanup periodically after updates
+            cleanupGhostBackdrops();
+        });
+
+        // Also run on commit to be safe (v3)
+        if(Livewire.hook('commit')) {
+             Livewire.hook('commit', ({ component, commit, succeed, fail, respond }) => {
+                succeed(({ snapshot, effect }) => {
+                    cleanupGhostBackdrops();
+                })
+            })
+        }
     }
-})
+});
+
+// Global Cleanup on Hidden (Bootstrap Event) - Delegation
+document.addEventListener('hidden.bs.modal', function (event) {
+    cleanupGhostBackdrops();
+});
+
