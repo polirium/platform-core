@@ -174,12 +174,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Also run on commit to be safe (v3)
-        if(Livewire.hook('commit')) {
-             Livewire.hook('commit', ({ component, commit, succeed, fail, respond }) => {
+        // Note: Livewire v3 hooks do not return booleans, just register them directly
+        try {
+            Livewire.hook('commit', ({ component, commit, succeed, fail, respond }) => {
                 succeed(({ snapshot, effect }) => {
-                    cleanupGhostBackdrops();
-                })
-            })
+                    // Queue cleanup after DOM updates from commit are processed
+                    setTimeout(cleanupGhostBackdrops, 10);
+                });
+            });
+        } catch (e) {
+            console.warn('Livewire commit hook registration failed', e);
         }
     }
 });
