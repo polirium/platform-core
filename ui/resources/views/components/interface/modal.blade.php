@@ -72,6 +72,24 @@
             // Set aria-hidden after modal is fully hidden
             e.target.setAttribute('aria-hidden', 'true');
             e.target.removeAttribute('aria-modal');
+
+            // Clean up leftover backdrops
+            setTimeout(function() {
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                const openModals = document.querySelectorAll('.modal.show');
+
+                // Remove extra backdrops
+                while (backdrops.length > openModals.length) {
+                    backdrops[backdrops.length - 1].remove();
+                }
+
+                // If no modals are open, restore body
+                if (openModals.length === 0) {
+                    document.body.classList.remove('modal-open');
+                    document.body.style.removeProperty('overflow');
+                    document.body.style.removeProperty('padding-right');
+                }
+            }, 50);
         });
     });
 </script>
