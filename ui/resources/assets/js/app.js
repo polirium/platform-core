@@ -168,10 +168,14 @@ Livewire.on('modal', (id, action) => {
         setTimeout(() => {
             const backdrops = document.querySelectorAll('.modal-backdrop');
             const openModals = document.querySelectorAll('.modal.show');
+            const countToRemove = backdrops.length - openModals.length;
 
-            // Remove extra backdrops
-            while (backdrops.length > openModals.length) {
-                backdrops[backdrops.length - 1].remove();
+            // Remove extra backdrops (safely)
+            for (let i = 0; i < countToRemove; i++) {
+                // Remove from the end
+                if (backdrops[backdrops.length - 1 - i]) {
+                    backdrops[backdrops.length - 1 - i].remove();
+                }
             }
 
             // If no modals open, cleanup body
