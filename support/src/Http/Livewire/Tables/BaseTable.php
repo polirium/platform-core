@@ -2,12 +2,14 @@
 
 namespace Polirium\Core\Support\Http\Livewire\Tables;
 
+use Polirium\Datatable\Concerns\FilterBuilder;
 use Polirium\Datatable\PowerGridComponent;
 use Polirium\Datatable\Traits\WithExport;
 
 class BaseTable extends PowerGridComponent
 {
     use WithExport;
+    use FilterBuilder;
 
     public string $bulkDeletePermission = '';
 
