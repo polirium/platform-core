@@ -167,23 +167,23 @@ Livewire.on('modal', (id, action) => handleModalEvent(id, action));
 // Hook into Livewire lifecycle to cleanup after DOM updates
 // This fixes case where Livewire removes the modal element from DOM before it hides
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof Livewire !== 'undefined' && Livewire.hook) {
+    if (typeof Livewire !== 'undefined') {
+        // morph.updated hook still works in v4
         Livewire.hook('morph.updated', ({ el, component }) => {
             // Run cleanup periodically after updates
             cleanupGhostBackdrops();
         });
 
-        // Also run on commit to be safe (v3)
-        // Note: Livewire v3 hooks do not return booleans, just register them directly
+        // Livewire v4: Replace 'commit' hook with 'interceptMessage'
         try {
-            Livewire.hook('commit', ({ component, commit, succeed, fail, respond }) => {
-                succeed(({ snapshot, effect }) => {
+            Livewire.interceptMessage(({ message, onSuccess }) => {
+                onSuccess(() => {
                     // Queue cleanup after DOM updates from commit are processed
                     setTimeout(cleanupGhostBackdrops, 10);
                 });
             });
         } catch (e) {
-            console.warn('Livewire commit hook registration failed', e);
+            console.warn('Livewire interceptMessage registration failed', e);
         }
     }
 });

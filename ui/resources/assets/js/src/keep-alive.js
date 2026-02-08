@@ -202,21 +202,16 @@ class PoliriumKeepAlive {
             return;
         }
 
-        if (!window.Livewire || typeof window.Livewire.hook !== 'function') {
-            this.log('Livewire hook not available, skipping CSRF hook setup');
+        if (!window.Livewire) {
+            this.log('Livewire not available, skipping CSRF hook setup');
             return;
         }
 
-        // Register hook ONCE to inject CSRF token on every request
-        window.Livewire.hook('request', ({ options }) => {
+        // Livewire v4: Use interceptRequest API
+        window.Livewire.interceptRequest(({ request }) => {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            if (csrfToken) {
-                // Ensure headers object exists
-                if (!options.headers) {
-                    options.headers = {};
-                }
-                // Inject the current CSRF token from meta tag
-                options.headers['X-CSRF-TOKEN'] = csrfToken;
+            if (csrfToken && request.headers) {
+                request.headers['X-CSRF-TOKEN'] = csrfToken;
             }
         });
 
@@ -300,16 +295,14 @@ class PoliriumKeepAlive {
             return;
         }
 
-        // Livewire 3.x hooks
-        if (window.Livewire.hook) {
-            window.Livewire.hook('request', ({ fail }) => {
-                fail(({ status, content }) => {
-                    this.handleLivewireError({ status, content });
-                });
+        // Livewire v4: Use interceptRequest API with onError
+        window.Livewire.interceptRequest(({ onError }) => {
+            onError(({ status, content }) => {
+                this.handleLivewireError({ status, content });
             });
-        }
+        });
 
-        // Listen for Livewire errors
+        // Listen for Livewire errors (still supported)
         window.addEventListener('livewire:error', (event) => {
             this.handleLivewireError(event.detail);
         });
