@@ -1,0 +1,378 @@
+/**
+ * CRM Users Page - Swiss Modernism 2.0 Design
+ * Grid-based, mathematical spacing, clean hierarchy
+ */
+
+/* Base System - 4px base unit */
+:root {
+    --crm-space-1: 4px;
+    --crm-space-2: 8px;
+    --crm-space-3: 12px;
+    --crm-space-4: 16px;
+    --crm-space-5: 20px;
+    --crm-space-6: 24px;
+    --crm-space-8: 32px;
+    --crm-space-10: 40px;
+    --crm-space-12: 48px;
+
+    --crm-primary: #2563EB;
+    --crm-primary-light: #3B82F6;
+    --crm-success: #10B981;
+    --crm-warning: #F59E0B;
+    --crm-danger: #EF4444;
+
+    --crm-bg-base: #F8FAFC;
+    --crm-bg-card: #FFFFFF;
+    --crm-text-primary: #1E293B;
+    --crm-text-secondary: #64748B;
+    --crm-text-muted: #94A3B8;
+    --crm-border: #E2E8F0;
+
+    --crm-radius-sm: 6px;
+    --crm-radius-md: 8px;
+    --crm-radius-lg: 12px;
+
+    --crm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --crm-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    --crm-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+}
+
+/* Page Container */
+.crm-users-page {
+    background-color: var(--crm-bg-base);
+    min-height: 100vh;
+    padding: var(--crm-space-6);
+}
+
+/* Main Content Card */
+.crm-main-card {
+    background: var(--crm-bg-card);
+    border-radius: var(--crm-radius-lg);
+    box-shadow: var(--crm-shadow-sm);
+    border: 1px solid var(--crm-border);
+    overflow: hidden;
+}
+
+/* Card Header - Swiss Style */
+.crm-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--crm-space-5) var(--crm-space-6);
+    border-bottom: 1px solid var(--crm-border);
+    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+}
+
+.crm-card-title {
+    display: flex;
+    align-items: center;
+    gap: var(--crm-space-3);
+}
+
+.crm-card-title h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--crm-text-primary);
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+.crm-card-title-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--crm-primary);
+    color: white;
+    border-radius: var(--crm-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.crm-card-title-icon .ti {
+    width: 20px;
+    height: 20px;
+    stroke-width: 1.5;
+}
+
+/* Action Button */
+.crm-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--crm-space-2);
+    padding: var(--crm-space-3) var(--crm-space-4);
+    background: var(--crm-primary);
+    color: white;
+    border: none;
+    border-radius: var(--crm-radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 200ms ease;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+}
+
+.crm-btn-primary .ti {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+}
+
+.crm-btn-primary:hover {
+    background: #1D4ED8;
+    box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+    transform: translateY(-1px);
+}
+
+.crm-btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Table Container */
+.crm-table-wrapper {
+    overflow-x: auto;
+    border-radius: 0;
+}
+
+/* Modern Data Table */
+.crm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.crm-table thead {
+    background: #F8FAFC;
+    border-bottom: 2px solid var(--crm-border);
+}
+
+.crm-table th {
+    padding: var(--crm-space-4) var(--crm-space-5);
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--crm-text-secondary);
+}
+
+.crm-table tbody tr {
+    border-bottom: 1px solid var(--crm-border);
+    transition: background 150ms ease;
+}
+
+.crm-table tbody tr:hover {
+    background: #F8FAFC;
+}
+
+.crm-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.crm-table td {
+    padding: var(--crm-space-4) var(--crm-space-5);
+    color: var(--crm-text-primary);
+}
+
+/* User Cell */
+.crm-user-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--crm-space-3);
+}
+
+.crm-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--crm-primary) 0%, var(--crm-primary-light) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.crm-user-avatar[style*="background-image"] {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.crm-user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.crm-user-name {
+    font-weight: 500;
+    color: var(--crm-text-primary);
+}
+
+.crm-user-email {
+    font-size: 13px;
+    color: var(--crm-text-secondary);
+}
+
+/* Status Badge */
+.crm-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--crm-space-1);
+    padding: 4px 10px;
+    border-radius: var(--crm-radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.crm-status-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.crm-status-badge.active {
+    background: #DCFCE7;
+    color: var(--crm-success);
+}
+
+.crm-status-badge.active::before {
+    background: var(--crm-success);
+}
+
+.crm-status-badge.inactive {
+    background: #FEE2E2;
+    color: var(--crm-danger);
+}
+
+.crm-status-badge.inactive::before {
+    background: var(--crm-danger);
+}
+
+.crm-status-badge.pending {
+    background: #FEF3C7;
+    color: var(--crm-warning);
+}
+
+.crm-status-badge.pending::before {
+    background: var(--crm-warning);
+}
+
+/* Role Badge */
+.crm-role-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: #F1F5F9;
+    color: var(--crm-text-secondary);
+    border-radius: var(--crm-radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.crm-role-badge.admin {
+    background: linear-gradient(135deg, #E9D5FF 0%, #DDD6FE 100%);
+    color: #7C3AED;
+}
+
+/* Action Buttons */
+.crm-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--crm-text-secondary);
+    border-radius: var(--crm-radius-sm);
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.crm-action-btn .ti {
+    width: 18px;
+    height: 18px;
+    stroke-width: 1.5;
+}
+
+.crm-action-btn:hover {
+    background: #F1F5F9;
+    color: var(--crm-primary);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 640px) {
+    .crm-users-page {
+        padding: var(--crm-space-4);
+    }
+
+    .crm-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--crm-space-3);
+    }
+
+    .crm-btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .crm-table th,
+    .crm-table td {
+        padding: var(--crm-space-3);
+    }
+}
+
+/* Dark Mode Support */
+[data-bs-theme="dark"] {
+    --crm-bg-base: #0F172A;
+    --crm-bg-card: #1E293B;
+    --crm-text-primary: #F1F5F9;
+    --crm-text-secondary: #94A3B8;
+    --crm-text-muted: #64748B;
+    --crm-border: #334155;
+
+    --crm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --crm-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+}
+
+[data-bs-theme="dark"] .crm-card-header {
+    background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+}
+
+[data-bs-theme="dark"] .crm-table thead {
+    background: #1E293B;
+}
+
+[data-bs-theme="dark"] .crm-table tbody tr:hover {
+    background: #334155;
+}
+
+[data-bs-theme="dark"] .crm-action-btn:hover {
+    background: #334155;
+}
+
+/* Accessibility */
+.crm-btn-primary:focus-visible,
+.crm-action-btn:focus-visible {
+    outline: 2px solid var(--crm-primary);
+    outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .crm-btn-primary,
+    .crm-table tbody tr {
+        transition: none;
+    }
+
+    .crm-btn-primary:hover {
+        transform: none;
+    }
+}

@@ -1,0 +1,241 @@
+<?php
+
+namespace Polirium\Core\Base\Http\Livewire\Users\Datatable;
+
+use CoreSupport;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Blade;
+use Polirium\Core\Base\Http\Models\Role;
+use Polirium\Core\Base\Http\Models\User;
+use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
+use Polirium\Datatable\Button;
+use Polirium\Datatable\Column;
+use Polirium\Datatable\Components\SetUp\Exportable;
+use Polirium\Datatable\Facades\Filter;
+use Polirium\Datatable\Facades\PowerGrid;
+use Polirium\Datatable\Facades\Rule;
+use Polirium\Datatable\PowerGridFields;
+use Polirium\Datatable\Traits\WithExport;
+
+final class UserTable extends BaseTable
+{
+    use WithExport;
+
+    public string $tableName = 'usersTable';
+
+    public function setUp(): array
+    {
+        $this->showCheckBox();
+
+        return [
+            PowerGrid::exportable(fileName: 'users')
+                ->type(Exportable::TYPE_XLS, Exportable::TYPE_CSV),
+            PowerGrid::header()
+                ->showSearchInput()
+                ->showToggleColumns(),
+            PowerGrid::footer()
+                ->showPerPage(perPage: 25, perPageValues: [10, 25, 50, 100])
+                ->showRecordCount(),
+        ];
+    }
+
+    public function datasource(): Builder
+    {
+        return User::query()
+            ->with(['roles']);
+    }
+
+    public function relationSearch(): array
+    {
+        return [
+            'roles' => ['name'],
+        ];
+    }
+
+    public function fields(): PowerGridFields
+    {
+        return PowerGrid::fields()
+            ->add('id')
+            ->add('username')
+            ->add('name', function (User $model) {
+                return Blade::render(<<<HTML
+                    <x-ui.table::column.user name="$model->name" avatar="$model->avatar" email="$model->email" />
+                HTML);
+            })
+            ->add('email')
+            ->add('phone')
+            ->add('roles_list', function (User $model) {
+                $badges = $model->roles->map(function ($role) {
+                    $isAdmin = strtolower($role->name) === 'admin' || strtolower($role->name) === 'super admin';
+                    $class = $isAdmin ? 'crm-role-badge admin' : 'crm-role-badge';
+
+                    return "<span class='{$class} me-1'>{$role->name}</span>";
+                })->join('');
+
+                return $badges ?: '<span class="text-muted">—</span>';
+            })
+            ->add('status_badge', function (User $model) {
+                $status = $model->status ?? 'active';
+                if ($status === 'active') {
+                    return '<span class="crm-status-badge active">Hoạt động</span>';
+                }
+
+                return '<span class="crm-status-badge inactive">Không hoạt động</span>';
+            })
+            ->add('super_admin_badge', function (User $model) {
+                if ($model->super_admin) {
+                    return '<span class="crm-role-badge admin"><i class="ti ti-shield-check me-1"></i>Super Admin</span>';
+                }
+
+                return '<span class="text-muted">—</span>';
+            })
+            ->add('created_at_formatted', function (User $model) {
+                return CoreSupport::datetime($model->created_at ?? now());
+            });
+    }
+
+    public function columns(): array
+    {
+        return [
+            Column::make('Id', 'id')
+                ->hidden(),
+
+            Column::make(trans('core/base::general.users'), 'name')
+                ->sortable()
+                ->searchable(),
+
+            Column::make(trans('core/base::general.username'), 'username')
+                ->sortable()
+                ->searchable()
+                ->hidden(),
+
+            Column::make(trans('core/base::general.email'), 'email')
+                ->sortable()
+                ->searchable()
+                ->hidden(),
+
+            Column::make(trans('core/base::general.phone'), 'phone')
+                ->sortable()
+                ->searchable(),
+
+            Column::make(trans('core/base::general.role'), 'roles_list')
+                ->contentClasses('text-nowrap'),
+
+            Column::make(trans('core/base::general.status'), 'status_badge'),
+
+            Column::make(trans('core/base::general.super_admin'), 'super_admin_badge'),
+
+            Column::make(trans('core/base::general.created_at'), 'created_at_formatted', 'created_at')
+                ->sortable(),
+
+            Column::action(trans('core/base::general.action')),
+        ];
+    }
+
+    public function filters(): array
+    {
+        $roles = Role::pluck('name', 'id')->toArray();
+
+        return [
+            Filter::inputText('name')
+                ->placeholder(trans('core/base::general.search_by_name_placeholder'))
+                ->operators(['contains']),
+
+            Filter::inputText('email')
+                ->placeholder(trans('core/base::general.search_by_email_placeholder'))
+                ->operators(['contains']),
+
+            Filter::inputText('phone')
+                ->placeholder(trans('core/base::general.search_by_phone_placeholder'))
+                ->operators(['contains']),
+
+            Filter::select('role_filter', 'id')
+                ->dataSource(Role::all())
+                ->optionLabel('name')
+                ->optionValue('id')
+                ->builder(function (Builder $query, mixed $value) {
+                    return $query->whereHas('roles', fn ($q) => $q->where('roles.id', $value));
+                }),
+
+            Filter::boolean('super_admin')
+                ->label(trans('core/base::general.super_admin'), trans('core/base::general.no')),
+
+            Filter::select('status', 'status')
+                ->dataSource([
+                    ['id' => 'active', 'name' => trans('core/base::general.active')],
+                    ['id' => 'inactive', 'name' => trans('core/base::general.inactive')],
+                ])
+                ->optionLabel('name')
+                ->optionValue('id'),
+
+            Filter::datetimepicker('created_at'),
+        ];
+    }
+
+    public function actions(User $row): array
+    {
+        $actions = [];
+
+        // Detail action
+        $actions[] = Button::add('detail')
+            ->slot(tabler_icon('eye', ['class' => 'icon']))
+            ->id()
+            ->class('btn btn-info btn-icon btn-sm me-1')
+            ->attributes([
+                'onclick' => "Livewire.dispatch('show-modal-detail-user', {id: {$row->id}});",
+                'title' => trans('core/base::general.details'),
+            ])
+            ->tooltip(trans('core/base::general.details'));
+
+        if (auth()->user()->can('users.edit')) {
+            $actions[] = Button::add('edit')
+                ->slot(tabler_icon('pencil', ['class' => 'icon']))
+                ->id()
+                ->class('btn btn-primary btn-icon btn-sm me-1')
+                ->attributes([
+                    'onclick' => "Livewire.dispatch('show-modal-edit-user', {id: {$row->id}});",
+                    'title' => trans('core/base::general.edit'),
+                ])
+                ->tooltip(trans('core/base::general.edit'));
+        }
+
+        if (auth()->user()->can('users.delete')) {
+            $actions[] = Button::add('delete')
+                ->slot(tabler_icon('trash', ['class' => 'icon']))
+                ->id()
+                ->class('btn btn-outline-danger btn-icon btn-sm me-1')
+                ->attributes([
+                    'onclick' => "Livewire.dispatch('show-modal-delete-user', {id: {$row->id}});",
+                    'title' => trans('core/base::general.delete'),
+                ])
+                ->tooltip(trans('core/base::general.delete'));
+        }
+
+        if (auth()->user()->can('users.impersonate') && $row->id !== auth()->id() && $row->canBeImpersonated()) {
+            $actions[] = Button::add('impersonate')
+                ->slot(tabler_icon('login', ['class' => 'icon']))
+                ->id()
+                ->class('btn btn-warning btn-icon btn-sm')
+                ->route('impersonate', ['id' => $row->id])
+                ->attributes(['title' => trans('core/base::general.login')])
+                ->tooltip(trans('core/base::general.login'));
+        }
+
+        return $actions;
+    }
+
+    public function actionRules($row): array
+    {
+        return [
+            Rule::button('delete')
+                ->when(fn ($row) => $row->super_admin || $row->id === auth()->id())
+                ->hide(),
+        ];
+    }
+
+    public function onUpdatedToggleable(string|int $id, string $field, string $value): void
+    {
+        User::find($id)->update([$field => $value]);
+        $this->dispatch('pg:eventRefresh-usersTable');
+    }
+}

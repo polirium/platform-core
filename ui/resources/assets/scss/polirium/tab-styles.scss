@@ -1,0 +1,95 @@
+// Tab Component Styles (v1 - Original Blue Theme)
+.nav-tabs {
+  border-bottom: 1px solid #dee2e6;
+
+  .nav-item {
+    margin-bottom: -1px;
+
+    .nav-link {
+      border: 1px solid transparent;
+      border-top-left-radius: 0.25rem;
+      border-top-right-radius: 0.25rem;
+      color: #495057;
+      padding: 0.5rem 1rem;
+      font-weight: 500;
+      transition:
+        color 0.15s ease-in-out,
+        background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out;
+
+      &:hover {
+        border-color: #e9ecef #e9ecef #dee2e6;
+        color: #206bc4; // Brand blue hover
+      }
+
+      &.active {
+        color: #206bc4; // Brand blue active text
+        background-color: #fff;
+        border-color: #dee2e6 #dee2e6 #fff;
+        font-weight: 600;
+      }
+
+      // Close button style
+      .close-tab-btn {
+        color: #fff;
+        background: #d63939;
+        transition: all 0.2s;
+        padding: 0;
+        margin-left: 8px;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          opacity: 1;
+          background: #b62d2d;
+          color: #fff;
+        }
+
+        svg,
+        .icon {
+          width: 12px;
+          height: 12px;
+          stroke-width: 3;
+        }
+      }
+    }
+  }
+}
+
+// Add New Tab Button (v1 Style)
+.add-tab-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background: #206bc4;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
+  margin-left: 0.5rem;
+  cursor: pointer;
+
+  &:hover {
+    background: #1a569d;
+    color: #fff;
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2;
+  }
+}

@@ -1,0 +1,23 @@
+{
+    "name": "polirium/{-name}",
+    "description": "{Name} Module - Module for Polirium Core",
+    "authors": [
+        {
+            "name": "Nghia Pham",
+            "email": "vingamagic@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Polirium\\Modules\\{Name}\\": "src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Polirium\\Modules\\{Name}\\Providers\\{Name}ServiceProvider"
+            ]
+        }
+    }
+}

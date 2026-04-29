@@ -1,0 +1,73 @@
+{
+    "name": "polirium/core",
+    "description": "Polirium ERP Core, is core of Polirium ERP System, it's include all base function for ERP System",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Nghia Ne",
+            "email": "vingadev@gmail.com"
+        }
+    ],
+    "homepage": "https://nghiane.com",
+    "support": {
+        "issues": "https://nghiane.com",
+        "document": "https://nghiane.com"
+    },
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^10.0|^11.0|^12.0",
+        "livewire/livewire": "^4.0",
+        "davejamesmiller/laravel-breadcrumbs": "^5.0",
+        "kalnoy/nestedset": "^6.0",
+        "mcamara/laravel-localization": "^1.8 || ^2.0 || dev-master",
+        "twig/twig": "^3.21",
+        "doctrine/dbal": "^3.10",
+        "aws/aws-sdk-php": "^3.356",
+        "laravel/fortify": "^1.28",
+        "laravel/horizon": "^5.33",
+        "laravolt/avatar": "^6.1",
+        "lavary/laravel-menu": "^1.8.4",
+        "intervention/image": "^3.8",
+        "openspout/openspout": "^4.30",
+        "kjmtrue/vietnam-zone": "^1.0.5",
+        "ifsnop/mysqldump-php": "^2.12",
+        "league/flysystem-sftp-v3": "^3.30",
+        "pusher/pusher-php-server": "^7.2.7",
+        "spatie/laravel-activitylog": "^4.10",
+        "spatie/laravel-permission": "^6.21",
+        "spatie/laravel-medialibrary": "^11.14",
+        "polirium/datatable": "@dev",
+        "vigstudio/laravel-tabler-icons": "@dev",
+        "polirium/laravel-impersonate": "@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "Polirium\\Core\\Support\\": "support/src",
+            "Polirium\\Core\\Base\\": "base/src",
+            "Polirium\\Core\\UI\\": "ui/src",
+            "Polirium\\Core\\Settings\\": "settings/src",
+            "Polirium\\Core\\DevTool\\": "dev-tool/src",
+            "Polirium\\Core\\Media\\": "media/src"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Polirium\\Core\\Support\\Providers\\SupportServiceProvider",
+                "Polirium\\Core\\Base\\Providers\\BaseServiceProvider",
+                "Polirium\\Core\\UI\\Providers\\UIServiceProvider",
+                "Polirium\\Core\\Settings\\Providers\\SettingServiceProvider",
+                "Polirium\\Core\\DevTool\\Providers\\DevToolServiceProvider",
+                "Polirium\\Core\\Media\\Providers\\MediaServiceProvider"
+            ],
+            "aliases": {
+                "CoreSupport": "Polirium\\Core\\Support\\Facades\\CoreSupport",
+                "Assets": "Polirium\\Core\\UI\\Facades\\Assets",
+                "Settings": "Polirium\\Core\\Settings\\Facades\\Settings",
+                "Media": "Polirium\\Core\\Media\\Facades\\Media"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

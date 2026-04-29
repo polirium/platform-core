@@ -1,0 +1,200 @@
+//
+// Widget Chart Utilities
+// Chart colors for SVG and canvas elements
+// Supports light/dark mode with proper contrast ratios
+//
+
+// ============================================
+// SVG CHART GRADIENTS
+// ============================================
+
+// Primary gradient
+.chart-gradient-primary-stop-1 { stop-color: rgba(32, 107, 196, 0.3); }
+.chart-gradient-primary-stop-2 { stop-color: rgba(32, 107, 196, 0); }
+[data-bs-theme='dark'] .chart-gradient-primary-stop-1 { stop-color: rgba(77, 171, 247, 0.3); }
+[data-bs-theme='dark'] .chart-gradient-primary-stop-2 { stop-color: rgba(77, 171, 247, 0); }
+
+// Success gradient
+.chart-gradient-success-stop-1 { stop-color: rgba(47, 179, 68, 0.3); }
+.chart-gradient-success-stop-2 { stop-color: rgba(47, 179, 68, 0); }
+[data-bs-theme='dark'] .chart-gradient-success-stop-1 { stop-color: rgba(81, 207, 102, 0.3); }
+[data-bs-theme='dark'] .chart-gradient-success-stop-2 { stop-color: rgba(81, 207, 102, 0); }
+
+// Warning gradient
+.chart-gradient-warning-stop-1 { stop-color: rgba(247, 103, 7, 0.3); }
+.chart-gradient-warning-stop-2 { stop-color: rgba(247, 103, 7, 0); }
+[data-bs-theme='dark'] .chart-gradient-warning-stop-1 { stop-color: rgba(255, 169, 77, 0.3); }
+[data-bs-theme='dark'] .chart-gradient-warning-stop-2 { stop-color: rgba(255, 169, 77, 0); }
+
+// Info gradient
+.chart-gradient-info-stop-1 { stop-color: rgba(66, 153, 225, 0.3); }
+.chart-gradient-info-stop-2 { stop-color: rgba(66, 153, 225, 0); }
+[data-bs-theme='dark'] .chart-gradient-info-stop-1 { stop-color: rgba(116, 192, 252, 0.3); }
+[data-bs-theme='dark'] .chart-gradient-info-stop-2 { stop-color: rgba(116, 192, 252, 0); }
+
+// Purple gradient
+.chart-gradient-purple-stop-1 { stop-color: rgba(154, 80, 165, 0.3); }
+.chart-gradient-purple-stop-2 { stop-color: rgba(154, 80, 165, 0); }
+[data-bs-theme='dark'] .chart-gradient-purple-stop-1 { stop-color: rgba(204, 93, 232, 0.3); }
+[data-bs-theme='dark'] .chart-gradient-purple-stop-2 { stop-color: rgba(204, 93, 232, 0); }
+
+// ============================================
+// SVG CHART STROKES (Direct colors for SVG compatibility)
+// ============================================
+
+// Light mode (default)
+.chart-stroke-primary { stroke: #206bc4; }
+.chart-stroke-success { stroke: #2fb344; }
+.chart-stroke-danger { stroke: #d63939; }
+.chart-stroke-warning { stroke: #f76707; }
+.chart-stroke-info { stroke: #4299e1; }
+.chart-stroke-purple { stroke: #9a50a5; }
+.chart-stroke-gray { stroke: #e9ecef; }
+
+// Dark mode overrides
+[data-bs-theme='dark'] .chart-stroke-primary { stroke: #4dabf7; }
+[data-bs-theme='dark'] .chart-stroke-success { stroke: #51cf66; }
+[data-bs-theme='dark'] .chart-stroke-danger { stroke: #ff6b6b; }
+[data-bs-theme='dark'] .chart-stroke-warning { stroke: #ffa94d; }
+[data-bs-theme='dark'] .chart-stroke-info { stroke: #74c0fc; }
+[data-bs-theme='dark'] .chart-stroke-purple { stroke: #cc5de8; }
+[data-bs-theme='dark'] .chart-stroke-gray { stroke: #374151; }
+
+// ============================================
+// SVG CHART FILLS (Direct colors for SVG compatibility)
+// ============================================
+
+// Light mode (default)
+.chart-fill-primary { fill: #206bc4; }
+.chart-fill-success { fill: #2fb344; }
+.chart-fill-danger { fill: #d63939; }
+.chart-fill-warning { fill: #f76707; }
+.chart-fill-info { fill: #4299e1; }
+.chart-fill-purple { fill: #9a50a5; }
+.chart-fill-gray { fill: #e9ecef; }
+
+// Dark mode overrides
+[data-bs-theme='dark'] .chart-fill-primary { fill: #4dabf7; }
+[data-bs-theme='dark'] .chart-fill-success { fill: #51cf66; }
+[data-bs-theme='dark'] .chart-fill-danger { fill: #ff6b6b; }
+[data-bs-theme='dark'] .chart-fill-warning { fill: #ffa94d; }
+[data-bs-theme='dark'] .chart-fill-info { fill: #74c0fc; }
+[data-bs-theme='dark'] .chart-fill-purple { fill: #cc5de8; }
+[data-bs-theme='dark'] .chart-fill-gray { fill: #374151; }
+
+// ============================================
+// CHART CONTAINERS
+// ============================================
+
+// Radial/Donut charts
+.chart-radial {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Sparkline charts
+.chart-sparkline {
+  position: relative;
+  overflow: hidden;
+
+  svg {
+    display: block;
+  }
+}
+
+// ============================================
+// PAYMENT METHOD BADGES
+// ============================================
+
+.payment-method-badge {
+  margin: 2px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.payment-methods-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+// ============================================
+// ACCESSIBILITY & REDUCED MOTION
+// ============================================
+
+// Respect user's motion preferences
+@media (prefers-reduced-motion: reduce) {
+  .payment-method-badge,
+  .payment-method-badge:hover {
+    transition: none;
+  }
+
+  .chart-radial svg,
+  .chart-sparkline svg {
+    animation: none !important;
+  }
+}
+
+// Focus visible for keyboard navigation
+.payment-method-badge:focus-visible,
+a:focus-visible .payment-method-badge {
+  outline: 2px solid #206bc4;
+  outline-offset: 2px;
+}
+
+// ============================================
+// RESPONSIVE ADJUSTMENTS
+// ============================================
+
+// Small charts on mobile
+@media (max-width: 576px) {
+  .chart-radial[style*="width: 80px"] {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .chart-radial[style*="width: 70px"] {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .chart-sparkline[style*="height: 60px"] {
+    height: 40px !important;
+  }
+
+  .chart-sparkline[style*="height: 30px"] {
+    height: 20px !important;
+  }
+}
+
+// ============================================
+// PRINT STYLES
+// ============================================
+
+@media print {
+  .chart-radial,
+  .chart-sparkline {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .payment-method-badge {
+    border: 1px solid #ccc;
+  }
+}

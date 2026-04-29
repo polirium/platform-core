@@ -1,0 +1,10 @@
+<?php
+
+namespace {Module}\Http\Controllers;
+
+use Polirium\Core\Base\Http\Controllers\BaseController;
+use Illuminate\Http\Request;
+
+class {Name}Controller extends BaseController
+{
+}
