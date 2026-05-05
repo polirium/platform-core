@@ -16,6 +16,8 @@ class ValueSerializer implements ValueSerializerContract
     {
         $safelistedClasses = Arr::wrap(config('settings.unserialize_safelist', []));
 
-        return unserialize($serialized, ['allowed_classes' => $safelistedClasses]);
+        $result = @unserialize($serialized, ['allowed_classes' => $safelistedClasses]);
+
+        return $result !== false ? $result : null;
     }
 }
