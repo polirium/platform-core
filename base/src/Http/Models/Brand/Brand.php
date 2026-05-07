@@ -48,6 +48,8 @@ class Brand extends BaseModel
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id')->withDefault(['name' => null]);
+        return $this->belongsTo(User::class, 'user_id')
+            ->withoutGlobalScope(\Illuminate\Database\Eloquent\SoftDeletingScope::class)
+            ->withDefault(['name' => null]);
     }
 }

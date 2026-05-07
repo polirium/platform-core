@@ -58,7 +58,8 @@ class Branch extends BaseModel
     {
         return $this->belongsToMany(User::class, 'user_branches', 'branch_id', 'user_id')
         ->withTimestamps()
-        ->withPivot(['id', 'active']);
+        ->withPivot(['id', 'active'])
+        ->withoutGlobalScope(\Illuminate\Database\Eloquent\SoftDeletingScope::class);
     }
 
     /**

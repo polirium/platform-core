@@ -34,12 +34,53 @@
                 </div>
             </div>
 
+            <!-- Tabs -->
+            <div class="card-tabs mb-3 pe-3 ps-3">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="active-users-tab" data-tab="active" type="button" role="tab" aria-controls="active-users" aria-selected="true">
+                            {!! tabler_icon('users-group', ['class' => 'icon me-2']) !!}
+                            {{ __('core/base::general.active_users') }}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="deleted-users-tab" data-tab="deleted" type="button" role="tab" aria-controls="deleted-users" aria-selected="false">
+                            {!! tabler_icon('trash', ['class' => 'icon me-2']) !!}
+                            {{ __('core/base::general.deleted_users') }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <script>
+                document.querySelectorAll('[data-tab]').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const tab = this.getAttribute('data-tab');
+
+                        // Update active tab styling
+                        document.querySelectorAll('[data-tab]').forEach(b => {
+                            b.classList.remove('active');
+                            b.setAttribute('aria-selected', 'false');
+                        });
+                        this.classList.add('active');
+                        this.setAttribute('aria-selected', 'true');
+
+                        // Dispatch to Livewire
+                        Livewire.dispatch('switch-user-tab', {
+                            tab: tab
+                        });
+                    });
+                });
+            </script>
+
             <!-- User Table -->
             @livewire('core/base::user-table')
 
             @livewire('core/base::user.modal')
             @livewire('core/base::user.modal.detail')
             @livewire('core/base::user.modal.delete')
+            @livewire('core/base::user.modal.restore')
+            @livewire('core/base::user.modal.force-delete')
         </div>
     </div>
 </x-ui.layouts::app>

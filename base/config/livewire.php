@@ -16,6 +16,8 @@ use Polirium\Core\Base\Http\Livewire\Users\Datatable\UserTable;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalDeleteUserComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalDetailUserComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalUserComponent;
+use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalRestoreUserComponent;
+use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalForceDeleteUserComponent;
 
 return [
     /**
@@ -40,6 +42,16 @@ return [
         'class' => ModalDeleteUserComponent::class,
         'alias' => 'core/base::user.modal.delete',
         'description' => 'User Modal Delete',
+    ],
+    'user.modal.restore' => [
+        'class' => ModalRestoreUserComponent::class,
+        'alias' => 'core/base::user.modal.restore',
+        'description' => 'User Modal Restore',
+    ],
+    'user.modal.force-delete' => [
+        'class' => ModalForceDeleteUserComponent::class,
+        'alias' => 'core/base::user.modal.force-delete',
+        'description' => 'User Modal Force Delete',
     ],
 
     'script-action-ui' => [

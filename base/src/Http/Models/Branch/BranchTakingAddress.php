@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Polirium\Core\Base\Http\Models\BaseModel;
 use Polirium\Core\Base\Http\Models\District;
 use Polirium\Core\Base\Http\Models\Province;
+use Polirium\Core\Base\Http\Models\User;
 use Polirium\Core\Base\Http\Models\Ward;
 
 class BranchTakingAddress extends BaseModel
@@ -51,5 +52,15 @@ class BranchTakingAddress extends BaseModel
     public function ward(): BelongsTo
     {
         return $this->belongsTo(Ward::class, 'ward_id')->withDefault(['name' => null]);
+    }
+
+    /**
+     * Get the user that owns the taking address
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id')->withoutGlobalScope(\Illuminate\Database\Eloquent\SoftDeletingScope::class);
     }
 }

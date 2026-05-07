@@ -5,6 +5,7 @@ namespace Polirium\Core\Base\Http\Livewire\Users\Datatable;
 use CoreSupport;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Blade;
+use Livewire\Attributes\On;
 use Polirium\Core\Base\Http\Models\Role;
 use Polirium\Core\Base\Http\Models\User;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
@@ -22,6 +23,16 @@ final class UserTable extends BaseTable
     use WithExport;
 
     public string $tableName = 'usersTable';
+
+    public string $tab = 'active'; // 'active' hoặc 'deleted'
+
+    #[On('switch-user-tab')]
+    public function switchTab(string $tab): void
+    {
+        $this->tab = $tab;
+        // Reset pagination and refresh the data grid
+        $this->dispatch('pg:eventRefresh-usersTable');
+    }
 
     public function setUp(): array
     {
@@ -41,8 +52,15 @@ final class UserTable extends BaseTable
 
     public function datasource(): Builder
     {
-        return User::query()
+        $query = User::query()
             ->with(['roles']);
+
+        if ($this->tab === 'deleted') {
+            return $query->onlyTrashed();
+        }
+
+        // Active users (default behavior includes SoftDeletes scope)
+        return $query;
     }
 
     public function relationSearch(): array
@@ -187,38 +205,66 @@ final class UserTable extends BaseTable
             ])
             ->tooltip(trans('core/base::general.details'));
 
-        if (auth()->user()->can('users.edit')) {
-            $actions[] = Button::add('edit')
-                ->slot(tabler_icon('pencil', ['class' => 'icon']))
-                ->id()
-                ->class('btn btn-primary btn-icon btn-sm me-1')
-                ->attributes([
-                    'onclick' => "Livewire.dispatch('show-modal-edit-user', {id: {$row->id}});",
-                    'title' => trans('core/base::general.edit'),
-                ])
-                ->tooltip(trans('core/base::general.edit'));
-        }
+        if ($this->tab === 'active') {
+            // For active users: edit and delete
+            if (auth()->user()->can('users.edit')) {
+                $actions[] = Button::add('edit')
+                    ->slot(tabler_icon('pencil', ['class' => 'icon']))
+                    ->id()
+                    ->class('btn btn-primary btn-icon btn-sm me-1')
+                    ->attributes([
+                        'onclick' => "Livewire.dispatch('show-modal-edit-user', {id: {$row->id}});",
+                        'title' => trans('core/base::general.edit'),
+                    ])
+                    ->tooltip(trans('core/base::general.edit'));
+            }
 
-        if (auth()->user()->can('users.delete')) {
-            $actions[] = Button::add('delete')
-                ->slot(tabler_icon('trash', ['class' => 'icon']))
-                ->id()
-                ->class('btn btn-outline-danger btn-icon btn-sm me-1')
-                ->attributes([
-                    'onclick' => "Livewire.dispatch('show-modal-delete-user', {id: {$row->id}});",
-                    'title' => trans('core/base::general.delete'),
-                ])
-                ->tooltip(trans('core/base::general.delete'));
-        }
+            if (auth()->user()->can('users.delete')) {
+                $actions[] = Button::add('delete')
+                    ->slot(tabler_icon('trash', ['class' => 'icon']))
+                    ->id()
+                    ->class('btn btn-outline-danger btn-icon btn-sm me-1')
+                    ->attributes([
+                        'onclick' => "Livewire.dispatch('show-modal-delete-user', {id: {$row->id}});",
+                        'title' => trans('core/base::general.delete'),
+                    ])
+                    ->tooltip(trans('core/base::general.delete'));
+            }
 
-        if (auth()->user()->can('users.impersonate') && $row->id !== auth()->id() && $row->canBeImpersonated()) {
-            $actions[] = Button::add('impersonate')
-                ->slot(tabler_icon('login', ['class' => 'icon']))
-                ->id()
-                ->class('btn btn-warning btn-icon btn-sm')
-                ->route('impersonate', ['id' => $row->id])
-                ->attributes(['title' => trans('core/base::general.login')])
-                ->tooltip(trans('core/base::general.login'));
+            if (auth()->user()->can('users.impersonate') && $row->id !== auth()->id() && $row->canBeImpersonated()) {
+                $actions[] = Button::add('impersonate')
+                    ->slot(tabler_icon('login', ['class' => 'icon']))
+                    ->id()
+                    ->class('btn btn-warning btn-icon btn-sm')
+                    ->route('impersonate', ['id' => $row->id])
+                    ->attributes(['title' => trans('core/base::general.login')])
+                    ->tooltip(trans('core/base::general.login'));
+            }
+        } else {
+            // For deleted users: restore and permanently delete
+            if (auth()->user()->can('users.edit')) {
+                $actions[] = Button::add('restore')
+                    ->slot(tabler_icon('rotate-clockwise', ['class' => 'icon']))
+                    ->id()
+                    ->class('btn btn-success btn-icon btn-sm me-1')
+                    ->attributes([
+                        'onclick' => "Livewire.dispatch('show-modal-restore-user', {id: {$row->id}});",
+                        'title' => trans('core/base::general.restore'),
+                    ])
+                    ->tooltip(trans('core/base::general.restore'));
+            }
+
+            if (auth()->user()->can('users.delete')) {
+                $actions[] = Button::add('force-delete')
+                    ->slot(tabler_icon('trash-x', ['class' => 'icon']))
+                    ->id()
+                    ->class('btn btn-danger btn-icon btn-sm me-1')
+                    ->attributes([
+                        'onclick' => "Livewire.dispatch('show-modal-force-delete-user', {id: {$row->id}});",
+                        'title' => trans('core/base::general.permanent_delete'),
+                    ])
+                    ->tooltip(trans('core/base::general.permanent_delete'));
+            }
         }
 
         return $actions;

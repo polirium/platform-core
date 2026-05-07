@@ -6,6 +6,7 @@ use Avatar;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -25,6 +26,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasUuid;
     use HasRoles;
     use Impersonate;
+    use SoftDeletes;
 
     /**
      * @return bool
@@ -126,6 +128,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(Branch::class, 'user_branches', 'user_id', 'branch_id')
         ->withTimestamps()
-        ->withPivot(['id', 'active']);
+        ->withPivot(['id', 'active'])
+        ->withoutGlobalScope(\Illuminate\Database\Eloquent\SoftDeletingScope::class);
     }
 }
