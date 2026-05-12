@@ -70,17 +70,58 @@
     </script>
 
     <script>
-        document.addEventListener('livewire:init', function () {
-            Livewire.hook('request', ({ fail }) => {
-                fail(({ status, preventDefault }) => {
+        document.addEventListener('livewire:init', function() {
+            Livewire.hook('request', ({
+                fail
+            }) => {
+                fail(({
+                    status,
+                    preventDefault
+                }) => {
                     if (status === 419) {
                         preventDefault();
-                        if (confirm('Phiên làm việc đã hết hạn. Bấm OK để tải lại trang.')) {
-                            window.location.reload();
-                        }
+
+                        // Refresh CSRF token silently — do NOT reload page (data loss)
+                        const refreshToken = window._keepAlive ?
+                            window._keepAlive.refreshCsrfToken() :
+                            fetch('/admin/csrf-token', {
+                                credentials: 'same-origin'
+                            })
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.csrf_token) {
+                                    const meta = document.querySelector('meta[name="csrf-token"]');
+                                    if (meta) meta.content = data.csrf_token;
+                                    document.querySelectorAll('input[name="_token"]').forEach(i => i.value = data.csrf_token);
+                                }
+                            });
+
+                        refreshToken.then(() => {
+                            Livewire.dispatch('toast', {
+                                message: 'Token đã được làm mới. Vui lòng thử lại thao tác.',
+                                type: 'warning'
+                            });
+                        }).catch(() => {
+                            Livewire.dispatch('toast', {
+                                message: 'Không thể làm mới token. Vui lòng kiểm tra kết nối và thử lại.',
+                                type: 'error'
+                            });
+                        });
                     }
                 });
             });
+        });
+
+        // Auto-start keep-alive to prevent CSRF token expiry (HTTP 419)
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.PoliriumKeepAlive) {
+                window._keepAlive = new window.PoliriumKeepAlive({
+                    heartbeatInterval: 4 * 60 * 1000, // 4 minutes (session = 120 min)
+                    csrfRefreshInterval: 20 * 60 * 1000, // 20 minutes
+                    debug: false,
+                });
+                window._keepAlive.start();
+            }
         });
     </script>
 
