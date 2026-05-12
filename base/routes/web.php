@@ -110,6 +110,22 @@ Route::middleware(['web', 'auth'])
         Route::get('/activity-logs', [\Polirium\Core\Base\Http\Controllers\ActivityLogController::class, 'index'])
             ->name('activity-logs.index')
             ->middleware('can:activity-logs.index');
+
+        /**
+         * Keep-Alive: heartbeat & CSRF token refresh
+         */
+        Route::post('/heartbeat', function () {
+            return response()->json([
+                'status'     => 'ok',
+                'csrf_token' => csrf_token(),
+            ]);
+        })->name('heartbeat');
+
+        Route::get('/csrf-token', function () {
+            return response()->json([
+                'csrf_token' => csrf_token(),
+            ]);
+        })->name('csrf-token');
     });
 
 Route::get('/', function () {
