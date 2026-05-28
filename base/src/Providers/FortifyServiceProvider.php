@@ -4,7 +4,6 @@ namespace Polirium\Core\Base\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -30,10 +29,7 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->app['events']->listen(RouteMatched::class, function () {
-            Config::set('fortify.home', route('core.index'));
-        });
-
+        Config::set('fortify.home', '/' . trim((string) config('core.base.setting.admin_dir', 'admin'), '/'));
         Config::set('fortify.username', 'user');
         Config::set('fortify.email', 'email');
 
