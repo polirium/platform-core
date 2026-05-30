@@ -33,13 +33,11 @@ trait GetPermission
 
         foreach (BaseHelper::scanFolder(platform_path($type)) as $module) {
             $key = strtolower($type . '.' . $module . '.permissions');
-            $configuration = config($key);
+            $configuration = config($key, []);
+            $configFile = platform_path($type . '/' . $module . '/config/permissions.php');
 
-            if (empty($configuration)) {
-                $configFile = platform_path($type . '/' . $module . '/config/permissions.php');
-                if (file_exists($configFile)) {
-                    $configuration = require $configFile;
-                }
+            if (file_exists($configFile)) {
+                $configuration = array_merge($configuration ?: [], require $configFile);
             }
 
             if (! empty($configuration)) {
