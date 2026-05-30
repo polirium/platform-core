@@ -183,17 +183,21 @@
                 }
             });
 
-            Livewire.hook('message.processed', ({ component }) => {
-                if (component.name === 'modal-create-role-component' ||
-                    component.el.closest('[id^="modal-create-role"]')) {
-                    const normalContent = submitBtn.querySelector('.btn-content-normal');
-                    const loadingContent = submitBtn.querySelector('.btn-content-loading');
-                    if (normalContent && loadingContent) {
-                        normalContent.classList.remove('d-none');
-                        loadingContent.classList.add('d-none');
-                        submitBtn.disabled = false;
+            Livewire.interceptMessage(({ message, onFinish }) => {
+                const component = message.component;
+
+                onFinish(() => {
+                    if (component.name === 'modal-create-role-component' ||
+                        component.el.closest('[id^="modal-create-role"]')) {
+                        const normalContent = submitBtn.querySelector('.btn-content-normal');
+                        const loadingContent = submitBtn.querySelector('.btn-content-loading');
+                        if (normalContent && loadingContent) {
+                            normalContent.classList.remove('d-none');
+                            loadingContent.classList.add('d-none');
+                            submitBtn.disabled = false;
+                        }
                     }
-                }
+                });
             });
         }
 

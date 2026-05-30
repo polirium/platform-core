@@ -71,14 +71,9 @@
 
     <script>
         document.addEventListener('livewire:init', function() {
-            Livewire.hook('request', ({
-                fail
-            }) => {
-                fail(({
-                    status,
-                    preventDefault
-                }) => {
-                    if (status === 419) {
+            Livewire.interceptRequest(({ onError }) => {
+                onError(({ response, preventDefault }) => {
+                    if (response.status === 419) {
                         preventDefault();
 
                         // Refresh CSRF token silently — do NOT reload page (data loss)
