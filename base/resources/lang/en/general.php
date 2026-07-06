@@ -144,6 +144,11 @@ return [
 
     // Activity Log
     'activity_log' => 'Activity Log',
+    'activity_logs' => 'Activity Logs',
+    'system_logs' => 'System Logs',
+    'log_file' => 'Log file',
+    'log_level' => 'Log level',
+    'latest_errors' => 'Latest errors',
 
     // Branch
     'branch' => 'Branch',

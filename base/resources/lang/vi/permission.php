@@ -53,4 +53,12 @@ return [
     'widgets.quick_access' => 'Widget Truy cập nhanh',
     'widgets.revenue' => 'Widget Doanh thu',
     'widgets.sales' => 'Widget Bán hàng',
+
+    // Activity Logs
+    'activity_logs' => 'Lịch sử hoạt động',
+    'activity_logs.index' => 'Xem lịch sử hoạt động',
+
+    // System Logs
+    'system_logs' => 'Log hệ thống',
+    'system_logs.index' => 'Xem log hệ thống',
 ];

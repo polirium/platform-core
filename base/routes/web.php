@@ -5,6 +5,7 @@ use Polirium\Core\Base\Http\Controllers\BranchController;
 use Polirium\Core\Base\Http\Controllers\BrandController;
 use Polirium\Core\Base\Http\Controllers\DashboadController;
 use Polirium\Core\Base\Http\Controllers\RoleManagerController;
+use Polirium\Core\Base\Http\Controllers\SystemLogController;
 use Polirium\Core\Base\Http\Controllers\UserProfileController;
 use Polirium\Core\Base\Http\Controllers\UsersManagerController;
 
@@ -112,11 +113,18 @@ Route::middleware(['web', 'auth'])
             ->middleware('can:activity-logs.index');
 
         /**
+         * System Logs
+         */
+        Route::get('/system-logs', [SystemLogController::class, 'index'])
+            ->name('system-logs.index')
+            ->middleware('can:system-logs.index');
+
+        /**
          * Keep-Alive: heartbeat & CSRF token refresh
          */
         Route::post('/heartbeat', function () {
             return response()->json([
-                'status'     => 'ok',
+                'status' => 'ok',
                 'csrf_token' => csrf_token(),
             ]);
         })->name('heartbeat');

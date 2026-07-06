@@ -105,4 +105,13 @@ return [
         'sort' => 5,
         'permission' => 'activity-logs.view',
     ],
+    [
+        'id' => 'core.system-logs',
+        'name' => 'core/base::general.system_logs',
+        'parent' => 'core.setting',
+        'route' => 'core.system-logs.index',
+        'icon' => 'bug',
+        'sort' => 6,
+        'permission' => 'system-logs.index',
+    ],
 ];

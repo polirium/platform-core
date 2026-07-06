@@ -240,4 +240,19 @@ return [
         'flag' => 'activity-logs.index',
         'parent_flag' => 'activity-logs',
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | System Logs
+    |--------------------------------------------------------------------------
+    */
+    [
+        'name' => 'core/base::permission.system_logs',
+        'flag' => 'system-logs',
+    ],
+    [
+        'name' => 'core/base::permission.system_logs.index',
+        'flag' => 'system-logs.index',
+        'parent_flag' => 'system-logs',
+    ],
 ];

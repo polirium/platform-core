@@ -155,6 +155,11 @@ return [
 
     // Activity Log
     'activity_log' => 'Lịch sử hoạt động',
+    'activity_logs' => 'Lịch sử hoạt động',
+    'system_logs' => 'Log hệ thống',
+    'log_file' => 'File log',
+    'log_level' => 'Mức lỗi',
+    'latest_errors' => 'Lỗi mới nhất',
     'filter_by_user' => 'Lọc theo người dùng',
     'all_users' => 'Tất cả người dùng',
     'filter_by_action' => 'Lọc theo hành động',

@@ -53,4 +53,12 @@ return [
     'widgets.quick_access' => 'Quick Access Widget',
     'widgets.revenue' => 'Revenue Widget',
     'widgets.sales' => 'Sales Widget',
+
+    // Activity Logs
+    'activity_logs' => 'Activity Logs',
+    'activity_logs.index' => 'View Activity Logs',
+
+    // System Logs
+    'system_logs' => 'System Logs',
+    'system_logs.index' => 'View System Logs',
 ];
