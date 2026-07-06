@@ -61,4 +61,5 @@ return [
     // System Logs
     'system_logs' => 'System Logs',
     'system_logs.index' => 'View System Logs',
+    'system_logs.delete' => 'Delete System Logs',
 ];

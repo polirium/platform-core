@@ -255,4 +255,9 @@ return [
         'flag' => 'system-logs.index',
         'parent_flag' => 'system-logs',
     ],
+    [
+        'name' => 'core/base::permission.system_logs.delete',
+        'flag' => 'system-logs.delete',
+        'parent_flag' => 'system-logs',
+    ],
 ];

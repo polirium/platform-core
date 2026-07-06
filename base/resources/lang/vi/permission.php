@@ -61,4 +61,5 @@ return [
     // System Logs
     'system_logs' => 'Log hệ thống',
     'system_logs.index' => 'Xem log hệ thống',
+    'system_logs.delete' => 'Xóa log hệ thống',
 ];

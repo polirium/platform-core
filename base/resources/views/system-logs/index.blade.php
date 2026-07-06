@@ -69,9 +69,22 @@
                             {!! tabler_icon('bug', ['class' => 'icon me-2']) !!}
                             {{ __('core/base::general.latest_errors') }}
                         </div>
-                        @if($selectedFile)
-                            <span class="badge bg-muted-lt">{{ $selectedFile }}</span>
-                        @endif
+                        <div class="d-flex align-items-center gap-2">
+                            @if($selectedFile)
+                                <span class="badge bg-muted-lt">{{ $selectedFile }}</span>
+                                @can('system-logs.delete')
+                                    <form method="POST" action="{{ route('core.system-logs.destroy') }}" onsubmit="return confirm('{{ __('core/base::general.delete_log_confirm') }}')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="hidden" name="file" value="{{ $selectedFile }}">
+                                        <button class="btn btn-danger btn-sm" type="submit">
+                                            {!! tabler_icon('trash', ['class' => 'icon']) !!}
+                                            {{ __('core/base::general.delete_log') }}
+                                        </button>
+                                    </form>
+                                @endcan
+                            @endif
+                        </div>
                     </div>
                 </x-slot>
 

@@ -148,6 +148,9 @@ return [
     'system_logs' => 'System Logs',
     'log_file' => 'Log file',
     'log_level' => 'Log level',
+    'delete_log' => 'Delete log',
+    'delete_log_confirm' => 'Are you sure you want to delete this log file? This action cannot be undone.',
+    'log_deleted_successfully' => 'Log file deleted.',
     'latest_errors' => 'Latest errors',
 
     // Branch

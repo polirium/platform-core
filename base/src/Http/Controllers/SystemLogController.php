@@ -36,6 +36,23 @@ class SystemLogController extends BaseController
         return view('core/base::system-logs.index', compact('entries', 'level', 'limit', 'logFiles', 'selectedFile'));
     }
 
+    public function destroy(Request $request)
+    {
+        $selectedFile = $this->safeLogFileName($request->string('file')->toString());
+
+        abort_if(! $selectedFile, 404);
+
+        $path = storage_path('logs/' . $selectedFile);
+
+        abort_if(! File::isFile($path), 404);
+
+        File::delete($path);
+
+        return redirect()
+            ->route('core.system-logs.index')
+            ->with('success', __('core/base::general.log_deleted_successfully'));
+    }
+
     private function availableLogFiles(): array
     {
         if (! File::isDirectory(storage_path('logs'))) {

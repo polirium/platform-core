@@ -119,6 +119,10 @@ Route::middleware(['web', 'auth'])
             ->name('system-logs.index')
             ->middleware('can:system-logs.index');
 
+        Route::delete('/system-logs', [SystemLogController::class, 'destroy'])
+            ->name('system-logs.destroy')
+            ->middleware('can:system-logs.delete');
+
         /**
          * Keep-Alive: heartbeat & CSRF token refresh
          */
