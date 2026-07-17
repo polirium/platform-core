@@ -59,6 +59,10 @@ class MenuServiceProvider extends ServiceProvider
                     $item->data('permission', $menuData['permission']);
                 }
 
+                if (! empty($menuData['user_ids'])) {
+                    $item->data('user_ids', $menuData['user_ids']);
+                }
+
                 //Add Sub Menu
                 if (isset($this->tree[$element])) {
                     $this->loopTree($element, $menu);
@@ -95,6 +99,10 @@ class MenuServiceProvider extends ServiceProvider
             // Attach permission data to menu item
             if (! empty($menuData['permission'])) {
                 $item->data('permission', $menuData['permission']);
+            }
+
+            if (! empty($menuData['user_ids'])) {
+                $item->data('user_ids', $menuData['user_ids']);
             }
 
             if (isset($this->tree[$subElement])) {

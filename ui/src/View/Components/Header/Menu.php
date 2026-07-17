@@ -47,14 +47,25 @@ class Menu extends Component
             return collect([]);
         }
 
-        // Super admin can see everything
-        if ($user->super_admin) {
-            return $items;
-        }
-
         $filteredItems = collect([]);
 
         foreach ($items as $item) {
+            // Restrict menu to specific user IDs (applies even for super admin)
+            $userIds = $item->data('user_ids');
+            if (! empty($userIds) && ! in_array((int) $user->id, array_map('intval', (array) $userIds), true)) {
+                continue;
+            }
+
+            // Super admin can see everything else
+            if ($user->super_admin) {
+                if ($item->hasChildren()) {
+                    $this->filterMenuItemsByPermission($item->children());
+                }
+                $filteredItems->push($item);
+
+                continue;
+            }
+
             // Get permission from menu item data
             $permission = $item->data('permission');
 
@@ -91,6 +102,9 @@ class Menu extends Component
             }
 
             if ($hasPermission) {
+                if ($item->hasChildren()) {
+                    $this->filterMenuItemsByPermission($item->children());
+                }
                 $filteredItems->push($item);
             }
         }

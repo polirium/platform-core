@@ -20,6 +20,13 @@
                                     <div class="dropdown-menu-columns">
                                         <div class="dropdown-menu-column">
                                             @foreach ($menu->children() as $children)
+                                                @php
+                                                    $childUserIds = $children->data('user_ids');
+                                                    $childVisible = empty($childUserIds) || in_array((int) auth()->id(), array_map('intval', (array) $childUserIds), true);
+                                                    $childPermission = $children->data('permission');
+                                                    $childAllowed = empty($childPermission) || auth()->user()?->super_admin || auth()->user()?->can($childPermission);
+                                                @endphp
+                                                @continue(! $childVisible || ! $childAllowed)
                                                 @if ($children->hasChildren())
                                                     @include('core/ui::components.header.menu-sub-item', ['menu' => $children])
                                                 @else
