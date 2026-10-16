@@ -11,7 +11,7 @@ class ReadableKeyGenerator implements KeyGenerator
 {
     protected ContextSerializer $serializer;
 
-    public function generate(string $key, Context $context = null): string
+    public function generate(string $key, ?Context $context = null): string
     {
         $key = $this->normalizeKey($key);
 

@@ -19,7 +19,7 @@ class Factory
     {
     }
 
-    public function driver(string $driver = null): Driver
+    public function driver(?string $driver = null): Driver
     {
         return $this->resolveDriver($driver);
     }
@@ -62,7 +62,7 @@ class Factory
         return $this->app['config']["core.settings.config.drivers.{$driver}"];
     }
 
-    protected function resolveDriver(string $driver = null): Driver
+    protected function resolveDriver(?string $driver = null): Driver
     {
         $driver = $driver ?: $this->getDefaultDriver();
 

@@ -7,7 +7,7 @@ use Polirium\Core\Settings\Support\Context;
 
 class DotNotationContextSerializer implements ContextSerializerContract
 {
-    public function serialize(Context $context = null): string
+    public function serialize(?Context $context = null): string
     {
         if (is_null($context)) {
             return '';

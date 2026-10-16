@@ -19,6 +19,7 @@ class InstallCommand extends Command
         'platform/core/base/database/migrations',
         'platform/core/settings/database/migrations',
         'platform/core/media/database/migrations',
+        'platform/packages/vietnam-administrative-units/database/migrations',
     ];
 
     public function handle()
@@ -27,10 +28,12 @@ class InstallCommand extends Command
         $this->normalizeActivityLogMigrations();
 
         $this->components->info('Run core migration first (no module migrations)...');
-        $this->call('migrate', [
+        if ($this->call('migrate', [
             '--path' => self::ROOT_MIGRATION_PATHS,
             '--force' => true,
-        ]);
+        ]) !== self::SUCCESS) {
+            return self::FAILURE;
+        }
 
         $this->components->info('Discover modules...');
         /** @var ModuleManager $moduleManager */
@@ -56,26 +59,42 @@ class InstallCommand extends Command
 
         if (! empty($moduleMigrationPaths)) {
             $this->components->info('Run migrations for active modules...');
-            $this->call('migrate', [
+            if ($this->call('migrate', [
                 '--path' => $moduleMigrationPaths,
                 '--realpath' => true,
                 '--force' => true,
-            ]);
+            ]) !== self::SUCCESS) {
+                return self::FAILURE;
+            }
         } else {
             $this->components->info('No active module migrations to run.');
         }
 
+        $this->components->info('Synchronizing Vietnam administrative units...');
+        if ($this->call('vietnam-units:sync', [
+            '--apply' => true,
+            '--archive-missing' => true,
+        ]) !== self::SUCCESS) {
+            return self::FAILURE;
+        }
+
         if ($this->confirmToProceed('Create a new super user?', true)) {
-            $this->call('poli:user:create');
+            if ($this->call('poli:user:create') !== self::SUCCESS) {
+                return self::FAILURE;
+            }
         }
 
         $this->components->info('Installing ERP Core...');
-        $this->call('vendor:publish', [
+        if ($this->call('vendor:publish', [
             '--provider' => 'Polirium\Core\UI\Providers\UIServiceProvider',
             '--force' => true,
-        ]);
+        ]) !== self::SUCCESS) {
+            return self::FAILURE;
+        }
 
         $this->components->info('Install completed.');
+
+        return self::SUCCESS;
     }
 
     protected function normalizeActivityLogMigrations(): void

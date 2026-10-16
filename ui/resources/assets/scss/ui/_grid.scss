@@ -65,7 +65,7 @@
       $spacers
     )
 {
-  $name-prefixed: if($name == null, null, '-#{$name}');
+  $name-prefixed: if(not sass($name == null): '-#{$name}');
 
   .space-y#{$name-prefixed} {
     display: flex;
@@ -88,7 +88,7 @@
       $spacers
     )
 {
-  $name-prefixed: if($name == null, null, '-#{$name}');
+  $name-prefixed: if(not sass($name == null): '-#{$name}');
 
   .divide-y#{$name-prefixed} {
     > :not(template) ~ :not(template) {

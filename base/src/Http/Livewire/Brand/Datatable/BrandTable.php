@@ -8,12 +8,12 @@ use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
 use Polirium\Core\UI\Facades\Assets;
 use Polirium\Datatable\Button;
 use Polirium\Datatable\Column;
-use Polirium\Datatable\Facades\Rule;
 use Polirium\Datatable\Components\SetUp\Detail;
 use Polirium\Datatable\Components\SetUp\Exportable;
 use Polirium\Datatable\Components\SetUp\Footer;
 use Polirium\Datatable\Components\SetUp\Header;
 use Polirium\Datatable\Facades\Filter;
+use Polirium\Datatable\Facades\Rule;
 use Polirium\Datatable\PowerGridFields;
 
 final class BrandTable extends BaseTable
@@ -136,11 +136,11 @@ final class BrandTable extends BaseTable
     {
         return [
             Rule::button('edit')
-                ->when(fn($row) => !auth()->user()?->can('brands.edit'))
+                ->when(fn ($row) => ! auth()->user()?->can('brands.edit'))
                 ->hide(),
 
             Rule::button('delete')
-                ->when(fn($row) => !auth()->user()?->can('brands.delete'))
+                ->when(fn ($row) => ! auth()->user()?->can('brands.delete'))
                 ->hide(),
         ];
     }

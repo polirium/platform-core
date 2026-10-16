@@ -6,9 +6,10 @@ use Illuminate\Support\Facades\Facade;
 use Polirium\Core\Base\Service\LocationService;
 
 /**
- * @method static getProvinces()
- * @method static getDistricts(int $province_id)
- * @method static getWards(int $district_id)
+ * @method static getProvinces(?int $include_id = null)
+ * @method static getDistricts(int $province_id, ?int $include_id = null)
+ * @method static getWards(int $district_id, ?int $include_id = null)
+ * @method static getWardsByProvince(int $province_id, ?int $include_id = null)
  *
  * @see Polirium\Core\Base\Service\LocationService
  */

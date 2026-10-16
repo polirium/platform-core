@@ -10,35 +10,35 @@ use Polirium\Core\Base\Helpers\BaseHelper;
  * |
  */
 if (! function_exists('platform_path')) {
-    function platform_path(string $path = null): string
+    function platform_path(?string $path = null): string
     {
         return base_path('platform/' . $path);
     }
 }
 
 if (! function_exists('core_path')) {
-    function core_path(string $path = null): string
+    function core_path(?string $path = null): string
     {
         return platform_path('core/' . $path);
     }
 }
 
 if (! function_exists('modules_path')) {
-    function modules_path(string $path = null): string
+    function modules_path(?string $path = null): string
     {
         return platform_path('modules/' . $path);
     }
 }
 
 if (! function_exists('package_path')) {
-    function package_path(string $path = null): string
+    function package_path(?string $path = null): string
     {
         return platform_path('packages/' . $path);
     }
 }
 
 if (! function_exists('admin_prefix')) {
-    function admin_prefix(string $path = null): ?string
+    function admin_prefix(?string $path = null): ?string
     {
         return BaseHelper::getAdminPrefix();
     }
@@ -109,23 +109,30 @@ if (! function_exists('number_to_text')) {
 }
 
 if (! function_exists('get_provinces')) {
-    function get_provinces()
+    function get_provinces(?int $include_id = null)
     {
-        return LocationHelper::getProvinces();
+        return LocationHelper::getProvinces($include_id);
     }
 }
 
 if (! function_exists('get_districts')) {
-    function get_districts(int $province_id)
+    function get_districts(int $province_id, ?int $include_id = null)
     {
-        return LocationHelper::getDistricts($province_id);
+        return LocationHelper::getDistricts($province_id, $include_id);
     }
 }
 
 if (! function_exists('get_wards')) {
-    function get_wards(int $district_id)
+    function get_wards(int $district_id, ?int $include_id = null)
     {
-        return LocationHelper::getWards($district_id);
+        return LocationHelper::getWards($district_id, $include_id);
+    }
+}
+
+if (! function_exists('get_wards_by_province')) {
+    function get_wards_by_province(int $province_id, ?int $include_id = null)
+    {
+        return LocationHelper::getWardsByProvince($province_id, $include_id);
     }
 }
 

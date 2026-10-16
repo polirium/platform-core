@@ -4,16 +4,10 @@
     "private": true,
     "scripts": {
         "dev": "npm run development",
-        "development": "mix",
-        "watch": "mix watch",
+        "development": "node ../../../scripts/build-assets.mjs --core=media",
+        "watch": "node ../../../scripts/build-assets.mjs --watch --core=media",
         "prod": "npm run production",
-        "production": "mix --production"
-    },
-    "devDependencies": {
-        "laravel-mix": "^6.0.49",
-        "resolve-url-loader": "^5.0.0",
-        "sass": "^1.69.5",
-        "sass-loader": "^13.3.2"
+        "production": "node ../../../scripts/build-assets.mjs --production --core=media"
     },
     "dependencies": {
         "cropperjs": "^1.6.2"

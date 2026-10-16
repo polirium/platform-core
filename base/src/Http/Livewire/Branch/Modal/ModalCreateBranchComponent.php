@@ -5,9 +5,7 @@ namespace Polirium\Core\Base\Http\Livewire\Branch\Modal;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Polirium\Core\Base\Http\Models\Branch\Branch;
-use Polirium\Core\Base\Http\Models\District;
 use Polirium\Core\Base\Http\Models\Province;
-use Polirium\Core\Base\Http\Models\Ward;
 
 class ModalCreateBranchComponent extends Component
 {
@@ -40,7 +38,7 @@ class ModalCreateBranchComponent extends Component
 
     public function mount()
     {
-        $this->list['provinces'] = Province::select(['id', 'name'])->pluck('name', 'id')->all();
+        $this->list['provinces'] = Province::where('published', true)->select(['id', 'name'])->pluck('name', 'id')->all();
         $this->list['districts'] = [];
         $this->list['wards'] = [];
         $this->resetInput();
@@ -54,8 +52,8 @@ class ModalCreateBranchComponent extends Component
     public function updatedProvinceId($value)
     {
         if ($value) {
-            $this->list['districts'] = District::select(['id', 'name'])->where('province_id', $value)->pluck('name', 'id')->all();
-            $this->list['wards'] = [];
+            $this->list['districts'] = get_districts($value);
+            $this->list['wards'] = get_wards_by_province($value);
         } else {
             $this->list['districts'] = [];
             $this->list['wards'] = [];
@@ -68,7 +66,7 @@ class ModalCreateBranchComponent extends Component
     public function updatedDistrictId($value)
     {
         if ($value) {
-            $this->list['wards'] = Ward::select(['id', 'name'])->where('district_id', $value)->pluck('name', 'id')->all();
+            $this->list['wards'] = get_wards($value);
         } else {
             $this->list['wards'] = [];
         }
@@ -83,6 +81,9 @@ class ModalCreateBranchComponent extends Component
 
     public function resetInput()
     {
+        $this->list['provinces'] = get_provinces();
+        $this->list['districts'] = [];
+        $this->list['wards'] = [];
         $this->name = '';
         $this->phone = '';
         $this->phone_2 = '';
@@ -99,6 +100,10 @@ class ModalCreateBranchComponent extends Component
     {
         $this->authorize($id ? 'branches.edit' : 'branches.create');
 
+        $this->list['provinces'] = get_provinces();
+        $this->list['districts'] = [];
+        $this->list['wards'] = [];
+
         $this->branch_id = $id;
         if ($id) {
             $branch = Branch::findOrFail($id);
@@ -112,10 +117,9 @@ class ModalCreateBranchComponent extends Component
 
             // Load districts and wards for the existing branch
             if ($branch->province_id) {
-                $this->list['districts'] = District::select(['id', 'name'])->where('province_id', $branch->province_id)->pluck('name', 'id')->all();
-            }
-            if ($branch->district_id) {
-                $this->list['wards'] = Ward::select(['id', 'name'])->where('district_id', $branch->district_id)->pluck('name', 'id')->all();
+                $this->list['provinces'] = get_provinces($branch->province_id);
+                $this->list['districts'] = get_districts($branch->province_id, $branch->district_id);
+                $this->list['wards'] = get_wards_by_province($branch->province_id, $branch->ward_id);
             }
 
             $this->district_id = $branch->district_id;

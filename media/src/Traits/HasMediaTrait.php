@@ -194,7 +194,7 @@ trait HasMediaTrait
      * @param \Spatie\MediaLibrary\MediaCollections\Models\Media|null $media
      * @return void
      */
-    public function registerMediaConversions(\Spatie\MediaLibrary\MediaCollections\Models\Media $media = null): void
+    public function registerMediaConversions(?\Spatie\MediaLibrary\MediaCollections\Models\Media $media = null): void
     {
         $conversions = config('media.image_conversions', []);
 

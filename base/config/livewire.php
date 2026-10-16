@@ -15,9 +15,9 @@ use Polirium\Core\Base\Http\Livewire\Roles\Modal\ModalCreateRoleComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Datatable\UserTable;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalDeleteUserComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalDetailUserComponent;
-use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalUserComponent;
-use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalRestoreUserComponent;
 use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalForceDeleteUserComponent;
+use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalRestoreUserComponent;
+use Polirium\Core\Base\Http\Livewire\Users\Modal\ModalUserComponent;
 
 return [
     /**

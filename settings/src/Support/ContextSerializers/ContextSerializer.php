@@ -7,7 +7,7 @@ use Polirium\Core\Settings\Support\Context;
 
 class ContextSerializer implements ContextSerializerContract
 {
-    public function serialize(Context $context = null): string
+    public function serialize(?Context $context = null): string
     {
         return serialize($context);
     }

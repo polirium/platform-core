@@ -33,7 +33,6 @@
                                 type="tel"
                             />
                         </div>
-
                         <div class="col-12">
                             <x-ui.form.input
                                 wire:model="email"
@@ -65,7 +64,7 @@
                                 :options="$list['provinces']"
                             />
                         </div>
-
+                        @if ($list['districts'] !== [])
                         <div class="col-12">
                             <x-ui.form.select
                                 wire:model.live="district_id"
@@ -74,6 +73,7 @@
                                 :options="$list['districts']"
                             />
                         </div>
+                        @endif
 
                         <div class="col-12">
                             <x-ui.form.select

@@ -3,7 +3,8 @@
 namespace Polirium\Core\Base\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Lavary\Menu\Facade as Menu;
+use Polirium\Core\Base\Menu\MenuBuilder;
+use Polirium\Core\Base\Menu\MenuManager;
 use Polirium\Core\Base\Traits\GetMenuDataTrait;
 
 class MenuServiceProvider extends ServiceProvider
@@ -14,19 +15,13 @@ class MenuServiceProvider extends ServiceProvider
 
     public $tree = [];
 
-    public function __construct()
-    {
-        $this->getMenus = $this->getAvailableMenus();
-        $this->tree = $this->getMenuTree($this->getMenus);
-    }
-
     public function boot()
     {
         $this->getMenus = $this->getAvailableMenus();
         $this->tree = $this->getMenuTree($this->getMenus);
 
         // Always create menu (even if empty) to prevent null errors
-        Menu::make('polirium.core.menu', function ($menu) {
+        $this->app->make(MenuManager::class)->make('polirium.core.menu', function (MenuBuilder $menu) {
             if (empty($this->tree) || empty($this->tree['root'])) {
                 return;
             }
@@ -71,7 +66,7 @@ class MenuServiceProvider extends ServiceProvider
         });
     }
 
-    public function loopTree(string $element, \Lavary\Menu\Builder $menu): void
+    public function loopTree(string $element, MenuBuilder $menu): void
     {
         foreach ($this->tree[$element] as $subKey => $subElement) {
             if (! isset($this->getMenus[$subElement])) {

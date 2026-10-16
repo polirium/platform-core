@@ -2,9 +2,9 @@
 
 namespace Polirium\Core\Base\Http\Models;
 
-use Kjmtrue\VietnamZone\Models\District as ModelsDistrict;
+use Polirium\VietnamAdministrativeUnits\Models\District as BaseDistrict;
 
-class District extends ModelsDistrict
+class District extends BaseDistrict
 {
     protected $table = 'districts';
 

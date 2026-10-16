@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Schema;
 use Polirium\Core\Base\Exceptions\Handler;
 use Polirium\Core\Base\Helpers\Assets;
 use Polirium\Core\Base\Helpers\BaseHelper;
+use Polirium\Core\Base\Menu\MenuManager;
 use Polirium\Core\Base\Service\ModuleManager;
 use Polirium\Core\Settings\Facades\SettingRegistry;
 use Polirium\Core\Support\Providers\PoliriumBaseServiceProvider;
@@ -67,6 +68,7 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
         });
 
         $this->app->singleton(\Polirium\Core\Base\Services\PageTitle::class);
+        $this->app->singleton(MenuManager::class);
 
         // Register Dashboard Widget Registry
         $this->app->singleton('dashboard.widgets', function () {

@@ -5,17 +5,15 @@ namespace Polirium\Core\UI\View\Components\Header;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
-use Lavary\Menu\Facade as MenuFacade;
-use Lavary\Menu\Item;
+use Polirium\Core\Base\Menu\MenuManager;
 
 class Menu extends Component
 {
     /**
      * Create a new component instance.
      */
-    public function __construct()
+    public function __construct(private readonly MenuManager $menus)
     {
-        //
     }
 
     /**
@@ -23,7 +21,7 @@ class Menu extends Component
      */
     public function render(): View|Closure|string
     {
-        $menu = MenuFacade::get('polirium.core.menu');
+        $menu = $this->menus->get('polirium.core.menu');
 
         if (! $menu) {
             $menuItems = collect([]);
@@ -59,7 +57,7 @@ class Menu extends Component
             // Super admin can see everything else
             if ($user->super_admin) {
                 if ($item->hasChildren()) {
-                    $this->filterMenuItemsByPermission($item->children());
+                    $item->setVisibleChildren($this->filterMenuItemsByPermission($item->children()));
                 }
                 $filteredItems->push($item);
 
@@ -75,6 +73,7 @@ class Menu extends Component
                 if ($item->hasChildren()) {
                     // Filter children first
                     $filteredChildren = $this->filterMenuItemsByPermission($item->children());
+                    $item->setVisibleChildren($filteredChildren);
 
                     // Only include parent if it has visible children
                     if ($filteredChildren->count() > 0) {
@@ -103,7 +102,7 @@ class Menu extends Component
 
             if ($hasPermission) {
                 if ($item->hasChildren()) {
-                    $this->filterMenuItemsByPermission($item->children());
+                    $item->setVisibleChildren($this->filterMenuItemsByPermission($item->children()));
                 }
                 $filteredItems->push($item);
             }

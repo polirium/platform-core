@@ -8,9 +8,11 @@
             <div class="mb-3">
                 <x-form::select wire:model.live="branch.province_id" :label="__('core/base::general.city_province')" :options="$list['provinces']" tomselect />
             </div>
+            @if ($list['districts'] !== [])
             <div class="mb-3">
                 <x-form::select wire:model.live="branch.district_id" :label="__('core/base::general.district')" :options="$list['districts']" tomselect />
             </div>
+            @endif
             <div class="mb-3">
                 <x-form::select wire:model="branch.ward_id" :label="__('core/base::general.ward')" :options="$list['wards']" tomselect />
             </div>

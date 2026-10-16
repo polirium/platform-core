@@ -2,9 +2,9 @@
 
 namespace Polirium\Core\Base\Http\Models;
 
-use Kjmtrue\VietnamZone\Models\Province as ModelsProvince;
+use Polirium\VietnamAdministrativeUnits\Models\Province as BaseProvince;
 
-class Province extends ModelsProvince
+class Province extends BaseProvince
 {
     protected $table = 'provinces';
 

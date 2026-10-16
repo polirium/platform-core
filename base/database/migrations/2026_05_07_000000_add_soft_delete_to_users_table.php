@@ -12,7 +12,7 @@ return new class () extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             // Add soft delete column if it doesn't exist
-            if (!Schema::hasColumn('users', 'deleted_at')) {
+            if (! Schema::hasColumn('users', 'deleted_at')) {
                 $table->softDeletes();
             }
         });
