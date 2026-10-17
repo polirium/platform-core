@@ -3,6 +3,7 @@
 namespace Polirium\Core\Base\Widgets;
 
 use Livewire\Component;
+use Polirium\Core\Base\Services\Dashboard\WidgetRegistry;
 
 /**
  * Abstract Widget Base Class
@@ -31,6 +32,15 @@ abstract class AbstractWidget extends Component
      * Widget position Y
      */
     public int $y = 0;
+
+    /**
+     * Runs on every request to the widget: the dashboard only mounts permitted
+     * widgets, and this keeps a widget's data closed to anyone else.
+     */
+    public function boot(): void
+    {
+        abort_unless(WidgetRegistry::allows(auth()->user(), static::getPermissions()), 403);
+    }
 
     /**
      * Get the unique widget ID

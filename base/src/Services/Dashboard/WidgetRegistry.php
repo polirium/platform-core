@@ -85,20 +85,25 @@ class WidgetRegistry
             return [];
         }
 
-        // Super admin gets all widgets
-        if ($user->super_admin ?? false) {
-            return $this->widgets;
+        return collect($this->widgets)
+            ->filter(fn ($widget) => self::allows($user, $widget['permissions'] ?? []))
+            ->all();
+    }
+
+    /**
+     * Whether a user may see a widget that needs any of these permissions.
+     */
+    public static function allows($user, array $permissions): bool
+    {
+        if (! $user) {
+            return false;
         }
 
-        return collect($this->widgets)->filter(function ($widget) use ($user) {
-            // No permission required
-            if (empty($widget['permissions'])) {
-                return true;
-            }
+        if ($user->super_admin ?? false) {
+            return true;
+        }
 
-            // Check if user has any of the required permissions
-            return $user->hasAnyPermission($widget['permissions']);
-        })->all();
+        return empty($permissions) || $user->hasAnyPermission($permissions);
     }
 
     /**

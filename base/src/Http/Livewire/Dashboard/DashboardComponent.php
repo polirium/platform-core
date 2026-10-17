@@ -2,6 +2,7 @@
 
 namespace Polirium\Core\Base\Http\Livewire\Dashboard;
 
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Polirium\Core\Base\Http\Models\UserDashboardLayout;
 
@@ -11,13 +12,21 @@ use Polirium\Core\Base\Http\Models\UserDashboardLayout;
 class DashboardComponent extends Component
 {
     /**
-     * All available widgets (filtered by permission)
+     * Widget sizes offered in the editor (Bootstrap columns).
      */
+    private const WIDTHS = [4, 6, 8, 12];
+
+    /**
+     * All available widgets (filtered by permission). Locked: the browser must
+     * not be able to add widgets or components the user may not see.
+     */
+    #[Locked]
     public array $allWidgets = [];
 
     /**
-     * Widget layout (id, x, y, w, h)
+     * Widget layout (id, x, y, w, h). Locked: changed only by the actions below.
      */
+    #[Locked]
     public array $layout = [];
 
     /**
@@ -78,18 +87,9 @@ class DashboardComponent extends Component
                     ];
                 })->values()->toArray();
 
-            // Clean up orphaned widget records from DB
-            $orphanedIds = collect($savedLayout)
-                ->pluck('widget_id')
-                ->filter(fn ($id) => ! in_array($id, $registeredWidgetIds))
-                ->values()
-                ->toArray();
-
-            if (! empty($orphanedIds)) {
-                foreach ($orphanedIds as $orphanedId) {
-                    UserDashboardLayout::removeWidgetForUser($userId, $orphanedId);
-                }
-            }
+            // Rows for widgets the user may not see now (permission revoked,
+            // module disabled) are kept, so the layout comes back unchanged if
+            // access is restored.
 
             // Auto-append only truly NEW widgets that have never been in user's layout
             // (e.g. a new widget was just registered). Do NOT re-add widgets the user explicitly removed.
@@ -208,6 +208,10 @@ class DashboardComponent extends Component
      */
     public function updateWidgetSize(string $widgetId, int $width): void
     {
+        if (! in_array($width, self::WIDTHS, true)) {
+            return;
+        }
+
         foreach ($this->layout as &$item) {
             if ($item['id'] === $widgetId) {
                 $item['w'] = (int) $width;
@@ -283,6 +287,13 @@ class DashboardComponent extends Component
      */
     public function saveLayout(): void
     {
+        $permitted = array_keys(app('dashboard.widgets')->forUser(auth()->user()));
+        $this->layout = collect($this->layout)
+            ->filter(fn ($item) => in_array($item['id'], $permitted, true))
+            ->map(fn ($item) => [...$item, 'w' => in_array((int) $item['w'], self::WIDTHS, true) ? (int) $item['w'] : 6])
+            ->values()
+            ->all();
+
         UserDashboardLayout::saveLayoutForUser(auth()->id(), $this->layout);
         $this->editMode = false;
 
