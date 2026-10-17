@@ -106,9 +106,21 @@ function onLivewire(callback) {
 }
 
 onLivewire(() => {
-    // Rebuild after the dashboard re-renders (edit mode, add/remove, save, reset).
-    window.Livewire.on('dashboard-grid-refresh', () => {
-        requestAnimationFrame(initDashboardGrid);
+    // Rebuild after the dashboard re-renders (edit mode, add/remove, save,
+    // reset). The microtask runs once Livewire has applied the new HTML;
+    // responses without HTML (grid position updates) leave the grid alone.
+    window.Livewire.hook('commit', ({ component, succeed }) => {
+        succeed(({ effects }) => {
+            if (!effects?.html) {
+                return;
+            }
+
+            queueMicrotask(() => {
+                if (component.el?.querySelector(`#${GRID_ID}`)) {
+                    initDashboardGrid();
+                }
+            });
+        });
     });
 });
 
