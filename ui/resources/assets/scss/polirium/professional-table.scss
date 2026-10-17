@@ -637,3 +637,13 @@
 .page-header .btn-list > .dropdown {
   margin-bottom: 0 !important;
 }
+
+/* Datatable: rows dim while a search, filter, sort or page change loads */
+.power-grid-table > tbody {
+    transition: opacity 0.15s ease;
+}
+
+.power-grid-table.pg-table-loading > tbody {
+    opacity: 0.5;
+    pointer-events: none;
+}
