@@ -8,20 +8,39 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
-                    <a href=".">
-                        <img src="{{ get_logo() }}" width="110" height="32" alt="Tabler" class="navbar-brand-image">
+                    <a href="{{ url(admin_prefix()) }}">
+                        <img src="{{ get_logo() }}" width="110" height="32" alt="{{ config('app.name') }}" class="navbar-brand-image">
                     </a>
                 </h1>
+
+                @auth
+                    {{-- Header search (opens the Ctrl+K dialog) --}}
+                    <button type="button" class="global-search-trigger d-none d-md-flex" data-global-search-open>
+                        {!! tabler_icon('search', ['class' => 'icon']) !!}
+                        <span class="global-search-trigger-text">{{ __('core/base::general.search_trigger') }}</span>
+                        <kbd>Ctrl K</kbd>
+                    </button>
+                @endauth
 
                 <div class="navbar-nav flex-row order-md-last">
                     {{-- Quick Sales Button --}}
                     {{-- Quick Sales Button --}}
-                    <div class="nav-item d-none d-md-flex me-3">
-                        <a href="{{ route('products.payment') }}" class="btn btn-primary">
-                            {!! tabler_icon('shopping-cart', ['class' => 'icon me-1']) !!}
-                            {{ trans('core/base::general.sales') }}
-                        </a>
-                    </div>
+                    @auth
+                        <div class="nav-item d-md-none">
+                            <a href="#" class="nav-link px-2" data-global-search-open aria-label="{{ __('core/base::general.search') }}">
+                                {!! tabler_icon('search', ['class' => 'icon']) !!}
+                            </a>
+                        </div>
+                    @endauth
+
+                    @if (Route::has('products.payment') && auth()->user()?->can('sales.payment.index'))
+                        <div class="nav-item d-none d-md-flex me-3">
+                            <a href="{{ route('products.payment') }}" class="btn btn-primary">
+                                {!! tabler_icon('shopping-cart', ['class' => 'icon me-1']) !!}
+                                {{ trans('core/base::general.sales') }}
+                            </a>
+                        </div>
+                    @endif
 
                     <div class="nav-item d-none d-md-flex me-3">
                         <div class="btn-list">
@@ -117,6 +136,10 @@
         </header>
 
         <x-ui.header::menu />
+
+        @auth
+            @livewire('global-search')
+        @endauth
 
         <div class="page-wrapper">
             <!-- Page header -->

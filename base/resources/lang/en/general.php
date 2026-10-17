@@ -458,4 +458,21 @@ return [
     'sales' => 'Sales',
     'notifications' => 'Notifications',
     'logout' => 'Log Out',
+
+    // Header search
+    'global_search_placeholder' => 'Search pages, products, customers, invoices…',
+    'search' => 'Search',
+    'search_hint' => 'Type to find a page or a record. Accents are optional.',
+    'search_menu_group' => 'Pages',
+    'search_no_results' => 'No results',
+    'search_key_move' => 'move',
+    'search_key_open' => 'open',
+    'search_key_close' => 'close',
+    'search_trigger' => 'Search…',
+    'search_group_products' => 'Products',
+    'search_group_customers' => 'Customers',
+    'search_group_invoices' => 'Invoices',
+    'search_group_vendors' => 'Suppliers',
+    'search_group_projects' => 'Projects',
+    'search_group_tasks' => 'Tasks',
 ];

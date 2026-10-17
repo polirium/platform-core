@@ -66,6 +66,11 @@ return [
         'alias' => 'core/base::branch-table',
         'description' => 'Branch Table',
     ],
+    'global-search' => [
+        'class' => \Polirium\Core\Base\Http\Livewire\GlobalSearchComponent::class,
+        'alias' => 'global-search',
+        'description' => 'Header search (Ctrl+K)',
+    ],
     'switch-branch' => [
         'class' => SwitchBranchComponent::class,
         'alias' => 'switch-branch',

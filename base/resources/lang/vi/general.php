@@ -500,4 +500,21 @@ return [
     'back' => 'Quay lại',
     'optional' => '(không bắt buộc)',
     'delete_confirm' => 'Bạn có chắc chắn muốn xóa?',
+
+    // Header search
+    'global_search_placeholder' => 'Tìm chức năng, hàng hóa, khách hàng, hóa đơn…',
+    'search' => 'Tìm kiếm',
+    'search_hint' => 'Gõ để tìm trang hoặc dữ liệu. Có thể gõ không dấu.',
+    'search_menu_group' => 'Chức năng',
+    'search_no_results' => 'Không tìm thấy kết quả',
+    'search_key_move' => 'chọn',
+    'search_key_open' => 'mở',
+    'search_key_close' => 'đóng',
+    'search_trigger' => 'Tìm kiếm…',
+    'search_group_products' => 'Hàng hóa',
+    'search_group_customers' => 'Khách hàng',
+    'search_group_invoices' => 'Hóa đơn',
+    'search_group_vendors' => 'Nhà cung cấp',
+    'search_group_projects' => 'Dự án',
+    'search_group_tasks' => 'Công việc',
 ];

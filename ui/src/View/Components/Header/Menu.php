@@ -36,7 +36,7 @@ class Menu extends Component
     /**
      * Filter menu items based on user permissions
      */
-    protected function filterMenuItemsByPermission($items): \Illuminate\Support\Collection
+    public function filterMenuItemsByPermission($items): \Illuminate\Support\Collection
     {
         $user = auth()->user();
 

@@ -67,6 +67,7 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
 
         $this->app->singleton(\Polirium\Core\Base\Services\PageTitle::class);
         $this->app->singleton(MenuManager::class);
+        $this->app->singleton(\Polirium\Core\Base\Search\GlobalSearch::class);
 
         // Register Dashboard Widget Registry
         $this->app->singleton('dashboard.widgets', function () {
