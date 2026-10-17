@@ -561,7 +561,9 @@ class Settings
             return $value;
         }
 
-        return rescue(fn () => $this->encrypter->decrypt($value), fn () => $value);
+        // Values saved before encryption was enabled are plain text: use them
+        // as they are, without reporting an error on every read.
+        return rescue(fn () => $this->encrypter->decrypt($value), fn () => $value, report: false);
     }
 
     protected function doNotResetContext(): self
