@@ -517,4 +517,12 @@ return [
     'search_group_vendors' => 'Nhà cung cấp',
     'search_group_projects' => 'Dự án',
     'search_group_tasks' => 'Công việc',
+
+    // Standard buttons
+    'export_excel' => 'Xuất Excel',
+    'delete_selected' => 'Xóa đã chọn',
+    'print' => 'In',
+    'cancel_document' => 'Hủy phiếu',
+    'cancel_document_confirm' => 'Bạn có chắc chắn muốn hủy phiếu này?',
+    'return_goods' => 'Trả hàng',
 ];

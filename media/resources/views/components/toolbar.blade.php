@@ -140,7 +140,7 @@
                     <button type="button"
                             wire:click="emptyTrash"
                             wire:confirm="Xác nhận xóa vĩnh viễn TẤT CẢ file trong thùng rác?"
-                            class="btn btn-danger ms-2"
+                            class="btn btn-outline-danger ms-2"
                             title="Dọn sạch thùng rác">
                         {!! tabler_icon('trash-x', ['class' => 'icon']) !!}
                         <span class="d-none d-md-inline">Dọn sạch</span>

@@ -77,7 +77,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <input type="hidden" name="file" value="{{ $selectedFile }}">
-                                        <button class="btn btn-danger btn-sm" type="submit">
+                                        <button class="btn btn-outline-danger btn-sm" type="submit">
                                             {!! tabler_icon('trash', ['class' => 'icon']) !!}
                                             {{ __('core/base::general.delete_log') }}
                                         </button>

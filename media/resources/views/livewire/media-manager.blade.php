@@ -331,11 +331,11 @@ class="media-manager">
                         {{ count($clipboard) }} {{ __('core/media::media.files_waiting') }}
                     </span>
                     <div class="clipboard-actions">
-                        <x-ui::button color="success" size="sm" icon="clipboard" wire:click="paste">
-                            {{ __('core/media::media.paste_here') }}
-                        </x-ui::button>
                         <x-ui::button color="secondary" size="sm" icon="x" :outline="true" wire:click="clearClipboard">
                             {{ __('core/media::media.cancel') }}
+                        </x-ui::button>
+                        <x-ui::button color="primary" size="sm" icon="clipboard" wire:click="paste">
+                            {{ __('core/media::media.paste_here') }}
                         </x-ui::button>
                     </div>
                 </div>

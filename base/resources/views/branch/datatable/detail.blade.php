@@ -210,10 +210,10 @@
                                 </div>
                                 <div class="professional-address-actions">
                                     @can('branches.edit')
-                                    <x-ui::button color="primary" size="sm" icon="edit"
-                                            wire:click="$dispatch('show-modal-create-branch-taking-address', { branch_id: {{ $id }}, id: {{ $item->id }} })">
-                                        {{ __('core/base::general.edit') }}
-                                    </x-ui::button>
+                                        <x-ui::row-actions>
+                                            <x-ui::action-icon icon="pencil" :label="__('core/base::general.edit')"
+                                                wire:click="$dispatch('show-modal-create-branch-taking-address', { branch_id: {{ $id }}, id: {{ $item->id }} })" />
+                                        </x-ui::row-actions>
                                     @endcan
                                 </div>
                             </div>
@@ -232,26 +232,24 @@
     </div>
 
     {{-- Action Buttons --}}
-    <div class="professional-detail-actions">
+    <x-ui::detail-actions>
         @can('branches.edit')
-        @if ($row->status)
-            <x-ui::button x-show="activeTab === 1" color="danger" size="sm" icon="player-pause" :outline="true"
-                    wire:click="$dispatch('toggleActive', { id: {{ $id }}, status: 0 })">
-                Tắt hoạt động
-            </x-ui::button>
-        @else
-            <x-ui::button x-show="activeTab === 1" color="success" size="sm" icon="check" :outline="true"
-                    wire:click="$dispatch('toggleActive', { id: {{ $id }}, status: 1 })">
-                Bật hoạt động
-            </x-ui::button>
-        @endif
-        @endcan
+            @if ($row->status)
+                <x-ui::button x-show="activeTab === 1" color="secondary" outline size="sm" icon="toggle-right"
+                        wire:click="$dispatch('toggleActive', { id: {{ $id }}, status: 0 })">
+                    {{ __('core/base::general.deactivate') }}
+                </x-ui::button>
+            @else
+                <x-ui::button x-show="activeTab === 1" color="secondary" outline size="sm" icon="toggle-left"
+                        wire:click="$dispatch('toggleActive', { id: {{ $id }}, status: 1 })">
+                    {{ __('core/base::general.activate') }}
+                </x-ui::button>
+            @endif
 
-        @can('branches.edit')
-        <x-ui::button x-show="activeTab === 3" color="primary" icon="plus"
-                wire:click="$dispatch('show-modal-create-branch-taking-address', { branch_id: {{ $id }} })">
-            {{ __('core/base::general.add_address') }}
-        </x-ui::button>
+            <x-ui::button x-show="activeTab === 3" color="primary" size="sm" icon="plus"
+                    wire:click="$dispatch('show-modal-create-branch-taking-address', { branch_id: {{ $id }} })">
+                {{ __('core/base::general.add_address') }}
+            </x-ui::button>
         @endcan
-    </div>
+    </x-ui::detail-actions>
 </div>

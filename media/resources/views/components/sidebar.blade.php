@@ -100,7 +100,7 @@
             <div class="sidebar-actions mt-auto">
                 <div class="d-grid gap-2">
                     <div>
-                        <a href="{{ $selectedMedia->getSecureUrl() }}" target="_blank" class="btn btn-outline-primary w-100" wire:key="action-open-{{ $selectedMedia->id }}">
+                        <a href="{{ $selectedMedia->getSecureUrl() }}" target="_blank" class="btn btn-primary w-100" wire:key="action-open-{{ $selectedMedia->id }}">
                             {!! tabler_icon('external-link', ['class' => 'icon']) !!} {{ __('core/media::media.open_new_tab') }}
                         </a>
                     </div>
@@ -165,7 +165,7 @@
             {{-- Actions --}}
             <div class="sidebar-actions mt-auto">
                 <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-outline-primary w-100" wire:click="navigateToFolder('{{ $selectedFolder['path'] }}')">
+                    <button type="button" class="btn btn-primary w-100" wire:click="navigateToFolder('{{ $selectedFolder['path'] }}')">
                         {!! tabler_icon('folder-open', ['class' => 'icon']) !!} {{ __('core/media::media.open') }}
                     </button>
 

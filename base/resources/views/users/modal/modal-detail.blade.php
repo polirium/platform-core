@@ -88,18 +88,6 @@
 
                                 <!-- Quick Actions -->
                                 <div class="btn-list flex-nowrap">
-                                    @if(auth()->user()->can('users.edit'))
-                                        <x-ui::button
-                                            color="primary"
-                                            size="sm"
-                                            icon="edit"
-                                            :outline="true"
-                                            onclick="Livewire.dispatch('close-modal-detail-user'); Livewire.dispatch('show-modal-edit-user', {id: {{ $user['id'] ?? 0 }}})"
-                                        >
-                                            {{ __('core/base::general.edit') }}
-                                        </x-ui::button>
-                                    @endif
-
                                     @if(auth()->user()->can('users.delete'))
                                         <x-ui::button
                                             color="danger"
@@ -110,6 +98,17 @@
                                             wire:confirm="{{ __('core/base::general.confirm_delete') }}"
                                         >
                                             {{ __('core/base::general.delete') }}
+                                        </x-ui::button>
+                                    @endif
+
+                                    @if(auth()->user()->can('users.edit'))
+                                        <x-ui::button
+                                            color="primary"
+                                            size="sm"
+                                            icon="pencil"
+                                            onclick="Livewire.dispatch('close-modal-detail-user'); Livewire.dispatch('show-modal-edit-user', {id: {{ $user['id'] ?? 0 }}})"
+                                        >
+                                            {{ __('core/base::general.edit') }}
                                         </x-ui::button>
                                     @endif
                                 </div>
@@ -260,7 +259,7 @@
         @endif
 
         <x-slot:footer>
-            <x-ui::button color="secondary" data-bs-dismiss="modal">
+            <x-ui::button color="secondary" ghost data-bs-dismiss="modal">
                 {{ __('core/base::general.close') }}
             </x-ui::button>
         </x-slot:footer>

@@ -26,11 +26,10 @@
                     <h2>{{ __('core/base::general.user_list') }}</h2>
                 </div>
                 <div class="card-actions">
-                    <button type="button" class="btn btn-primary" data-action="show-modal" data-modal="modal-user">
-                        {!! tabler_icon('plus', ['class' => 'icon']) !!}
+                    <x-ui::button type="button" color="primary" icon="plus" data-action="show-modal" data-modal="modal-user">
                         <span class="btn-text">{{ __('core/base::general.add_user') }}</span>
                         <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                    </button>
+                    </x-ui::button>
                 </div>
             </div>
 

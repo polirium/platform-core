@@ -103,37 +103,19 @@
             </div>
 
             <x-slot name="footer">
-                <div class="brand-modal-footer">
-                    <button
-                        type="button"
-                        class="brand-modal-btn brand-btn-cancel"
-                        data-bs-dismiss="modal"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 6L6 18M6 6l12 12"/>
-                        </svg>
-                        {{ __('core/base::general.cancel') }}
-                    </button>
-                    <button
-                        type="submit"
-                        class="brand-modal-btn brand-btn-submit"
-                        wire:loading.attr="disabled"
-                    >
-                        <span wire:loading.remove wire:target="save">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 13l4 4L19 7"/>
-                            </svg>
-                            {{ __('core/base::general.save') }}
-                        </span>
-                        <span wire:loading wire:target="save">
-                            <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                <path d="M12 8v4l3 3"/>
-                            </svg>
-                            {{ __('core/base::general.saving') }}
-                        </span>
-                    </button>
-                </div>
+                <button type="button" class="btn btn-ghost-secondary me-auto" data-bs-dismiss="modal">
+                    {{ __('core/base::general.cancel') }}
+                </button>
+                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                    <span wire:loading.remove wire:target="save">
+                        {!! tabler_icon('device-floppy', ['class' => 'icon']) !!}
+                        {{ __('core/base::general.save') }}
+                    </span>
+                    <span wire:loading wire:target="save">
+                        {!! tabler_icon('loader-2', ['class' => 'icon icon-spin']) !!}
+                        {{ __('core/base::general.saving') }}
+                    </span>
+                </button>
             </x-slot>
         </x-ui::modal>
     </form>

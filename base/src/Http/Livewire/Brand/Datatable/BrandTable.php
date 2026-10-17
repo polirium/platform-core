@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Polirium\Core\Base\Http\Models\Brand\Brand;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
 use Polirium\Core\UI\Facades\Assets;
-use Polirium\Datatable\Button;
+use Polirium\Datatable\ActionButtons;
 use Polirium\Datatable\Column;
 use Polirium\Datatable\Components\SetUp\Detail;
 use Polirium\Datatable\Components\SetUp\Exportable;
@@ -112,24 +112,10 @@ final class BrandTable extends BaseTable
 
     public function actions(Brand $row): array
     {
-        return [
-            Button::add('edit')
-                ->slot(tabler_icon('pencil', ['class' => 'icon']))
-                ->id()
-                ->class('btn btn-primary btn-icon btn-sm me-1')
-                ->attributes(['aria-label' => trans('core/base::general.edit')])
-                ->tooltip(trans('core/base::general.edit'))
-                ->dispatch('show-modal-create-brand', ['id' => $row->id]),
-
-            Button::add('delete')
-                ->slot(tabler_icon('trash', ['class' => 'icon']))
-                ->id()
-                ->class('btn btn-outline-danger btn-icon btn-sm')
-                ->attributes(['aria-label' => trans('core/base::general.delete')])
-                ->tooltip(trans('core/base::general.delete'))
-                ->confirm(trans('core/base::general.delete_confirm'))
-                ->dispatch('deleteBrand', ['id' => $row->id]),
-        ];
+        return ActionButtons::make(
+            ActionButtons::edit('show-modal-create-brand', $row->id),
+            ActionButtons::delete('deleteBrand', $row->id, null, trans('core/base::general.delete_confirm')),
+        );
     }
 
     public function actionRules($row): array

@@ -4,7 +4,7 @@
     $finalClass = $hasContent ? str_replace('btn-icon', '', $class) : $class;
     $finalClass = preg_replace('/\s+/', ' ', trim($finalClass)); // Clean up extra spaces
 @endphp
-<{{ $tag }} {{ $attributes->merge(['class' => $finalClass]) }}>
+<{{ $tag }} @if ($tag === 'a') href="{{ $href }}" @endif {{ $attributes->merge(['class' => $finalClass]) }}>
     @if (! empty($icon))
         {!! tabler_icon($icon, ['class' => 'icon']) !!}
     @endif

@@ -204,3 +204,59 @@
         display: none !important;
     }
 }
+
+/* ============================================
+   STANDARD (1.1): row actions and detail action bar
+   ============================================
+   Row actions: <x-ui::row-actions> with <x-ui::action-icon>, or
+   Polirium\Datatable\ActionButtons in datatables. Icon-only ghost buttons,
+   grey, delete in red; fixed order view, edit, copy, print, other, delete.
+   Detail bar: <x-ui::detail-actions>, destructive actions left, main action
+   (primary) rightmost. */
+
+.row-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.125rem;
+    white-space: nowrap;
+
+    .btn-icon {
+        width: 2rem;
+        height: 2rem;
+        padding: 0;
+    }
+
+    .btn-ghost-secondary {
+        color: var(--tblr-secondary);
+
+        &:hover,
+        &:focus-visible {
+            color: var(--tblr-primary);
+            background: rgba(var(--tblr-primary-rgb), 0.08);
+        }
+    }
+}
+
+.detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--tblr-border-color);
+
+    .detail-actions-start,
+    .detail-actions-end {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-actions-end {
+        margin-left: auto;
+    }
+}

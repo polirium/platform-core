@@ -12,9 +12,9 @@
 
 
             <x-slot name="footer">
-                <button type="button" class="btn me-auto" data-bs-dismiss="modal">{{ trans('core/base::general.cancel') }}</button>
-                <button type="submit" class="btn btn-success">
-                    {!! tabler_icon('rotate-clockwise') !!}
+                <button type="button" class="btn btn-ghost-secondary me-auto" data-bs-dismiss="modal">{{ trans('core/base::general.cancel') }}</button>
+                <button type="submit" class="btn btn-primary">
+                    {!! tabler_icon('restore', ['class' => 'icon']) !!}
                     {{ trans('core/base::general.restore') }}
                 </button>
             </x-slot>

@@ -22,8 +22,11 @@
             </div>
 
             <x-slot name="footer">
-                <button type="submit" class="btn btn-success">
-                    {{ tabler_icon('device-floppy') }}
+                <button type="button" class="btn btn-ghost-secondary me-auto" data-bs-dismiss="modal">
+                    {{ __('core/base::general.cancel') }}
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    {!! tabler_icon('device-floppy', ['class' => 'icon']) !!}
                     {{ __('core/base::general.save') }}
                 </button>
             </x-slot>

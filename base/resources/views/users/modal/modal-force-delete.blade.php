@@ -13,9 +13,9 @@
 
 
             <x-slot name="footer">
-                <button type="button" class="btn me-auto" data-bs-dismiss="modal">{{ trans('core/base::general.cancel') }}</button>
+                <button type="button" class="btn btn-ghost-secondary me-auto" data-bs-dismiss="modal">{{ trans('core/base::general.cancel') }}</button>
                 <button type="submit" class="btn btn-danger">
-                    {!! tabler_icon('trash-x') !!}
+                    {!! tabler_icon('trash-x', ['class' => 'icon']) !!}
                     {{ trans('core/base::general.permanent_delete') }}
                 </button>
             </x-slot>

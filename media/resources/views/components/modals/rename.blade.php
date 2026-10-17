@@ -22,11 +22,12 @@
                     />
                 </div>
                 <div class="modal-footer">
-                    <x-ui::button color="secondary" wire:click="$set('showRenameModal', false')">
+                    <button type="button" class="btn btn-ghost-secondary me-auto" wire:click="$set('showRenameModal', false)">
                         {{ __('core/media::media.cancel') }}
-                    </x-ui::button>
-                    <x-ui::button color="primary" wire:click="renameItem" wire:loading.attr="disabled">
+                    </button>
+                    <x-ui::button type="button" color="primary" wire:click="renameItem" wire:loading.attr="disabled">
                         <span wire:loading.remove wire:target="renameItem">
+                            {!! tabler_icon('device-floppy', ['class' => 'icon']) !!}
                             {{ __('core/media::media.save') }}
                         </span>
                         <span wire:loading wire:target="renameItem">

@@ -132,8 +132,8 @@
         </form>
 
         <x-slot:footer>
-            <div class="d-flex justify-content-end gap-2">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="d-flex w-100 gap-2">
+                <button type="button" class="btn btn-ghost-secondary me-auto" data-bs-dismiss="modal">
                     {{ __('core/base::general.cancel') }}
                 </button>
                 <button type="button" class="btn btn-primary" onclick="document.getElementById('role-form-submit').click()">

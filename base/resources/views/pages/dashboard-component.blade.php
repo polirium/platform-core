@@ -13,28 +13,23 @@
                 </div>
                 <div class="col-auto d-flex gap-2">
                     @if($editMode)
-                        <button wire:click="cancelEdit" class="btn btn-ghost-secondary">
-                            <x-tabler-icons::x class="icon" />
-                            {{ __('core/base::general.cancel') }}
-                        </button>
-                        <button wire:click="saveLayout" class="btn btn-primary">
-                            <x-tabler-icons::device-floppy class="icon" />
-                            {{ __('core/base::general.save_layout') }}
-                        </button>
-                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="offcanvas" data-bs-target="#widgetPanel">
-                            <x-tabler-icons::plus class="icon" />
-                            {{ __('core/base::general.add_widget') }}
-                        </button>
-                        <button type="button" class="btn btn-ghost-danger" wire:click="resetLayout"
+                        <x-ui::button type="button" color="danger" outline icon="restore" wire:click="resetLayout"
                                 wire:confirm="{{ __('core/base::general.reset_layout_confirm') }}">
-                            <x-tabler-icons::restore class="icon" />
                             {{ __('core/base::general.reset_layout') }}
-                        </button>
+                        </x-ui::button>
+                        <x-ui::button type="button" color="secondary" ghost icon="x" wire:click="cancelEdit">
+                            {{ __('core/base::general.cancel') }}
+                        </x-ui::button>
+                        <x-ui::button type="button" color="secondary" outline icon="plus" data-bs-toggle="offcanvas" data-bs-target="#widgetPanel">
+                            {{ __('core/base::general.add_widget') }}
+                        </x-ui::button>
+                        <x-ui::button type="button" color="primary" icon="device-floppy" wire:click="saveLayout">
+                            {{ __('core/base::general.save_layout') }}
+                        </x-ui::button>
                     @else
-                        <button wire:click="toggleEditMode" class="btn btn-outline-primary">
-                            <x-tabler-icons::settings class="icon" />
+                        <x-ui::button type="button" color="secondary" outline icon="settings" wire:click="toggleEditMode">
                             {{ __('core/base::general.customize') }}
-                        </button>
+                        </x-ui::button>
                     @endif
                 </div>
             </div>

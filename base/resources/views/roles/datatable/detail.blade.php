@@ -119,22 +119,6 @@
                 </small>
             </div>
         </div>
-
-        <div class="role-detail-actions">
-            @can('roles.edit')
-                <x-ui::button color="primary" size="sm" icon="edit"
-                        wire:click="$dispatch('show-modal-create-role', { id: {{ $row->id }} })">
-                    {{ trans('core/base::general.edit') }}
-                </x-ui::button>
-            @endcan
-            @can('roles.delete')
-                <x-ui::button color="danger" size="sm" icon="trash"
-                        wire:click="$dispatch('show-modal-delete-role', { id: {{ $row->id }} })"
-                        wire:confirm="{{ trans('core/base::general.delete_role_confirm') }}">
-                    {{ trans('core/base::general.delete') }}
-                </x-ui::button>
-            @endcan
-        </div>
     </div>
 
     {{-- Permission Tree --}}
@@ -200,4 +184,23 @@
             <p>{{ trans('core/base::general.no_permissions_assigned') }}</p>
         </div>
     @endif
+
+    {{-- Actions --}}
+    <x-ui::detail-actions>
+        <x-slot:start>
+            @can('roles.delete')
+                <x-ui::button color="danger" outline size="sm" icon="trash"
+                        wire:click="$dispatch('show-modal-delete-role', { id: {{ $row->id }} })"
+                        wire:confirm="{{ trans('core/base::general.delete_role_confirm') }}">
+                    {{ trans('core/base::general.delete') }}
+                </x-ui::button>
+            @endcan
+        </x-slot:start>
+        @can('roles.edit')
+            <x-ui::button color="primary" size="sm" icon="pencil"
+                    wire:click="$dispatch('show-modal-create-role', { id: {{ $row->id }} })">
+                {{ trans('core/base::general.edit') }}
+            </x-ui::button>
+        @endcan
+    </x-ui::detail-actions>
 </div>

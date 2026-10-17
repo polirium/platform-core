@@ -26,13 +26,13 @@
                         >
                     </div>
                 </div>
-                <div class="modal-footer border-0 justify-content-center pb-4">
-                    <button type="button" class="btn btn-ghost-secondary px-4 me-2" wire:click="$set('showCreateFolderModal', false')">
+                <div class="modal-footer border-0 pb-4">
+                    <button type="button" class="btn btn-ghost-secondary me-auto" wire:click="$set('showCreateFolderModal', false)">
                         {{ __('core/media::media.cancel') }}
                     </button>
-                    <button type="button" class="btn btn-primary px-5 rounded-pill" wire:click="createFolder" wire:loading.attr="disabled">
+                    <button type="button" class="btn btn-primary" wire:click="createFolder" wire:loading.attr="disabled">
                         <span wire:loading.remove wire:target="createFolder">
-                            {!! tabler_icon('plus', ['class' => 'icon me-2']) !!} {{ __('core/media::media.create') }}
+                            {!! tabler_icon('plus', ['class' => 'icon']) !!} {{ __('core/media::media.create') }}
                         </span>
                         <div wire:loading wire:target="createFolder" class="spinner-border spinner-border-sm text-white" role="status"></div>
                     </button>

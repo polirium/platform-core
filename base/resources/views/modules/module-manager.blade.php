@@ -21,14 +21,12 @@
         </div>
         <div class="d-flex align-items-center gap-2">
             @can('modules.manage')
-            <button class="btn btn-primary" wire:click="$dispatch('open-upload-modal')">
-                {!! tabler_icon('upload', ['class' => 'icon']) !!}
-                {{ trans('core/base::general.upload_module') }}
-            </button>
-            <button class="btn btn-dark" wire:click="discover">
-                {!! tabler_icon('refresh', ['class' => 'icon']) !!}
+            <x-ui::button type="button" color="secondary" outline icon="refresh" wire:click="discover">
                 {{ trans('core/base::general.refresh') }}
-            </button>
+            </x-ui::button>
+            <x-ui::button type="button" color="primary" icon="upload" wire:click="$dispatch('open-upload-modal')">
+                {{ trans('core/base::general.upload_module') }}
+            </x-ui::button>
             @endcan
         </div>
     </div>
@@ -293,8 +291,8 @@
                 </ul>
             </div>
 
-            <div class="d-flex justify-content-end gap-2">
-                <button type="button" class="btn btn-ghost-secondary" data-bs-dismiss="modal">{{ trans('core/base::general.cancel') }}</button>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-ghost-secondary me-auto" data-bs-dismiss="modal">{{ trans('core/base::general.cancel') }}</button>
                 <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
                     <span wire:loading wire:target="uploadModule" class="spinner-border spinner-border-sm me-1"></span>
                     {{ trans('core/base::general.upload_install') }}

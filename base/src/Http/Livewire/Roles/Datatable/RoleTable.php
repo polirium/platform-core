@@ -7,7 +7,7 @@ use Polirium\Core\Base\Http\Models\Role;
 use Polirium\Core\Base\Traits\GetPermission;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
 use Polirium\Core\UI\Facades\Assets;
-use Polirium\Datatable\Button;
+use Polirium\Datatable\ActionButtons;
 use Polirium\Datatable\Column;
 use Polirium\Datatable\Components\SetUp\Exportable;
 use Polirium\Datatable\Facades\PowerGrid;
@@ -127,27 +127,11 @@ final class RoleTable extends BaseTable
 
     public function actions(Role $row): array
     {
-        $actions = [];
-
-        if (auth()->user()->can('roles.edit')) {
-            $actions[] = Button::add('edit')
-                ->slot(tabler_icon('pencil', ['class' => 'icon']))
-                ->class('btn btn-primary btn-icon btn-sm me-1')
-                ->attributes(['aria-label' => trans('core/base::general.edit')])
-                ->tooltip(trans('core/base::general.edit'))
-                ->dispatch('show-modal-create-role', ['id' => $row->id]);
-        }
-
-        if (auth()->user()->can('roles.delete')) {
-            $actions[] = Button::add('delete')
-                ->slot(tabler_icon('trash', ['class' => 'icon']))
-                ->class('btn btn-outline-danger btn-icon btn-sm')
-                ->attributes(['aria-label' => trans('core/base::general.delete')])
-                ->tooltip(trans('core/base::general.delete'))
-                ->dispatch('show-modal-delete-role', ['id' => $row->id]);
-        }
-
-        return $actions;
+        return ActionButtons::make(
+            ActionButtons::edit('show-modal-create-role', $row->id, 'roles.edit'),
+            ActionButtons::custom('delete', 'trash', trans('core/base::general.delete'), true, 'roles.delete')
+                ?->dispatch('show-modal-delete-role', ['id' => $row->id]),
+        );
     }
 
     public function actionRules($row): array

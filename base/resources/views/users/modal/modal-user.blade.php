@@ -238,7 +238,7 @@
             </div>
 
             <x-slot name="footer">
-                <button type="button" class="btn btn-ghost-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-ghost-secondary me-auto" data-bs-dismiss="modal">
                     {{ __('core/base::general.cancel') }}
                 </button>
                 <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">

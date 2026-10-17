@@ -475,4 +475,17 @@ return [
     'search_group_vendors' => 'Suppliers',
     'search_group_projects' => 'Projects',
     'search_group_tasks' => 'Tasks',
+
+    // Standard buttons
+    'export_excel' => 'Export Excel',
+    'delete_selected' => 'Delete selected',
+    'print' => 'Print',
+    'cancel_document' => 'Cancel document',
+    'cancel_document_confirm' => 'Are you sure you want to cancel this document?',
+    'return_goods' => 'Return',
+    'import_excel' => 'Import Excel',
+    'add_new' => 'Add new',
+    'delete_confirm' => 'Are you sure you want to delete?',
+    'clear_filter' => 'Clear filter',
+    'close' => 'Close',
 ];

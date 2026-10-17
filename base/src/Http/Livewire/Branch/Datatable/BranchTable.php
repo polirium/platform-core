@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Polirium\Core\Base\Http\Models\Branch\Branch;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
 use Polirium\Core\UI\Facades\Assets;
-use Polirium\Datatable\Button;
+use Polirium\Datatable\ActionButtons;
 use Polirium\Datatable\Column;
 use Polirium\Datatable\Components\SetUp\Exportable;
 use Polirium\Datatable\Facades\Filter;
@@ -113,32 +113,14 @@ final class BranchTable extends BaseTable
 
     public function actions(Branch $row): array
     {
-        $actions = [];
-
-        // Edit button
-        $actions[] = Button::add('edit')
-            ->slot(tabler_icon('pencil', ['class' => 'icon']))
-            ->id()
-            ->class('btn btn-primary btn-icon btn-sm me-1')
-            ->attributes(['aria-label' => trans('core/base::general.edit')])
-            ->tooltip(trans('core/base::general.edit'))
-            ->dispatch('show-modal-create-branch', ['id' => $row->id]);
-
-        // Toggle status button - shows action to take (opposite of current status)
-        // If active → show pause icon (to deactivate), if inactive → show play icon (to activate)
-        $toggleIcon = $row->status ? 'player-pause' : 'player-play';
-        $toggleColor = $row->status ? 'warning' : 'success';
+        // Toggle status: the icon shows the current state, the label the action to take.
         $toggleLabel = $row->status ? trans('core/base::general.deactivate') : trans('core/base::general.activate');
-        // Changed from btn-ghost-* to btn-outline-* for visibility
-        $actions[] = Button::add('toggle-status')
-            ->slot(tabler_icon($toggleIcon, ['class' => 'icon', 'width' => 16, 'height' => 16]))
-            ->id()
-            ->class('btn btn-outline-' . $toggleColor . ' btn-icon btn-sm')
-            ->attributes(['aria-label' => $toggleLabel, 'title' => $toggleLabel])
-            ->tooltip($toggleLabel)
-            ->dispatch('toggleActive', ['id' => $row->id, 'status' => $row->status ? 0 : 1]);
 
-        return $actions;
+        return ActionButtons::make(
+            ActionButtons::edit('show-modal-create-branch', $row->id),
+            ActionButtons::custom('toggle', $row->status ? 'toggle-right' : 'toggle-left', $toggleLabel)
+                ->dispatch('toggleActive', ['id' => $row->id, 'status' => $row->status ? 0 : 1]),
+        );
     }
 
     /*

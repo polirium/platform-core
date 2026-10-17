@@ -76,13 +76,14 @@ class Button extends PoliriumComponent
             'icon' => $this->icon,
             'label' => $this->label,
             'tag' => $this->checkButtonOrATag(),
+            'href' => $this->href,
         ]);
     }
 
     public function checkButtonOrATag(): string
     {
         if (! empty($this->href)) {
-            return "a href={$this->href}";
+            return 'a';
         }
 
         return 'button';

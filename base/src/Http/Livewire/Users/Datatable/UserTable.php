@@ -9,7 +9,7 @@ use Livewire\Attributes\On;
 use Polirium\Core\Base\Http\Models\Role;
 use Polirium\Core\Base\Http\Models\User;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
-use Polirium\Datatable\Button;
+use Polirium\Datatable\ActionButtons;
 use Polirium\Datatable\Column;
 use Polirium\Datatable\Components\SetUp\Exportable;
 use Polirium\Datatable\Facades\Filter;
@@ -192,82 +192,36 @@ final class UserTable extends BaseTable
 
     public function actions(User $row): array
     {
-        $actions = [];
-
-        // Detail action
-        $actions[] = Button::add('detail')
-            ->slot(tabler_icon('eye', ['class' => 'icon']))
-            ->id()
-            ->class('btn btn-info btn-icon btn-sm me-1')
-            ->attributes([
-                'onclick' => "Livewire.dispatch('show-modal-detail-user', {id: {$row->id}});",
-                'title' => trans('core/base::general.details'),
-            ])
-            ->tooltip(trans('core/base::general.details'));
+        // Every action opens its own modal (delete/restore/force delete confirm there).
+        $modal = fn (string $event): array => ['onclick' => "Livewire.dispatch('{$event}', {id: {$row->id}});"];
 
         if ($this->tab === 'active') {
-            // For active users: edit and delete
-            if (auth()->user()->can('users.edit')) {
-                $actions[] = Button::add('edit')
-                    ->slot(tabler_icon('pencil', ['class' => 'icon']))
-                    ->id()
-                    ->class('btn btn-primary btn-icon btn-sm me-1')
-                    ->attributes([
-                        'onclick' => "Livewire.dispatch('show-modal-edit-user', {id: {$row->id}});",
-                        'title' => trans('core/base::general.edit'),
-                    ])
-                    ->tooltip(trans('core/base::general.edit'));
-            }
+            // For active users: view, edit, impersonate and delete
+            $canImpersonate = auth()->user()->can('users.impersonate') && $row->id !== auth()->id() && $row->canBeImpersonated();
 
-            if (auth()->user()->can('users.delete')) {
-                $actions[] = Button::add('delete')
-                    ->slot(tabler_icon('trash', ['class' => 'icon']))
-                    ->id()
-                    ->class('btn btn-outline-danger btn-icon btn-sm me-1')
-                    ->attributes([
-                        'onclick' => "Livewire.dispatch('show-modal-delete-user', {id: {$row->id}});",
-                        'title' => trans('core/base::general.delete'),
-                    ])
-                    ->tooltip(trans('core/base::general.delete'));
-            }
-
-            if (auth()->user()->can('users.impersonate') && $row->id !== auth()->id() && $row->canBeImpersonated()) {
-                $actions[] = Button::add('impersonate')
-                    ->slot(tabler_icon('login', ['class' => 'icon']))
-                    ->id()
-                    ->class('btn btn-warning btn-icon btn-sm')
-                    ->route('impersonate', ['id' => $row->id])
-                    ->attributes(['title' => trans('core/base::general.login')])
-                    ->tooltip(trans('core/base::general.login'));
-            }
-        } else {
-            // For deleted users: restore and permanently delete
-            if (auth()->user()->can('users.edit')) {
-                $actions[] = Button::add('restore')
-                    ->slot(tabler_icon('rotate-clockwise', ['class' => 'icon']))
-                    ->id()
-                    ->class('btn btn-success btn-icon btn-sm me-1')
-                    ->attributes([
-                        'onclick' => "Livewire.dispatch('show-modal-restore-user', {id: {$row->id}});",
-                        'title' => trans('core/base::general.restore'),
-                    ])
-                    ->tooltip(trans('core/base::general.restore'));
-            }
-
-            if (auth()->user()->can('users.delete')) {
-                $actions[] = Button::add('force-delete')
-                    ->slot(tabler_icon('trash-x', ['class' => 'icon']))
-                    ->id()
-                    ->class('btn btn-danger btn-icon btn-sm me-1')
-                    ->attributes([
-                        'onclick' => "Livewire.dispatch('show-modal-force-delete-user', {id: {$row->id}});",
-                        'title' => trans('core/base::general.permanent_delete'),
-                    ])
-                    ->tooltip(trans('core/base::general.permanent_delete'));
-            }
+            return ActionButtons::make(
+                ActionButtons::custom('view', 'eye', trans('core/base::general.details'))
+                    ->attributes($modal('show-modal-detail-user')),
+                ActionButtons::custom('edit', 'pencil', trans('core/base::general.edit'), false, 'users.edit')
+                    ?->attributes($modal('show-modal-edit-user')),
+                $canImpersonate
+                    ? ActionButtons::custom('impersonate', 'user-share', trans('core/base::general.login'))
+                        ->route('impersonate', ['id' => $row->id])
+                    : null,
+                ActionButtons::custom('delete', 'trash', trans('core/base::general.delete'), true, 'users.delete')
+                    ?->attributes($modal('show-modal-delete-user')),
+            );
         }
 
-        return $actions;
+        // For deleted users: view, restore and permanently delete
+        return ActionButtons::make(
+            ActionButtons::custom('view', 'eye', trans('core/base::general.details'))
+                ->attributes($modal('show-modal-detail-user')),
+            ActionButtons::custom('restore', 'restore', trans('core/base::general.restore'), false, 'users.edit')
+                ?->attributes($modal('show-modal-restore-user')),
+            ActionButtons::custom('force-delete', 'trash-x', trans('core/base::general.permanent_delete'), true, 'users.delete')
+                ?->attributes($modal('show-modal-force-delete-user')),
+        );
     }
 
     public function actionRules($row): array
