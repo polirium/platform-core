@@ -267,16 +267,45 @@ class ModuleManager
     }
 
     /**
+     * Names of active modules, or null when there is no modules table or no
+     * usable database yet (fresh installation, unreachable server).
+     *
+     * @return list<string>|null
+     */
+    public static function activeModuleNames(): ?array
+    {
+        try {
+            if (! \Schema::hasTable('modules')) {
+                return null;
+            }
+
+            return Module::active()->pluck('name')->all();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
      * Load all active modules.
      */
     public function loadActiveModules(): void
     {
-        // Check if table exists
-        if (! \Schema::hasTable('modules')) {
+        // A fresh installation has no database yet (no .env, or an unreachable
+        // server): boot without modules so the web installer can run.
+        try {
+            if (! \Schema::hasTable('modules')) {
+                return;
+            }
+
+            $activeModules = $this->getActive();
+        } catch (\Throwable $exception) {
+            // Expected before installation; afterwards it is a real outage.
+            if (is_file(storage_path('installed'))) {
+                report($exception);
+            }
+
             return;
         }
-
-        $activeModules = $this->getActive();
 
         foreach ($activeModules as $module) {
             $this->loadModule($module);

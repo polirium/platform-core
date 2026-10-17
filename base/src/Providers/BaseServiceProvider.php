@@ -50,11 +50,9 @@ class BaseServiceProvider extends PoliriumBaseServiceProvider
         // Register base settings
         $this->registerSettings();
 
-        // Only load modules when modules table exists and module is active.
-        // This prevents loading all module migrations/providers during first install.
-        if (Schema::hasTable('modules')) {
-            $this->app->make(ModuleManager::class)->loadActiveModules();
-        }
+        // Only load modules when the modules table exists and a module is active;
+        // loadActiveModules() also copes with no database yet (first install).
+        $this->app->make(ModuleManager::class)->loadActiveModules();
     }
 
     public function register()

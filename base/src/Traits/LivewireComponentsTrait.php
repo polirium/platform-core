@@ -23,12 +23,9 @@ trait LivewireComponentsTrait
     {
         $components = [];
 
-        $activeModules = [];
-        $checkActive = $type === 'modules' && \Illuminate\Support\Facades\Schema::hasTable('modules');
-
-        if ($checkActive) {
-            $activeModules = \Polirium\Core\Base\Http\Models\Module::active()->pluck('name')->all();
-        }
+        // Without a modules table (or a database at all, on first install) every module is listed.
+        $activeModules = $type === 'modules' ? \Polirium\Core\Base\Service\ModuleManager::activeModuleNames() : null;
+        $checkActive = $activeModules !== null;
 
         foreach (BaseHelper::scanFolder(platform_path($type)) as $module) {
             if ($checkActive && ! in_array($module, $activeModules)) {
