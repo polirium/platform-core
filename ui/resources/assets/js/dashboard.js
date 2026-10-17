@@ -23,7 +23,21 @@ function destroyGrid() {
     observers = [];
 
     if (grid) {
-        grid.destroy(false);
+        const el = grid.el;
+
+        // Livewire has usually re-rendered the grid already and removed the
+        // handles gridstack added; gridstack then fails to remove them itself.
+        try {
+            grid.destroy(false);
+        } catch {
+            // ignore: the grid is rebuilt from the fresh markup below
+        }
+
+        if (el) {
+            delete el.gridstack;
+            el.querySelectorAll('.ui-resizable-handle').forEach((handle) => handle.remove());
+        }
+
         grid = null;
     }
 }
