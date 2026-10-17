@@ -3,6 +3,7 @@
     wire:ignore.self
     x-data="{
         open: false,
+        openedAt: 0,
         q: '',
         active: 0,
         menu: @js($menuItems),
@@ -37,13 +38,14 @@
         },
         show() {
             this.open = true;
+            this.openedAt = Date.now();
             this.$nextTick(() => { this.$refs.input.focus(); this.$refs.input.select(); this.highlight(); });
         },
         hide() {
             this.open = false;
         },
         hotkey(event) {
-            const typing = event.target.closest('input, textarea, select, [contenteditable]');
+            const typing = event.target?.closest?.('input, textarea, select, [contenteditable]');
             if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
                 event.preventDefault();
                 this.open ? this.hide() : this.show();
@@ -57,7 +59,7 @@
     x-on:click.window="if ($event.target.closest('[data-global-search-open]')) { $event.preventDefault(); show(); }"
     x-init="$watch('q', () => { active = 0; $nextTick(() => highlight()); }); Livewire.hook('morph.updated', () => $nextTick(() => highlight()))"
 >
-    <div class="global-search-backdrop" x-show="open" x-transition.opacity x-on:click="hide()" style="display: none"></div>
+    <div class="global-search-backdrop" x-show="open" x-transition.opacity x-on:click="if (Date.now() - openedAt > 300) hide()" style="display: none"></div>
 
     <div class="global-search-dialog" x-show="open" x-transition role="dialog" aria-modal="true"
          aria-label="{{ __('core/base::general.search') }}" x-on:keydown.escape.prevent="hide()" style="display: none">
