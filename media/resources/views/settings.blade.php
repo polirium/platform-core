@@ -1,8 +1,4 @@
-@extends('core/ui::layouts.admin')
-
-@section('title', __('core/media::media.settings'))
-
-@section('content')
+<x-ui.layouts::app>
 <div class="container-xl">
     <div class="page-header mb-4">
         <div class="row align-items-center">
@@ -23,4 +19,4 @@
 
     <livewire:core/media::media-settings />
 </div>
-@endsection
+</x-ui.layouts::app>
