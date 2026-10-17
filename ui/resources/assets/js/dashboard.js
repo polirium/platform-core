@@ -1,40 +1,108 @@
 /**
- * Dashboard Widget Sortable
- * Handles drag & drop functionality for dashboard widgets in edit mode
+ * Dashboard widget grid (gridstack.js).
+ *
+ * The server renders every widget with its gs-x/gs-y/gs-w attributes. The grid
+ * is (re)built after each dashboard render: static in view mode, draggable and
+ * resizable (width) in edit mode. Heights follow the widget content. Changes
+ * are sent to the dashboard component, which saves them on "Save layout".
  */
 
-let sortableInstance = null;
+let grid = null;
+let observers = [];
 
-function initWidgetSortable() {
-    const container = document.getElementById('widget-sortable-container');
-    const dashboardContainer = document.querySelector('.dashboard-container');
-    const isEditMode = dashboardContainer?.dataset.editMode === 'true';
+const GRID_ID = 'dashboard-grid';
 
-    if (!container) return;
+function dashboardComponent(el) {
+    const root = el.closest('[wire\\:id]');
 
-    // Destroy existing sortable if any
-    if (sortableInstance) {
-        sortableInstance.destroy();
-        sortableInstance = null;
+    return root && window.Livewire ? window.Livewire.find(root.getAttribute('wire:id')) : null;
+}
+
+function destroyGrid() {
+    observers.forEach((observer) => observer.disconnect());
+    observers = [];
+
+    if (grid) {
+        grid.destroy(false);
+        grid = null;
+    }
+}
+
+function fitToContent(item) {
+    if (grid && item.gridstackNode) {
+        grid.resizeToContent(item);
+    }
+}
+
+function initDashboardGrid() {
+    destroyGrid();
+
+    const el = document.getElementById(GRID_ID);
+
+    if (!el || typeof window.GridStack === 'undefined') {
+        return;
     }
 
-    // Only init sortable in edit mode
-    if (!isEditMode) return;
+    const editing = el.closest('.dashboard-container')?.dataset.editMode === 'true';
 
-    sortableInstance = new Sortable(container, {
-        animation: 150,
+    grid = window.GridStack.init({
+        column: 12,
+        cellHeight: 16,
+        margin: 8,
+        float: false,
+        animate: true,
+        sizeToContent: true,
+        staticGrid: !editing,
         handle: '.widget-drag-handle',
-        draggable: '.widget-sortable-item',
-        ghostClass: 'sortable-ghost',
-        chosenClass: 'sortable-chosen',
-        onEnd: function (evt) {
-            const items = Array.from(container.querySelectorAll('.widget-sortable-item')).map(el => ({
-                value: el.dataset.id
-            }));
-            Livewire.find(dashboardContainer.closest('[wire\\:id]')?.getAttribute('wire:id'))?.call('updateOrder', items);
+        resizable: { handles: 'e,w' },
+        columnOpts: { breakpoints: [{ w: 768, c: 1 }] },
+    }, el);
+
+    // Widgets load data and change height (pagination, period switch): keep
+    // each grid cell as tall as its content.
+    el.querySelectorAll('.grid-stack-item').forEach((item) => {
+        const content = item.querySelector('.dashboard-widget');
+
+        if (!content || typeof ResizeObserver === 'undefined') {
+            return;
         }
+
+        const observer = new ResizeObserver(() => fitToContent(item));
+        observer.observe(content);
+        observers.push(observer);
+    });
+
+    grid.on('change', () => {
+        // The one-column phone layout is derived, never saved.
+        if (!editing || grid.getColumn() !== 12) {
+            return;
+        }
+
+        const items = grid.save(false).map(({ id, x, y, w, h }) => ({ id, x, y, w, h }));
+        dashboardComponent(el)?.call('updateGrid', items);
     });
 }
 
-// Export for external use
-window.initWidgetSortable = initWidgetSortable;
+function onLivewire(callback) {
+    if (window.Livewire) {
+        callback();
+    } else {
+        document.addEventListener('livewire:init', callback, { once: true });
+    }
+}
+
+onLivewire(() => {
+    // Rebuild after the dashboard re-renders (edit mode, add/remove, save, reset).
+    window.Livewire.on('dashboard-grid-refresh', () => {
+        requestAnimationFrame(initDashboardGrid);
+    });
+});
+
+document.addEventListener('livewire:initialized', initDashboardGrid);
+document.addEventListener('livewire:navigated', initDashboardGrid);
+
+if (document.readyState !== 'loading') {
+    requestAnimationFrame(initDashboardGrid);
+}
+
+window.initDashboardGrid = initDashboardGrid;

@@ -25,6 +25,11 @@
                             <x-tabler-icons::plus class="icon" />
                             {{ __('core/base::general.add_widget') }}
                         </button>
+                        <button type="button" class="btn btn-ghost-danger" wire:click="resetLayout"
+                                wire:confirm="{{ __('core/base::general.reset_layout_confirm') }}">
+                            <x-tabler-icons::restore class="icon" />
+                            {{ __('core/base::general.reset_layout') }}
+                        </button>
                     @else
                         <button wire:click="toggleEditMode" class="btn btn-outline-primary">
                             <x-tabler-icons::settings class="icon" />
@@ -49,57 +54,36 @@
                 </div>
             </div>
 
-            {{-- Widget Grid --}}
+            {{-- Widget Grid (gridstack.js): same markup in view and edit mode, so
+                 widgets keep their state when the editor opens. --}}
             @if(count($layout) > 0)
-                <div class="row g-3" id="widget-sortable-container">
-                    @foreach($layout as $index => $item)
-                        @php
-                            $widget = collect($allWidgets)->firstWhere('id', $item['id']);
-                            $width = $item['w'] ?? 6;
-                            // Responsive column classes
-                            $colClass = match((int)$width) {
-                                4 => 'col-12 col-sm-6 col-lg-4',
-                                6 => 'col-12 col-md-6',
-                                8 => 'col-12 col-lg-8',
-                                12 => 'col-12',
-                                default => 'col-12 col-md-6',
-                            };
-                        @endphp
+                <div class="grid-stack dashboard-grid" id="dashboard-grid">
+                    @foreach($layout as $item)
+                        @php $widget = $widgets->get($item['id']); @endphp
 
                         @if($widget)
-                            <div class="{{ $colClass }} widget-sortable-item" wire:key="widget-container-{{ $item['id'] }}" data-id="{{ $item['id'] }}">
-                                @if($editMode)
-                                    {{-- Edit Mode: Widget with toolbar --}}
-                                    <div class="widget-edit-wrapper">
+                            <div class="grid-stack-item" wire:key="widget-item-{{ $item['id'] }}"
+                                 gs-id="{{ $item['id'] }}" gs-x="{{ $item['x'] }}" gs-y="{{ $item['y'] }}"
+                                 gs-w="{{ $item['w'] }}" gs-h="{{ $item['h'] }}" gs-min-w="3">
+                                <div class="grid-stack-item-content">
+                                    <div class="dashboard-widget">
                                         <div class="widget-edit-toolbar">
-                                            <div class="d-flex align-items-center">
-                                                <span class="widget-drag-handle me-2">
+                                            <div class="d-flex align-items-center min-w-0">
+                                                <span class="widget-drag-handle me-2" title="{{ __('core/base::general.customize') }}">
                                                     <x-tabler-icons::grip-vertical class="icon" />
                                                 </span>
-                                                <span class="widget-edit-title">{{ $widget['name'] }}</span>
+                                                <span class="widget-edit-title text-truncate">{{ $widget['name'] }}</span>
                                             </div>
-                                            <div class="d-flex align-items-center gap-2">
-                                                <select wire:change="updateWidgetSize('{{ $item['id'] }}', $event.target.value)"
-                                                        class="form-select form-select-sm widget-size-select">
-                                                    <option value="4" {{ $width == 4 ? 'selected' : '' }}>1/3</option>
-                                                    <option value="6" {{ $width == 6 ? 'selected' : '' }}>1/2</option>
-                                                    <option value="8" {{ $width == 8 ? 'selected' : '' }}>2/3</option>
-                                                    <option value="12" {{ $width == 12 ? 'selected' : '' }}>Full</option>
-                                                </select>
-                                                <button type="button" class="btn btn-sm widget-remove-btn"
-                                                        wire:click="removeWidget('{{ $item['id'] }}')">
-                                                    <x-tabler-icons::x class="icon" />
-                                                </button>
-                                            </div>
+                                            <button type="button" class="btn btn-sm widget-remove-btn"
+                                                    wire:click="removeWidget('{{ $item['id'] }}')" aria-label="{{ __('core/base::general.delete') }}">
+                                                <x-tabler-icons::x class="icon" />
+                                            </button>
                                         </div>
-                                        <div class="widget-edit-content">
-                                            @livewire($widget['component'], [], key('widget-edit-' . $item['id']))
+                                        <div class="widget-body">
+                                            @livewire($widget['component'], [], key('widget-' . $item['id']))
                                         </div>
                                     </div>
-                                @else
-                                    {{-- Normal Mode: Just widget --}}
-                                    @livewire($widget['component'], [], key('widget-' . $item['id']))
-                                @endif
+                                </div>
                             </div>
                         @endif
                     @endforeach
@@ -164,30 +148,3 @@
         </div>
     </div>
 </div>
-
-@push('scripts')
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            // Function to run initialization safely
-            const runInit = () => {
-                if (typeof initWidgetSortable === 'function') {
-                    initWidgetSortable();
-                }
-            };
-
-            // Init on load if needed
-            runInit();
-
-            // Listen for edit mode change
-            Livewire.on('editModeChanged', () => {
-                // Small delay to allow DOM to update
-                setTimeout(runInit, 50);
-            });
-
-            // Listen for layout updates (adding/removing widgets)
-            Livewire.on('layoutUpdated', () => {
-                setTimeout(runInit, 50);
-            });
-        });
-    </script>
-@endpush

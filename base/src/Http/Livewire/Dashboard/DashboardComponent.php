@@ -3,18 +3,22 @@
 namespace Polirium\Core\Base\Http\Livewire\Dashboard;
 
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Renderless;
 use Livewire\Component;
 use Polirium\Core\Base\Http\Models\UserDashboardLayout;
+use Throwable;
 
 /**
- * Dashboard Component - Dynamic Widget-based Dashboard
+ * Dashboard Component - widgets on a 12-column grid (gridstack.js).
+ *
+ * Positions and widths are chosen by the user; heights follow each widget's
+ * content, so the stored height is informative only.
  */
 class DashboardComponent extends Component
 {
-    /**
-     * Widget sizes offered in the editor (Bootstrap columns).
-     */
-    private const WIDTHS = [4, 6, 8, 12];
+    private const COLUMNS = 12;
+
+    private const MIN_WIDTH = 3;
 
     /**
      * All available widgets (filtered by permission). Locked: the browser must
@@ -36,7 +40,7 @@ class DashboardComponent extends Component
 
     public function mount(): void
     {
-        \Polirium\Core\UI\Facades\Assets::loadJs(['sortable', 'dashboard']);
+        \Polirium\Core\UI\Facades\Assets::loadCss(['gridstack'])->loadJs(['gridstack', 'dashboard']);
         $this->loadWidgets();
         $this->loadUserLayout();
     }
@@ -46,89 +50,109 @@ class DashboardComponent extends Component
      */
     protected function loadWidgets(): void
     {
-        $registry = app('dashboard.widgets');
-        $widgets = $registry->forUser(auth()->user());
-
-        $this->allWidgets = collect($widgets)->values()->toArray();
+        $this->allWidgets = collect(app('dashboard.widgets')->forUser(auth()->user()))->values()->toArray();
     }
 
     /**
-     * Load user's layout
+     * Load the user's layout, or the default one if they never customised it.
      */
     protected function loadUserLayout(): void
     {
         $userId = auth()->id();
-        $registry = app('dashboard.widgets');
-        $registeredWidgetIds = array_keys($registry->forUser(auth()->user()));
-        $savedLayout = UserDashboardLayout::getLayoutForUser($userId);
+        $permittedIds = collect($this->allWidgets)->pluck('id')->all();
 
-        if (empty($savedLayout)) {
-            // Default layout: all widgets with default sizes
-            $this->layout = collect($this->allWidgets)->map(function ($widget, $index) {
-                return [
-                    'id' => $widget['id'],
-                    'x' => 0,
-                    'y' => $index,
-                    'w' => $widget['default_width'] ?? 6,
-                    'h' => $widget['default_height'] ?? 2,
-                ];
-            })->toArray();
-        } else {
-            // Map DB fields to component expected format, filtering out widgets that no longer exist
-            $this->layout = collect($savedLayout)
-                ->filter(fn ($item) => in_array($item['widget_id'], $registeredWidgetIds))
-                ->map(function ($item) {
-                    return [
-                        'id' => $item['widget_id'],
-                        'x' => $item['position_x'] ?? 0,
-                        'y' => $item['position_y'] ?? 0,
-                        'w' => $item['width'] ?? 6,
-                        'h' => $item['height'] ?? 2,
-                    ];
-                })->values()->toArray();
+        if (! UserDashboardLayout::hasLayout($userId)) {
+            $this->layout = $this->defaultLayout();
 
-            // Rows for widgets the user may not see now (permission revoked,
-            // module disabled) are kept, so the layout comes back unchanged if
-            // access is restored.
-
-            // Auto-append only truly NEW widgets that have never been in user's layout
-            // (e.g. a new widget was just registered). Do NOT re-add widgets the user explicitly removed.
-            $existingWidgetIds = collect($this->layout)->pluck('id')->toArray();
-            $missingWidgets = collect($this->allWidgets)
-                ->filter(fn ($w) => ! in_array($w['id'], $existingWidgetIds))
-                ->filter(fn ($w) => ! UserDashboardLayout::hasWidgetRecord($userId, $w['id']))
-                ->values()
-                ->toArray();
-
-            if (! empty($missingWidgets)) {
-                $maxY = collect($this->layout)->max('y') ?? -1;
-                foreach ($missingWidgets as $missing) {
-                    $maxY++;
-                    $this->layout[] = [
-                        'id' => $missing['id'],
-                        'x' => 0,
-                        'y' => $maxY,
-                        'w' => $missing['default_width'] ?? 6,
-                        'h' => $missing['default_height'] ?? 2,
-                    ];
-                    // Also save it to DB so it persists without having to hit "Save"
-                    UserDashboardLayout::addWidgetForUser($userId, $missing['id'], [
-                        'x' => 0,
-                        'y' => $maxY,
-                        'w' => $missing['default_width'] ?? 6,
-                        'h' => $missing['default_height'] ?? 2,
-                    ]);
-                }
-            }
+            return;
         }
+
+        // Rows for widgets the user may not see now (permission revoked,
+        // module disabled) are kept, so the layout comes back unchanged if
+        // access is restored.
+        $layout = collect(UserDashboardLayout::getLayoutForUser($userId))
+            ->filter(fn ($item) => in_array($item['widget_id'], $permittedIds, true))
+            ->map(fn ($item) => [
+                'id' => $item['widget_id'],
+                'x' => (int) ($item['position_x'] ?? 0),
+                'y' => (int) ($item['position_y'] ?? 0),
+                'w' => (int) ($item['width'] ?? 6),
+                'h' => (int) ($item['height'] ?? 2),
+            ])
+            ->values()
+            ->all();
+
+        // Layouts saved before the grid (1.0.x) kept only an order: every
+        // widget sits at x = 0. Lay them out side by side in that order.
+        if (count($layout) > 1 && collect($layout)->every(fn ($item) => $item['x'] === 0)) {
+            $layout = $this->pack($layout);
+        }
+
+        // Widgets that are new to this user (registered after they customised,
+        // or just permitted) are appended once; removed ones stay removed.
+        foreach ($this->allWidgets as $widget) {
+            if (collect($layout)->contains('id', $widget['id']) || UserDashboardLayout::hasWidgetRecord($userId, $widget['id'])) {
+                continue;
+            }
+
+            $item = ['id' => $widget['id'], 'x' => 0, 'y' => $this->bottom($layout), 'w' => $this->width($widget['default_width'] ?? 6), 'h' => 2];
+            $layout[] = $item;
+            UserDashboardLayout::addWidgetForUser($userId, $widget['id'], $item);
+        }
+
+        $this->layout = $layout;
     }
 
     /**
-     * Get enabled widget IDs
+     * Every permitted widget at its default width, filling rows left to right.
      */
-    public function getEnabledWidgetsProperty(): array
+    protected function defaultLayout(): array
     {
-        return collect($this->layout)->pluck('id')->toArray();
+        return $this->pack(collect($this->allWidgets)->map(fn ($widget) => [
+            'id' => $widget['id'],
+            'x' => 0,
+            'y' => 0,
+            'w' => $this->width($widget['default_width'] ?? 6),
+            'h' => 2,
+        ])->all());
+    }
+
+    /**
+     * Place items in order, left to right, wrapping when a row is full.
+     */
+    protected function pack(array $items): array
+    {
+        $x = 0;
+        $y = 0;
+
+        return collect($items)->map(function ($item) use (&$x, &$y) {
+            $w = $this->width($item['w']);
+
+            if ($x + $w > self::COLUMNS) {
+                $x = 0;
+                $y++;
+            }
+
+            $placed = [...$item, 'x' => $x, 'y' => $y, 'w' => $w];
+            $x += $w;
+
+            return $placed;
+        })->all();
+    }
+
+    protected function width(mixed $width): int
+    {
+        return max(self::MIN_WIDTH, min(self::COLUMNS, (int) $width ?: 6));
+    }
+
+    protected function bottom(array $layout): int
+    {
+        return (int) collect($layout)->map(fn ($item) => $item['y'] + max(1, $item['h']))->max();
+    }
+
+    protected function refreshGrid(): void
+    {
+        $this->dispatch('dashboard-grid-refresh');
     }
 
     /**
@@ -136,171 +160,130 @@ class DashboardComponent extends Component
      */
     public function getUnusedWidgetsProperty(): array
     {
-        $enabledIds = $this->enabledWidgets;
+        $enabledIds = collect($this->layout)->pluck('id')->all();
 
         return collect($this->allWidgets)
-            ->filter(fn ($widget) => ! in_array($widget['id'], $enabledIds))
+            ->reject(fn ($widget) => in_array($widget['id'], $enabledIds, true))
             ->values()
             ->toArray();
     }
 
-    /**
-     * Toggle edit mode
-     */
     public function toggleEditMode(): void
     {
         $this->editMode = true;
-        $this->dispatch('editModeChanged', editMode: true);
+        $this->refreshGrid();
     }
 
-    /**
-     * Cancel edit
-     */
     public function cancelEdit(): void
     {
         $this->editMode = false;
         $this->loadUserLayout();
-        $this->dispatch('editModeChanged', editMode: false);
-        $this->dispatch('layoutUpdated');
+        $this->refreshGrid();
     }
 
     /**
-     * Add widget to dashboard
+     * Add widget to the bottom of the dashboard
      */
     public function addWidget(string $widgetId): void
     {
         $widget = collect($this->allWidgets)->firstWhere('id', $widgetId);
 
-        if (! $widget) {
+        if (! $widget || collect($this->layout)->contains('id', $widgetId)) {
             return;
         }
-
-        // Find the next available Y position
-        $maxY = collect($this->layout)->max('y') ?? -1;
 
         $this->layout[] = [
             'id' => $widgetId,
             'x' => 0,
-            'y' => $maxY + 1,
-            'w' => $widget['default_width'] ?? 6,
-            'h' => $widget['default_height'] ?? 2,
+            'y' => $this->bottom($this->layout),
+            'w' => $this->width($widget['default_width'] ?? 6),
+            'h' => 2,
         ];
 
-        // Dispatch event to refresh grid
-        $this->dispatch('layoutUpdated');
+        $this->refreshGrid();
     }
 
-    /**
-     * Remove widget from dashboard
-     */
     public function removeWidget(string $widgetId): void
     {
-        $this->layout = array_values(
-            array_filter($this->layout, fn ($item) => $item['id'] !== $widgetId)
-        );
-
-        // Dispatch event to refresh grid
-        $this->dispatch('layoutUpdated');
+        $this->layout = collect($this->layout)->reject(fn ($item) => $item['id'] === $widgetId)->values()->all();
+        $this->refreshGrid();
     }
 
     /**
-     * Update widget column size
+     * Positions reported by the grid after a drag or resize. The grid already
+     * shows them, so nothing is re-rendered.
+     *
+     * @param array<int, array{id?: string, x?: int, y?: int, w?: int, h?: int}> $items
      */
-    public function updateWidgetSize(string $widgetId, int $width): void
+    #[Renderless]
+    public function updateGrid(array $items): void
     {
-        if (! in_array($width, self::WIDTHS, true)) {
-            return;
-        }
+        $positions = collect($items)->keyBy(fn ($item) => (string) ($item['id'] ?? ''));
 
-        foreach ($this->layout as &$item) {
-            if ($item['id'] === $widgetId) {
-                $item['w'] = (int) $width;
+        $this->layout = collect($this->layout)->map(function ($item) use ($positions) {
+            $position = $positions->get($item['id']);
 
-                break;
+            if (! $position) {
+                return $item;
             }
-        }
+
+            $w = $this->width($position['w'] ?? $item['w']);
+
+            return [
+                'id' => $item['id'],
+                'x' => max(0, min(self::COLUMNS - $w, (int) ($position['x'] ?? $item['x']))),
+                'y' => max(0, (int) ($position['y'] ?? $item['y'])),
+                'w' => $w,
+                'h' => max(1, (int) ($position['h'] ?? $item['h'])),
+            ];
+        })->sortBy([['y', 'asc'], ['x', 'asc']])->values()->all();
     }
 
-    /**
-     * Move widget up in order
-     */
-    public function moveWidgetUp(string $widgetId): void
-    {
-        $index = $this->findWidgetIndex($widgetId);
-
-        if ($index > 0) {
-            $temp = $this->layout[$index - 1];
-            $this->layout[$index - 1] = $this->layout[$index];
-            $this->layout[$index] = $temp;
-        }
-    }
-
-    /**
-     * Move widget down in order
-     */
-    public function moveWidgetDown(string $widgetId): void
-    {
-        $index = $this->findWidgetIndex($widgetId);
-
-        if ($index < count($this->layout) - 1) {
-            $temp = $this->layout[$index + 1];
-            $this->layout[$index + 1] = $this->layout[$index];
-            $this->layout[$index] = $temp;
-        }
-    }
-
-    /**
-     * Find widget index in layout
-     */
-    protected function findWidgetIndex(string $widgetId): int
-    {
-        foreach ($this->layout as $index => $item) {
-            if ($item['id'] === $widgetId) {
-                return $index;
-            }
-        }
-
-        return -1;
-    }
-
-    /**
-     * Update order from drag-drop (wire:sortable)
-     */
-    public function updateOrder(array $items): void
-    {
-        $orderedLayout = [];
-
-        foreach ($items as $item) {
-            $widgetId = $item['value'];
-            $existingItem = collect($this->layout)->firstWhere('id', $widgetId);
-
-            if ($existingItem) {
-                $orderedLayout[] = $existingItem;
-            }
-        }
-
-        $this->layout = $orderedLayout;
-    }
-
-    /**
-     * Save layout
-     */
     public function saveLayout(): void
     {
-        $permitted = array_keys(app('dashboard.widgets')->forUser(auth()->user()));
+        $permitted = collect($this->allWidgets)->pluck('id')->all();
         $this->layout = collect($this->layout)
             ->filter(fn ($item) => in_array($item['id'], $permitted, true))
-            ->map(fn ($item) => [...$item, 'w' => in_array((int) $item['w'], self::WIDTHS, true) ? (int) $item['w'] : 6])
             ->values()
             ->all();
 
-        UserDashboardLayout::saveLayoutForUser(auth()->id(), $this->layout);
-        $this->editMode = false;
+        try {
+            UserDashboardLayout::saveLayoutForUser(
+                auth()->id(),
+                $this->layout,
+                array_values(array_diff($permitted, collect($this->layout)->pluck('id')->all())),
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => trans('core/base::general.dashboard_layout_save_failed'),
+            ]);
 
-        $this->dispatch('editModeChanged', editMode: false);
+            return;
+        }
+
+        $this->editMode = false;
+        $this->refreshGrid();
         $this->dispatch('notify', [
             'type' => 'success',
             'message' => trans('core/base::general.dashboard_layout_saved'),
+        ]);
+    }
+
+    /**
+     * Forget the user's layout and show the default one.
+     */
+    public function resetLayout(): void
+    {
+        UserDashboardLayout::where('user_id', auth()->id())->delete();
+
+        $this->editMode = false;
+        $this->layout = $this->defaultLayout();
+        $this->refreshGrid();
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => trans('core/base::general.dashboard_layout_reset'),
         ]);
     }
 
@@ -308,6 +291,7 @@ class DashboardComponent extends Component
     {
         return view('core/base::pages.dashboard-component', [
             'unusedWidgets' => $this->unusedWidgets,
+            'widgets' => collect($this->allWidgets)->keyBy('id'),
         ]);
     }
 }

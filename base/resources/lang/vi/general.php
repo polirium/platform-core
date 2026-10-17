@@ -236,7 +236,7 @@ return [
     'customize' => 'Tùy chỉnh',
     'add_widget' => 'Thêm Widget',
     'customize_dashboard' => 'Tùy chỉnh Dashboard',
-    'edit_mode_hint' => 'Kéo thanh tiêu đề để sắp xếp, chọn kích thước, nhấn X để xóa.',
+    'edit_mode_hint' => 'Kéo thanh tiêu đề để di chuyển, kéo cạnh trái hoặc phải để đổi độ rộng, nhấn X để bỏ widget.',
     'no_widgets_yet' => 'Chưa có widget nào',
     'no_widgets_hint' => 'Nhấn Tùy chỉnh để thêm widget vào dashboard.',
     'all_widgets_added' => 'Đã thêm tất cả widgets!',
@@ -476,6 +476,10 @@ return [
     'task_completed' => 'Hoàn thành tác vụ',
     'profile_updated' => 'Cập nhật hồ sơ thành công!',
     'dashboard_layout_saved' => 'Đã lưu bố cục dashboard',
+    'reset_layout' => 'Khôi phục mặc định',
+    'reset_layout_confirm' => 'Thay dashboard của bạn bằng bố cục mặc định?',
+    'dashboard_layout_reset' => 'Đã khôi phục bố cục mặc định',
+    'dashboard_layout_save_failed' => 'Không lưu được bố cục dashboard. Vui lòng thử lại.',
 
     // Detail Modal
     'contact_info' => 'Thông tin liên hệ',

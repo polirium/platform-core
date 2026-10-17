@@ -217,7 +217,7 @@ return [
     'customize' => 'Customize',
     'add_widget' => 'Add Widget',
     'customize_dashboard' => 'Customize Dashboard',
-    'edit_mode_hint' => 'Drag title bar to arrange, select size, press X to delete.',
+    'edit_mode_hint' => 'Drag a widget by its title bar to move it, drag its left or right edge to resize, press X to remove.',
     'no_widgets_yet' => 'No widgets yet',
     'no_widgets_hint' => 'Click Customize to add widgets to your dashboard.',
     'all_widgets_added' => 'All widgets added!',
@@ -440,6 +440,10 @@ return [
     'task_completed' => 'Task Completed',
     'profile_updated' => 'Profile updated successfully!',
     'dashboard_layout_saved' => 'Dashboard layout saved',
+    'reset_layout' => 'Reset to default',
+    'reset_layout_confirm' => 'Replace your dashboard with the default layout?',
+    'dashboard_layout_reset' => 'Dashboard reset to the default layout',
+    'dashboard_layout_save_failed' => 'Could not save the dashboard layout. Please try again.',
 
     // Detail Modal
     'contact_info' => 'Contact Information',
