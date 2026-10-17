@@ -96,7 +96,11 @@ class Assets
     {
         $assetPath = $this->basePath . '/' . ltrim($path, '/');
 
-        return asset($assetPath);
+        // Version by modification time, so browsers fetch a file again after
+        // an update instead of running a cached older copy.
+        $modified = @filemtime(public_path($assetPath));
+
+        return asset($assetPath) . ($modified ? '?v=' . $modified : '');
     }
 
     /**
