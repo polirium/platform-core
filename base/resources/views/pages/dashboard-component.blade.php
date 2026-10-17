@@ -80,7 +80,7 @@
                                             </button>
                                         </div>
                                         <div class="widget-body">
-                                            @livewire($widget['component'], [], key('widget-' . $item['id']))
+                                            @livewire($widget['component'], ['lazy' => true], key('widget-' . $item['id']))
                                         </div>
                                     </div>
                                 </div>

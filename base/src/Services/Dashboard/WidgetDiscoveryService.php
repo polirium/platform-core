@@ -18,6 +18,8 @@ class WidgetDiscoveryService
 
     protected array $scanPaths = [];
 
+    protected ?array $activeModules = null;
+
     public function __construct(WidgetRegistry $registry)
     {
         $this->registry = $registry;
@@ -45,8 +47,10 @@ class WidgetDiscoveryService
             }
         }
 
-        // Modules
-        foreach (glob($basePath . 'modules/*/src/Widgets') as $path) {
+        // Modules: only enabled ones (none while there is no database yet)
+        foreach ($this->activeModules() ?? [] as $module) {
+            $path = $basePath . 'modules/' . $module . '/src/Widgets';
+
             if (is_dir($path)) {
                 $this->scanPaths[] = $path;
             }
@@ -54,20 +58,64 @@ class WidgetDiscoveryService
     }
 
     /**
+     * @return list<string>|null
+     */
+    protected function activeModules(): ?array
+    {
+        return $this->activeModules ??= \Polirium\Core\Base\Service\ModuleManager::activeModuleNames();
+    }
+
+    /**
      * Discover and register all widgets
      */
     public function discover(): void
     {
-        foreach ($this->scanPaths as $path) {
-            $this->discoverInPath($path);
+        foreach ($this->widgetClasses() as $className) {
+            if (class_exists($className)) {
+                $this->registerWidget($className);
+            }
+        }
+    }
+
+    /**
+     * Widget classes of the scanned paths. Scanning reads every widget file, so
+     * outside local development the result is cached per set of enabled
+     * modules (enabling or disabling a module changes the key).
+     *
+     * @return list<class-string<AbstractWidget>>
+     */
+    protected function widgetClasses(): array
+    {
+        $scan = function (): array {
+            $classes = [];
+
+            foreach ($this->scanPaths as $path) {
+                array_push($classes, ...$this->discoverInPath($path));
+            }
+
+            return $classes;
+        };
+
+        if (app()->isLocal()) {
+            return $scan();
+        }
+
+        try {
+            return cache()->rememberForever('dashboard.widget-classes.' . md5(json_encode($this->scanPaths)), $scan);
+        } catch (\Throwable) {
+            return $scan();
         }
     }
 
     /**
      * Discover widgets in a specific path
      */
-    protected function discoverInPath(string $path): void
+    /**
+     * @return list<class-string<AbstractWidget>>
+     */
+    protected function discoverInPath(string $path): array
     {
+        $classes = [];
         $files = File::glob($path . '/*.php');
 
         foreach ($files as $file) {
@@ -98,14 +146,14 @@ class WidgetDiscoveryService
                     continue;
                 }
 
-                // Register the widget
-                $this->registerWidget($className);
-
+                $classes[] = $className;
             } catch (\Exception $e) {
                 // Skip invalid classes
                 continue;
             }
         }
+
+        return $classes;
     }
 
     /**

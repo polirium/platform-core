@@ -43,6 +43,23 @@ abstract class AbstractWidget extends Component
     }
 
     /**
+     * Shown while a lazily loaded widget fetches its data.
+     */
+    public function placeholder(): string
+    {
+        return <<<'HTML'
+            <div class="card placeholder-glow" aria-busy="true">
+                <div class="card-body">
+                    <div class="placeholder col-5 mb-3"></div>
+                    <div class="placeholder placeholder-lg col-12 mb-2"></div>
+                    <div class="placeholder col-8 mb-2"></div>
+                    <div class="placeholder col-6"></div>
+                </div>
+            </div>
+            HTML;
+    }
+
+    /**
      * Get the unique widget ID
      */
     abstract public static function getWidgetId(): string;
