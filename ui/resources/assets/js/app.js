@@ -115,6 +115,10 @@ const handleModalEvent = (id, action) => {
         return;
     }
 
+    // The server has filled the content of a modal opened on click.
+    clearTimeout(modalElement._polLoadingTimer);
+    modalElement.classList.remove('is-loading');
+
     const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement, {
         backdrop: true,
         keyboard: true,
@@ -184,7 +188,26 @@ document.addEventListener('DOMContentLoaded', () => {
         // Livewire v4: interceptMessage for cleanup after actions
         // ONLY cleanup when necessary to avoid lag
         try {
-            Livewire.interceptMessage(({ message, onSuccess }) => {
+            Livewire.interceptMessage(({ message, onSuccess, onError, onFailure }) => {
+                // A modal opened on click whose request failed (no permission,
+                // server error, offline) closes instead of spinning.
+                const closeLoadingModals = () => document.querySelectorAll('.modal.is-loading').forEach((el) => {
+                    el.classList.remove('is-loading');
+                    clearTimeout(el._polLoadingTimer);
+                    const modal = bootstrap.Modal.getInstance(el);
+                    if (! modal) {
+                        return;
+                    }
+                    // Bootstrap ignores hide() while the modal is still fading in:
+                    // close it once it is shown.
+                    const closeWhenShown = () => modal.hide();
+                    el.addEventListener('shown.bs.modal', closeWhenShown, { once: true });
+                    el.addEventListener('hidden.bs.modal', () => el.removeEventListener('shown.bs.modal', closeWhenShown), { once: true });
+                    modal.hide();
+                });
+                onError?.(closeLoadingModals);
+                onFailure?.(closeLoadingModals);
+
                 onSuccess(() => {
                     // Only cleanup if there are ghost backdrops (more backdrops than modals)
                     const backdrops = document.querySelectorAll('.modal-backdrop');
@@ -205,9 +228,11 @@ document.addEventListener('hidden.bs.modal', function (event) {
     cleanupGhostBackdrops();
 });
 
-// Buttons that ask the server to open a modal ($dispatch('show-modal-…')) get
-// a busy state at once, so the wait for the server is visible and a second
-// click is not taken for "nothing happened".
+// Buttons that ask the server to open a modal ($dispatch('show-modal-X')).
+// When the page already holds #modal-X, open it at once in a loading state;
+// the server's "modal" event fills it and clears the state, so the wait for
+// the round trip happens inside an open dialog instead of after the click.
+// Otherwise the button gets a busy state and ignores repeat clicks.
 const openingButtons = new Set();
 const clearOpening = () => {
     openingButtons.forEach((button) => button.classList.remove('is-opening-modal'));
@@ -216,7 +241,8 @@ const clearOpening = () => {
 document.addEventListener('click', (event) => {
     const button = event.target.closest('button, a');
     const action = button?.getAttribute('wire:click') || '';
-    if (! button || ! action.includes("'show-modal")) {
+    const match = action.match(/\$dispatch\(\s*'show-(modal-[\w-]+)'/);
+    if (! button || ! match) {
         return;
     }
     if (button.classList.contains('is-opening-modal')) {
@@ -224,11 +250,30 @@ document.addEventListener('click', (event) => {
         event.stopImmediatePropagation();
         return;
     }
+
+    const modalElement = document.getElementById(match[1]);
+    if (modalElement && typeof bootstrap !== 'undefined') {
+        modalElement.classList.add('is-loading');
+        clearTimeout(modalElement._polLoadingTimer);
+        // Never leave the dialog locked if the server does not answer.
+        modalElement._polLoadingTimer = setTimeout(() => modalElement.classList.remove('is-loading'), 8000);
+        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        return;
+    }
+
     button.classList.add('is-opening-modal');
     openingButtons.add(button);
     setTimeout(clearOpening, 4000);
 }, true);
 document.addEventListener('shown.bs.modal', clearOpening);
+document.addEventListener('hidden.bs.modal', (event) => {
+    // A late "hidden" from an earlier close must not unlock a reopened modal.
+    if (event.target.classList.contains('show')) {
+        return;
+    }
+    clearTimeout(event.target._polLoadingTimer);
+    event.target.classList.remove('is-loading');
+});
 
 // Immediate Feedback for Modal Buttons
 // This provides instant visual feedback before Livewire processes the event

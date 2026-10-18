@@ -299,3 +299,55 @@ input[type="search"] {
     opacity: 0.6;
     pointer-events: none;
 }
+
+/*
+ * Modals: open fast on modest shop PCs.
+ * - modal-blur blurred the whole page behind the dialog on every frame of
+ *   the fade; a plain dim backdrop costs nothing.
+ * - Bootstrap fades the backdrop (0.15s) and then the dialog (0.3s) one
+ *   after the other; shorter fades make the dialog usable sooner.
+ */
+.modal-blur {
+    backdrop-filter: none;
+}
+
+.modal.fade,
+.modal-backdrop.fade {
+    transition-duration: 0.1s;
+}
+
+.modal.fade .modal-dialog {
+    transition-duration: 0.15s;
+}
+
+/* Opened on click while the server prepares its content (see app.js) */
+.modal.is-loading .modal-content {
+    position: relative;
+    min-height: 12rem;
+    pointer-events: none;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        border-radius: inherit;
+        background: var(--tblr-bg-surface, #fff);
+        opacity: 0.85;
+    }
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: min(50%, 10rem);
+        left: 50%;
+        z-index: 21;
+        width: 2rem;
+        height: 2rem;
+        margin: -1rem 0 0 -1rem;
+        border: 0.2em solid var(--tblr-primary, #206bc4);
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spinner-border 0.75s linear infinite;
+    }
+}
