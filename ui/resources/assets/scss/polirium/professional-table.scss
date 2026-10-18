@@ -647,3 +647,162 @@
     opacity: 0.5;
     pointer-events: none;
 }
+
+/* ============================================
+   Datatables (1.1): toolbar, compact control columns, row density
+   ============================================ */
+
+.pg-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--tblr-border-color);
+
+    .pg-toolbar-start,
+    .pg-toolbar-end {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .pg-toolbar-start {
+        flex: 1 1 18rem;
+        min-width: 0;
+    }
+
+    .pg-search {
+        flex: 0 1 22rem;
+        min-width: 12rem;
+    }
+
+    .pg-per-page {
+        width: auto;
+        min-width: 7.5rem;
+    }
+}
+
+.power-grid-table {
+    /* Expand and checkbox columns: as narrow as their control. */
+    > thead > tr > th.w-1,
+    > tbody > tr > td.w-1 {
+        width: 1%;
+        min-width: 0;
+        padding-left: 0.625rem;
+        padding-right: 0.625rem;
+    }
+
+    > tbody > tr > td {
+        padding-top: 0.625rem;
+        padding-bottom: 0.625rem;
+    }
+
+    .form-check {
+        display: flex;
+        justify-content: center;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+
+        .form-check-input {
+            float: none;
+            margin: 0;
+        }
+    }
+
+    /* Opened row: highlight it and its detail. */
+    > tbody > tr.cursor-pointer:hover > td {
+        background: rgba(var(--tblr-primary-rgb), 0.03);
+    }
+}
+
+/* Row detail: smooth reveal of the content. */
+.pg-detail-reveal {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.2s ease;
+
+    > .pg-detail-inner {
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    &.is-open {
+        grid-template-rows: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pg-detail-reveal {
+        transition: none;
+    }
+}
+
+/* Rows that open a detail: the whole row is the toggle (no +/- column). */
+.power-grid-table > tbody > tr.pg-row-expandable {
+    cursor: pointer;
+
+    > td:first-child {
+        transition: box-shadow 0.15s ease;
+    }
+
+    &.pg-row-open > td {
+        background: rgba(var(--tblr-primary-rgb), 0.06);
+    }
+
+    &.pg-row-open > td:first-child {
+        box-shadow: inset 3px 0 0 var(--tblr-primary);
+    }
+}
+
+.power-grid-table > tbody > tr:not(.pg-row-expandable).cursor-pointer:hover > td {
+    background: transparent;
+}
+
+/* Compact, modern table look: horizontal rules only, small muted header,
+   low rows, numbers aligned right where columns ask for it. */
+.card-table .power-grid-table,
+.power-grid-table {
+    margin-bottom: 0;
+    font-size: 0.875rem;
+
+    > :is(thead, tbody, tfoot) > tr > :is(th, td) {
+        border-left: 0 !important;
+        border-right: 0 !important;
+    }
+
+    > thead > tr > th {
+        padding: 0.5rem 0.75rem;
+        background: var(--tblr-bg-surface-secondary, #f8fafc);
+        color: var(--tblr-secondary);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--tblr-border-color);
+        white-space: nowrap;
+    }
+
+    > tbody > tr > td {
+        padding: 0.5rem 0.75rem;
+        border-bottom: 1px solid var(--tblr-border-color-translucent, var(--tblr-border-color));
+        vertical-align: middle;
+    }
+
+    > tbody > tr:last-child > td {
+        border-bottom: 0;
+    }
+
+    .pg-price-cell {
+        width: 11rem;
+    }
+}
+
+/* One page title: pages that render their own header hide the layout's
+   (menu-derived) one. */
+.page-wrapper:has(> .page-body .page-header) > .page-header {
+    display: none;
+}
