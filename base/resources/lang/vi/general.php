@@ -529,7 +529,7 @@ return [
     // Dashboard statistics
     'trend_new' => 'Mới',
     'trend_hint' => 'So với kỳ trước',
-    'collected_other' => 'Thu khác',
+    'collected_other' => 'COD & khác',
     'not_collected' => 'Chưa thu',
     'orders_with_customer' => 'Đơn có khách hàng (:count khách)',
     'cash_flow_title' => 'Thống kê thu chi',

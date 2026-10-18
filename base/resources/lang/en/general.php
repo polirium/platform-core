@@ -492,7 +492,7 @@ return [
     // Dashboard statistics
     'trend_new' => 'New',
     'trend_hint' => 'Compared with the previous period',
-    'collected_other' => 'Other methods',
+    'collected_other' => 'COD & other',
     'not_collected' => 'Not collected',
     'orders_with_customer' => 'Orders with a customer (:count customers)',
     'cash_flow_title' => 'Cash flow',

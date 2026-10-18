@@ -185,17 +185,31 @@
     }
 }
 
-/* Tiles wrap by the widget's own width (a widget can be narrow on a wide screen). */
+/* Tiles follow the widget's own width (a widget can be narrow on a wide
+   screen): 1 column when tiny, 2 by default, 4 when the widget is wide. */
+.dashboard-stat-card > .card-body,
+.dashboard-stat-card > .card-footer {
+    container-type: inline-size;
+}
+
 .stat-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
-
-    &.stat-grid-wide {
-        grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-    }
 
     &.stat-grid-compact {
         grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    }
+}
+
+@container (min-width: 52rem) {
+    .stat-grid:not(.stat-grid-compact) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@container (max-width: 22rem) {
+    .stat-grid:not(.stat-grid-compact) {
+        grid-template-columns: minmax(0, 1fr);
     }
 }

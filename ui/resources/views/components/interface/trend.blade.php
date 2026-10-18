@@ -2,8 +2,8 @@
     Change against the previous period: green up, red down, grey when flat
     or when there is nothing to compare with.
 
-    <x-ui::trend :value="12.5" />          {{-- ↑ 12.5% --}}
-    <x-ui::trend :value="-3" inverse />    {{-- for costs: a decrease is good --}}
+    <x-ui::trend :value="12.5" />          shows "+12,5%" in green
+    <x-ui::trend :value="-3" inverse />    for costs: a decrease is shown in green
 --}}
 @props([
     'value' => null,
