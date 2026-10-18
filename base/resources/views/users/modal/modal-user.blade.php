@@ -1,6 +1,6 @@
 <div>
     <form wire:submit.prevent="save">
-        <x-ui::modal id="modal-user" header="{{ $modalTitle }}" class="modal-xl">
+        <x-ui::modal id="modal-user" open-on="show-modal-create-user show-modal-edit-user" header="{{ $modalTitle }}" class="modal-xl">
 
             <div class="row g-4">
                 <!-- Left Column: Avatar -->

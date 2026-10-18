@@ -4,6 +4,8 @@
     'footer' => null,
     'keyboard' => 'true',
     'backdrop' => 'normal',
+    // Events that open this modal when its id is not "modal-X" for "show-modal-X" (see app.js)
+    'openOn' => null,
 ])
 
 {{-- Accessibility: Bootstrap 5 manages aria-hidden automatically --}}
@@ -15,6 +17,7 @@
     wire:ignore.self
     data-bs-backdrop="{{ $backdrop }}"
     data-bs-keyboard="{{ $keyboard }}"
+    @if ($openOn) data-open-on="{{ $openOn }}" @endif
 >
     <div {{ $attributes->class('modal-dialog') }}>
         <div class="modal-content">

@@ -209,6 +209,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 onFailure?.(closeLoadingModals);
 
                 onSuccess(() => {
+                    // The modal's own component answered: its content is up to date,
+                    // whichever event it uses to open itself.
+                    const componentEl = message.component?.el;
+                    if (componentEl) {
+                        document.querySelectorAll('.modal.is-loading').forEach((el) => {
+                            if (el.closest('[wire\\:id]') === componentEl || el.contains(componentEl)) {
+                                clearTimeout(el._polLoadingTimer);
+                                el.classList.remove('is-loading');
+                            }
+                        });
+                    }
+
                     // Only cleanup if there are ghost backdrops (more backdrops than modals)
                     const backdrops = document.querySelectorAll('.modal-backdrop');
                     const modals = document.querySelectorAll('.modal.show');
@@ -228,7 +240,7 @@ document.addEventListener('hidden.bs.modal', function (event) {
     cleanupGhostBackdrops();
 });
 
-// Buttons that ask the server to open a modal ($dispatch('show-modal-X')).
+// Buttons that ask the server to open a modal ($dispatch('show-modal-X') or 'modal-X').
 // When the page already holds #modal-X, open it at once in a loading state;
 // the server's "modal" event fills it and clears the state, so the wait for
 // the round trip happens inside an open dialog instead of after the click.
@@ -240,8 +252,12 @@ const clearOpening = () => {
 };
 document.addEventListener('click', (event) => {
     const button = event.target.closest('button, a');
-    const action = button?.getAttribute('wire:click') || '';
-    const match = action.match(/\$dispatch\(\s*'show-(modal-[\w-]+)'/);
+    // wire:click="$dispatch('show-modal-X', …)", onclick="Livewire.dispatch('show-modal-X')", Alpine clicks.
+    const action = ['wire:click', 'onclick', '@click', 'x-on:click']
+        .map((name) => button?.getAttribute(name) || '')
+        .join(' ');
+    // Events are "show-modal-X" or, for a few, "modal-X" itself; both open #modal-X.
+    const match = action.match(/(?:\$dispatch|Livewire\.dispatch)\(\s*['"]((?:show-)?(modal-[\w-]+))['"]/);
     if (! button || ! match) {
         return;
     }
@@ -251,7 +267,9 @@ document.addEventListener('click', (event) => {
         return;
     }
 
-    const modalElement = document.getElementById(match[1]);
+    // #modal-X, or a modal that names this event in data-open-on (x-ui::modal open-on).
+    const modalElement = document.getElementById(match[2])
+        || document.querySelector(`.modal[data-open-on~="${match[1]}"]`);
     if (modalElement && typeof bootstrap !== 'undefined') {
         modalElement.classList.add('is-loading');
         clearTimeout(modalElement._polLoadingTimer);
@@ -275,47 +293,24 @@ document.addEventListener('hidden.bs.modal', (event) => {
     event.target.classList.remove('is-loading');
 });
 
-// Immediate Feedback for Modal Buttons
-// This provides instant visual feedback before Livewire processes the event
+// Buttons marked data-action="show-modal" data-modal="modal-X" (users screen):
+// open the modal at once in its loading state and ask the server for its content.
 document.addEventListener('click', function(event) {
     const button = event.target.closest('[data-action="show-modal"]');
-    if (button) {
-        const modalId = button.getAttribute('data-modal');
-        const spinner = button.querySelector('.spinner-border');
-        const btnText = button.querySelector('.btn-text');
-
-        // Show loading state immediately
-        if (spinner) spinner.classList.remove('d-none');
-        if (btnText) btnText.style.opacity = '0.5';
-        button.disabled = true;
-
-        // Listen for modal to be shown, then reset button
-        const resetButton = () => {
-            if (spinner) spinner.classList.add('d-none');
-            if (btnText) btnText.style.opacity = '1';
-            button.disabled = false;
-        };
-
-        // Reset after modal shows OR after timeout (fallback)
-        const modalElement = document.getElementById(modalId);
-        if (modalElement) {
-            modalElement.addEventListener('shown.bs.modal', resetButton, { once: true });
-        }
-
-        // Fallback: reset after 3 seconds if modal never shows
-        setTimeout(resetButton, 3000);
-
-        // Dispatch Livewire event (keep original event name format)
-        Livewire.dispatch('show-modal-create-' + (modalId.replace('modal-', '') === 'modal-user' ? 'user' : modalId.replace('modal-', '')));
-
-        // Also try generic format
-        setTimeout(() => {
-            if (button.disabled && !document.getElementById(modalId).classList.contains('show')) {
-                // Fallback: try direct modal show if Livewire event didn't work
-                Livewire.dispatch('modal', modalId, 'show');
-            }
-        }, 100);
+    if (! button) {
+        return;
     }
+    const modalId = button.getAttribute('data-modal');
+    const modalElement = modalId && document.getElementById(modalId);
+    if (modalElement && typeof bootstrap !== 'undefined') {
+        modalElement.classList.add('is-loading');
+        clearTimeout(modalElement._polLoadingTimer);
+        modalElement._polLoadingTimer = setTimeout(() => modalElement.classList.remove('is-loading'), 8000);
+        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+    }
+
+    // Keep original event name format: modal-user -> show-modal-create-user
+    Livewire.dispatch('show-modal-create-' + modalId.replace('modal-', ''));
 }, true); // Use capture to catch clicks before other handlers
 
 
