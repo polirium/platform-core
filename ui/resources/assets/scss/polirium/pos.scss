@@ -202,6 +202,17 @@
     border-radius: var(--tblr-border-radius-lg);
 }
 
+.pos-cart {
+    position: relative;
+}
+
+.pos-price-editor {
+    position: absolute;
+    left: auto;
+    z-index: 1060;
+    width: 18rem;
+}
+
 .pos-cart-items {
     flex: 1 1 auto;
     min-height: 0;
@@ -527,4 +538,22 @@
         bottom: 0;
         z-index: 2;
     }
+}
+
+/* Instant feedback while the server answers */
+.pos-row-removing {
+    opacity: 0.35;
+    pointer-events: none;
+    transition: opacity 0.1s ease;
+}
+
+.pos-checkout .payment-view__summary-section,
+.pos-due > strong {
+    transition: opacity 0.15s ease;
+}
+
+.pos-invoice[data-pos-syncing] .payment-view__summary-section,
+.pos-invoice[data-pos-syncing] .pos-due > strong,
+.pos-invoice[data-pos-syncing] .pos-cart-table td:nth-last-child(2) {
+    opacity: 0.55;
 }
