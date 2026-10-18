@@ -60,6 +60,83 @@ abstract class AbstractWidget extends Component
     }
 
     /**
+     * Period of a statistics widget: 'today', 'week' (last 7 days) or
+     * 'month' (last 30 days), ending now.
+     *
+     * @return array{0: \Illuminate\Support\Carbon, 1: \Illuminate\Support\Carbon}
+     */
+    protected function periodRange(string $period): array
+    {
+        $end = now();
+
+        return match ($period) {
+            'week' => [today()->subDays(6), $end],
+            'month' => [today()->subDays(29), $end],
+            default => [today(), $end],
+        };
+    }
+
+    /**
+     * The same stretch of time just before (yesterday up to the same hour,
+     * the 7 or 30 days before).
+     *
+     * @return array{0: \Illuminate\Support\Carbon, 1: \Illuminate\Support\Carbon}
+     */
+    protected function previousRange(string $period): array
+    {
+        [$start, $end] = $this->periodRange($period);
+        $days = match ($period) {
+            'week' => 7,
+            'month' => 30,
+            default => 1,
+        };
+
+        return [$start->copy()->subDays($days), $end->copy()->subDays($days)];
+    }
+
+    /**
+     * Chart buckets of a period: hours of today, or the days of the range.
+     *
+     * @return list<string>
+     */
+    protected function periodBuckets(string $period): array
+    {
+        [$start, $end] = $this->periodRange($period);
+
+        if ($period === 'today') {
+            return array_map(fn ($hour) => (string) $hour, range(0, (int) $end->format('G')));
+        }
+
+        $buckets = [];
+        for ($day = $start->copy(); $day->lte($end); $day->addDay()) {
+            $buckets[] = $day->toDateString();
+        }
+
+        return $buckets;
+    }
+
+    /**
+     * Bucket of a moment for periodBuckets().
+     */
+    protected function bucketOf(string $period, \DateTimeInterface $moment): string
+    {
+        return $period === 'today' ? $moment->format('G') : $moment->format('Y-m-d');
+    }
+
+    /**
+     * Percentage change against the previous period; null when there is
+     * nothing to compare with.
+     */
+    protected function change(float $current, float $previous): ?float
+    {
+        if ($previous == 0.0) {
+            return $current == 0.0 ? 0.0 : null;
+        }
+
+        return round(($current - $previous) / abs($previous) * 100, 1);
+    }
+
+    /**
      * Get the unique widget ID
      */
     abstract public static function getWidgetId(): string;

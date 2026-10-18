@@ -525,4 +525,17 @@ return [
     'cancel_document' => 'Hủy phiếu',
     'cancel_document_confirm' => 'Bạn có chắc chắn muốn hủy phiếu này?',
     'return_goods' => 'Trả hàng',
+
+    // Dashboard statistics
+    'trend_new' => 'Mới',
+    'trend_hint' => 'So với kỳ trước',
+    'collected_other' => 'Thu khác',
+    'not_collected' => 'Chưa thu',
+    'orders_with_customer' => 'Đơn có khách hàng (:count khách)',
+    'cash_flow_title' => 'Thống kê thu chi',
+    'cash_in' => 'Thu',
+    'cash_out' => 'Chi',
+    'receipts_count' => ':count phiếu thu',
+    'payments_count' => ':count phiếu chi',
+    'cash_balance' => 'Cân đối',
 ];

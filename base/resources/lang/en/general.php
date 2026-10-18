@@ -488,4 +488,17 @@ return [
     'delete_confirm' => 'Are you sure you want to delete?',
     'clear_filter' => 'Clear filter',
     'close' => 'Close',
+
+    // Dashboard statistics
+    'trend_new' => 'New',
+    'trend_hint' => 'Compared with the previous period',
+    'collected_other' => 'Other methods',
+    'not_collected' => 'Not collected',
+    'orders_with_customer' => 'Orders with a customer (:count customers)',
+    'cash_flow_title' => 'Cash flow',
+    'cash_in' => 'In',
+    'cash_out' => 'Out',
+    'receipts_count' => ':count receipts',
+    'payments_count' => ':count payments',
+    'cash_balance' => 'Balance',
 ];
