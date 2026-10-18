@@ -292,3 +292,10 @@ input[type="search"] {
         widows: 3;
     }
 }
+
+/* A button waiting for the server to open its modal (see app.js) */
+.is-opening-modal {
+    cursor: progress !important;
+    opacity: 0.6;
+    pointer-events: none;
+}

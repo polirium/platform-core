@@ -205,6 +205,31 @@ document.addEventListener('hidden.bs.modal', function (event) {
     cleanupGhostBackdrops();
 });
 
+// Buttons that ask the server to open a modal ($dispatch('show-modal-…')) get
+// a busy state at once, so the wait for the server is visible and a second
+// click is not taken for "nothing happened".
+const openingButtons = new Set();
+const clearOpening = () => {
+    openingButtons.forEach((button) => button.classList.remove('is-opening-modal'));
+    openingButtons.clear();
+};
+document.addEventListener('click', (event) => {
+    const button = event.target.closest('button, a');
+    const action = button?.getAttribute('wire:click') || '';
+    if (! button || ! action.includes("'show-modal")) {
+        return;
+    }
+    if (button.classList.contains('is-opening-modal')) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+    }
+    button.classList.add('is-opening-modal');
+    openingButtons.add(button);
+    setTimeout(clearOpening, 4000);
+}, true);
+document.addEventListener('shown.bs.modal', clearOpening);
+
 // Immediate Feedback for Modal Buttons
 // This provides instant visual feedback before Livewire processes the event
 document.addEventListener('click', function(event) {

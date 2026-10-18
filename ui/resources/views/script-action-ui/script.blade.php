@@ -1,5 +1,7 @@
 <div>
     <script>
+        // One Bootstrap instance per modal element: `new bootstrap.Modal()` here
+        // used to stack a second backdrop that stayed after closing.
         Livewire.on('call-modal', (e) => {
             const modalId = e[0];
             const action = e[1] || 'show';
@@ -10,19 +12,8 @@
                 return;
             }
 
-            if (action === 'show') {
-                const modal = new bootstrap.Modal(modalElement);
-                modal.show();
-            } else if (action === 'hide') {
-                const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                if (modalInstance) {
-                    modalInstance.hide();
-                } else {
-                    // Nếu chưa có instance, tạo mới và ẩn luôn
-                    const newModal = new bootstrap.Modal(modalElement);
-                    newModal.hide();
-                }
-            }
+            const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            action === 'hide' ? modal.hide() : modal.show();
         });
     </script>
 </div>
