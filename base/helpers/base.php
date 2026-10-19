@@ -220,6 +220,49 @@ if (! function_exists('user_branch')) {
     }
 }
 
+if (! function_exists('user_can_access_branch')) {
+    /**
+     * Whether the signed-in user may work with records of this branch:
+     * super admins with every branch, other users with the ones assigned to them.
+     */
+    function user_can_access_branch($branch_id): bool
+    {
+        $user = auth()->user();
+
+        if (! $user || ! $branch_id) {
+            return false;
+        }
+
+        if ((bool) $user->super_admin === true) {
+            return true;
+        }
+
+        return $user->branches()->where('branch_id', (int) $branch_id)->exists();
+    }
+}
+
+if (! function_exists('user_branch_ids')) {
+    /**
+     * Ids of the branches the signed-in user may work with, or null for all of them (super admin).
+     *
+     * @return array<int, int>|null
+     */
+    function user_branch_ids(): ?array
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return [];
+        }
+
+        if ((bool) $user->super_admin === true) {
+            return null;
+        }
+
+        return $user->branches()->pluck('branches.id')->map(fn ($id) => (int) $id)->all();
+    }
+}
+
 if (! function_exists('admin_notification')) {
     /**
      * Register a listener for admin bar notifications.

@@ -423,6 +423,8 @@ return [
     'collapse_all' => 'Thu gọn tất cả',
     'no_permissions_assigned' => 'Vai trò này chưa được gán quyền nào',
     'delete_role_confirm' => 'Bạn có chắc chắn muốn xóa vai trò này?',
+    'role_in_use' => 'Vai trò đang được gán cho :count người dùng, hãy chuyển họ sang vai trò khác trước khi xóa.',
+    'role_deleted' => 'Đã xóa vai trò.',
 
     // Activity Log
     'performed_by' => 'Người thực hiện',

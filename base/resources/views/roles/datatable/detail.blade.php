@@ -190,7 +190,7 @@
         <x-slot:start>
             @can('roles.delete')
                 <x-ui::button color="danger" outline size="sm" icon="trash"
-                        wire:click="$dispatch('show-modal-delete-role', { id: {{ $row->id }} })"
+                        wire:click="$dispatch('delete-role', { id: {{ $row->id }} })"
                         wire:confirm="{{ trans('core/base::general.delete_role_confirm') }}">
                     {{ trans('core/base::general.delete') }}
                 </x-ui::button>

@@ -3,6 +3,7 @@
 namespace Polirium\Core\Base\Http\Livewire\Roles\Datatable;
 
 use Illuminate\Database\Eloquent\Builder;
+use Livewire\Attributes\On;
 use Polirium\Core\Base\Http\Models\Role;
 use Polirium\Core\Base\Traits\GetPermission;
 use Polirium\Core\Support\Http\Livewire\Tables\BaseTable;
@@ -129,9 +130,31 @@ final class RoleTable extends BaseTable
     {
         return ActionButtons::make(
             ActionButtons::edit('show-modal-create-role', $row->id, 'roles.edit'),
-            ActionButtons::custom('delete', 'trash', trans('core/base::general.delete'), true, 'roles.delete')
-                ?->dispatch('show-modal-delete-role', ['id' => $row->id]),
+            ActionButtons::delete('delete-role', $row->id, 'roles.delete', trans('core/base::general.delete_role_confirm')),
         );
+    }
+
+    #[On('delete-role')]
+    public function deleteRole(int $id): void
+    {
+        $this->authorize('roles.delete');
+
+        $role = Role::find($id);
+
+        if (! $role) {
+            return;
+        }
+
+        // Users would silently lose their permissions; they must be moved to another role first.
+        if ($count = $role->users()->count()) {
+            $this->dispatch('error', trans('core/base::general.role_in_use', ['count' => $count]));
+
+            return;
+        }
+
+        $role->delete();
+        $this->dispatch('success', trans('core/base::general.role_deleted'));
+        $this->dispatch('pg:eventRefresh-' . $this->tableName);
     }
 
     public function actionRules($row): array

@@ -124,6 +124,25 @@ abstract class AbstractWidget extends Component
     }
 
     /**
+     * SQL giving bucketOf() of a timestamp column, so a chart can be grouped
+     * in the database instead of loading every row.
+     */
+    protected function bucketSql(string $period, string $column = 'created_at'): string
+    {
+        $driver = \Illuminate\Support\Facades\DB::connection()->getDriverName();
+
+        if ($period === 'today') {
+            return match ($driver) {
+                'sqlite' => "CAST(strftime('%H', {$column}) AS INTEGER)",
+                'pgsql' => "CAST(EXTRACT(HOUR FROM {$column}) AS INTEGER)",
+                default => "HOUR({$column})",
+            };
+        }
+
+        return $driver === 'sqlite' ? "date({$column})" : "DATE({$column})";
+    }
+
+    /**
      * Percentage change against the previous period; null when there is
      * nothing to compare with.
      */
