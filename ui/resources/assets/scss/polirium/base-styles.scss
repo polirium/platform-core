@@ -336,6 +336,12 @@ input[type="search"] {
         opacity: 0.85;
     }
 
+    /* The close button stays usable above the overlay */
+    .btn-close {
+        z-index: 22;
+        pointer-events: auto;
+    }
+
     &::after {
         content: "";
         position: absolute;

@@ -103,7 +103,7 @@ class UserDashboardLayout extends BaseModel
                 ->update(['is_visible' => false]);
 
             foreach (array_diff($hiddenWidgetIds, $savedWidgetIds) as $widgetId) {
-                static::firstOrCreate(
+                static::createOrFirst(
                     ['user_id' => $userId, 'widget_id' => $widgetId],
                     ['is_visible' => false, 'order' => 0]
                 );
@@ -112,13 +112,14 @@ class UserDashboardLayout extends BaseModel
     }
 
     /**
-     * Add widget to user's dashboard (once; safe when two tabs load together).
+     * Add widget to user's dashboard once: createOrFirst relies on the unique
+     * (user_id, widget_id) key, so two tabs loading together do not fail.
      */
     public static function addWidgetForUser(int $userId, string $widgetId, array $config = []): static
     {
         $maxOrder = static::where('user_id', $userId)->max('order') ?? -1;
 
-        return static::firstOrCreate(
+        return static::createOrFirst(
             ['user_id' => $userId, 'widget_id' => $widgetId],
             [
                 'position_x' => $config['x'] ?? 0,

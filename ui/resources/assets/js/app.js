@@ -87,6 +87,50 @@ const items = {
   //# sourceMappingURL=demo.js.map
 
 
+// Modals opened on click before the server has filled them (see the click handler below).
+// is-loading shows a spinner; the modal's component clears it when it answers.
+const LOADING_TIMEOUT = 8000;
+
+const startLoading = (el) => {
+    el.classList.add('is-loading');
+    el._polClosedWhileLoading = 0;
+    clearTimeout(el._polLoadingTimer);
+    // No answer in time: close rather than unlock stale content.
+    el._polLoadingTimer = setTimeout(() => closeLoading(el), LOADING_TIMEOUT);
+    bootstrap.Modal.getOrCreateInstance(el).show();
+};
+
+const stopLoading = (el) => {
+    clearTimeout(el._polLoadingTimer);
+    el.classList.remove('is-loading');
+};
+
+// Bootstrap ignores hide() while a modal is still fading in (a fast answer to a
+// modal opened on click): hide it now, or as soon as it is shown.
+const hideModal = (el) => {
+    const modal = bootstrap.Modal.getInstance(el);
+    if (! modal) {
+        return;
+    }
+    const closeWhenShown = () => modal.hide();
+    el.addEventListener('shown.bs.modal', closeWhenShown, { once: true });
+    el.addEventListener('hidden.bs.modal', () => el.removeEventListener('shown.bs.modal', closeWhenShown), { once: true });
+    modal.hide();
+};
+
+const closeLoading = (el) => {
+    stopLoading(el);
+    hideModal(el);
+};
+
+// Whether a modal belongs to (or contains) a Livewire component's element.
+const ownedBy = (el, componentEl) => !! componentEl && (el.closest('[wire\\:id]') === componentEl || el.contains(componentEl));
+
+// A modal counts as open from show() on, including the backdrop fade before it gets .show.
+const openModalCount = () => [...document.querySelectorAll('.modal')]
+    .filter((el) => el.classList.contains('show') || el.classList.contains('is-loading') || bootstrap.Modal.getInstance(el)?._isShown)
+    .length;
+
 // Unified Modal Handler
 const handleModalEvent = (id, action) => {
     // Determine ID and Action
@@ -116,8 +160,13 @@ const handleModalEvent = (id, action) => {
     }
 
     // The server has filled the content of a modal opened on click.
-    clearTimeout(modalElement._polLoadingTimer);
-    modalElement.classList.remove('is-loading');
+    stopLoading(modalElement);
+
+    // The user closed it while it was loading: do not reopen it on the late answer.
+    if (modalAction === 'show' && modalElement._polClosedWhileLoading > Date.now() - LOADING_TIMEOUT) {
+        modalElement._polClosedWhileLoading = 0;
+        return;
+    }
 
     const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement, {
         backdrop: true,
@@ -128,7 +177,7 @@ const handleModalEvent = (id, action) => {
     if (modalAction === 'show') {
         modalInstance.show();
     } else {
-        modalInstance.hide();
+        hideModal(modalElement);
     }
 };
 
@@ -141,10 +190,9 @@ const cleanupGhostBackdrops = () => {
     }
 
     cleanupTimeout = setTimeout(() => {
-        const openModals = document.querySelectorAll('.modal.show');
         const backdrops = document.querySelectorAll('.modal-backdrop');
 
-        const requiredBackdrops = openModals.length;
+        const requiredBackdrops = openModalCount();
         const currentBackdrops = backdrops.length;
 
         // Only cleanup if there are EXCESS backdrops (more than modals)
@@ -189,42 +237,22 @@ document.addEventListener('DOMContentLoaded', () => {
         // ONLY cleanup when necessary to avoid lag
         try {
             Livewire.interceptMessage(({ message, onSuccess, onError, onFailure }) => {
-                // A modal opened on click whose request failed (no permission,
-                // server error, offline) closes instead of spinning.
-                const closeLoadingModals = () => document.querySelectorAll('.modal.is-loading').forEach((el) => {
-                    el.classList.remove('is-loading');
-                    clearTimeout(el._polLoadingTimer);
-                    const modal = bootstrap.Modal.getInstance(el);
-                    if (! modal) {
-                        return;
-                    }
-                    // Bootstrap ignores hide() while the modal is still fading in:
-                    // close it once it is shown.
-                    const closeWhenShown = () => modal.hide();
-                    el.addEventListener('shown.bs.modal', closeWhenShown, { once: true });
-                    el.addEventListener('hidden.bs.modal', () => el.removeEventListener('shown.bs.modal', closeWhenShown), { once: true });
-                    modal.hide();
-                });
+                const componentEl = message.component?.el;
+                const loadingModals = () => [...document.querySelectorAll('.modal.is-loading')].filter((el) => ownedBy(el, componentEl));
+
+                // The request of a modal opened on click failed (no permission, server
+                // error, offline): close that modal instead of spinning. Other modals stay.
+                const closeLoadingModals = () => loadingModals().forEach(closeLoading);
                 onError?.(closeLoadingModals);
                 onFailure?.(closeLoadingModals);
 
                 onSuccess(() => {
                     // The modal's own component answered: its content is up to date,
                     // whichever event it uses to open itself.
-                    const componentEl = message.component?.el;
-                    if (componentEl) {
-                        document.querySelectorAll('.modal.is-loading').forEach((el) => {
-                            if (el.closest('[wire\\:id]') === componentEl || el.contains(componentEl)) {
-                                clearTimeout(el._polLoadingTimer);
-                                el.classList.remove('is-loading');
-                            }
-                        });
-                    }
+                    loadingModals().forEach(stopLoading);
 
                     // Only cleanup if there are ghost backdrops (more backdrops than modals)
-                    const backdrops = document.querySelectorAll('.modal-backdrop');
-                    const modals = document.querySelectorAll('.modal.show');
-                    if (backdrops.length > modals.length) {
+                    if (document.querySelectorAll('.modal-backdrop').length > openModalCount()) {
                         cleanupGhostBackdrops();
                     }
                 });
@@ -271,11 +299,7 @@ document.addEventListener('click', (event) => {
     const modalElement = document.getElementById(match[2])
         || document.querySelector(`.modal[data-open-on~="${match[1]}"]`);
     if (modalElement && typeof bootstrap !== 'undefined') {
-        modalElement.classList.add('is-loading');
-        clearTimeout(modalElement._polLoadingTimer);
-        // Never leave the dialog locked if the server does not answer.
-        modalElement._polLoadingTimer = setTimeout(() => modalElement.classList.remove('is-loading'), 8000);
-        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        startLoading(modalElement);
         return;
     }
 
@@ -284,13 +308,12 @@ document.addEventListener('click', (event) => {
     setTimeout(clearOpening, 4000);
 }, true);
 document.addEventListener('shown.bs.modal', clearOpening);
-document.addEventListener('hidden.bs.modal', (event) => {
-    // A late "hidden" from an earlier close must not unlock a reopened modal.
-    if (event.target.classList.contains('show')) {
-        return;
+// Closed by the user (Esc, backdrop, close button) while still loading.
+document.addEventListener('hide.bs.modal', (event) => {
+    if (event.target.classList.contains('is-loading')) {
+        stopLoading(event.target);
+        event.target._polClosedWhileLoading = Date.now();
     }
-    clearTimeout(event.target._polLoadingTimer);
-    event.target.classList.remove('is-loading');
 });
 
 // Buttons marked data-action="show-modal" data-modal="modal-X" (users screen):
@@ -303,10 +326,7 @@ document.addEventListener('click', function(event) {
     const modalId = button.getAttribute('data-modal');
     const modalElement = modalId && document.getElementById(modalId);
     if (modalElement && typeof bootstrap !== 'undefined') {
-        modalElement.classList.add('is-loading');
-        clearTimeout(modalElement._polLoadingTimer);
-        modalElement._polLoadingTimer = setTimeout(() => modalElement.classList.remove('is-loading'), 8000);
-        bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        startLoading(modalElement);
     }
 
     // Keep original event name format: modal-user -> show-modal-create-user

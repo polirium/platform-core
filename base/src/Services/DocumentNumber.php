@@ -2,7 +2,6 @@
 
 namespace Polirium\Core\Base\Services;
 
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -23,12 +22,7 @@ class DocumentNumber
     public static function next(string $prefix, string $table, string $column = 'code', int $pad = 5): string
     {
         return DB::transaction(function () use ($prefix, $table, $column, $pad) {
-            $row = self::lockedRow($prefix, $table, $column);
-            $number = (int) $row->last_number + 1;
-
-            DB::table('document_sequences')
-                ->where('id', $row->id)
-                ->update(['last_number' => $number, 'updated_at' => now()]);
+            $number = self::take($prefix, $table, $column);
 
             return $prefix . '/' . str_pad((string) $number, $pad, '0', STR_PAD_LEFT);
         });
@@ -48,24 +42,39 @@ class DocumentNumber
             ->value('max_number');
     }
 
-    private static function lockedRow(string $prefix, string $table, string $column): object
+    /** Increments the counter under an exclusive row lock and returns the new number. */
+    private static function take(string $prefix, string $table, string $column): int
     {
-        $row = DB::table('document_sequences')->where('prefix', $prefix)->lockForUpdate()->first();
+        $counters = DB::table('document_sequences');
+
+        // Plain read first: a locking read of a missing row takes a gap lock,
+        // which blocks another save's insert of the same counter.
+        $row = (clone $counters)->where('prefix', $prefix)->exists()
+            ? (clone $counters)->where('prefix', $prefix)->lockForUpdate()->first()
+            : null;
+
         if ($row) {
-            return $row;
+            $number = (int) $row->last_number + 1;
+            (clone $counters)->where('id', $row->id)->update(['last_number' => $number, 'updated_at' => now()]);
+
+            return $number;
         }
 
-        try {
-            DB::table('document_sequences')->insert([
+        // First use of the prefix. Locking the missing row and then inserting
+        // deadlocks when two saves start the same counter (shared locks that both
+        // want to upgrade). An upsert takes the exclusive lock directly: the first
+        // save creates the counter, the others wait and then increment it.
+        (clone $counters)->upsert(
+            [[
                 'prefix' => $prefix,
-                'last_number' => self::highestUsed($prefix, $table, $column),
+                'last_number' => self::highestUsed($prefix, $table, $column) + 1,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
-        } catch (QueryException $e) {
-            // Another request created the counter first: use theirs.
-        }
+            ]],
+            ['prefix'],
+            ['last_number' => DB::raw('last_number + 1'), 'updated_at' => now()]
+        );
 
-        return DB::table('document_sequences')->where('prefix', $prefix)->lockForUpdate()->first();
+        return (int) (clone $counters)->where('prefix', $prefix)->lockForUpdate()->value('last_number');
     }
 }

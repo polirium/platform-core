@@ -152,17 +152,6 @@ class ModalUserComponent extends Component
         ]);
     }
 
-    public function updatedUser($value, $key)
-    {
-        // This ensures Livewire properly tracks user data changes
-        // Never log sensitive information like passwords
-        if (in_array($key, ['password', 'password_confirmation'])) {
-            \Log::info('User data updated:', ['key' => $key, 'value' => '***REDACTED***']);
-        } else {
-            \Log::info('User data updated:', ['key' => $key, 'value' => $value]);
-        }
-    }
-
     /**
      * Normalize role_ids to always be an array
      * Component may send JSON string, comma-separated string, or array from frontend
@@ -270,22 +259,14 @@ class ModalUserComponent extends Component
             // Load direct permissions (not from roles)
             $this->permission_ids = $user->getDirectPermissions()->pluck('name')->toArray();
 
-            // Debug log - check if data is actually set
-            \Log::info('Edit User Data Set:', [
-                'user_id' => $userId,
-                'user_array' => $this->user,
-                'username' => $this->user['username'] ?? 'NOT SET',
-                'email' => $this->user['email'] ?? 'NOT SET',
-                'first_name' => $this->user['first_name'] ?? 'NOT SET',
-                'last_name' => $this->user['last_name'] ?? 'NOT SET',
-                'role_ids' => $this->role_ids,
-                'branch_ids' => $this->branch_ids,
-            ]);
-
             // Force Livewire to recognize the changes
             $this->dispatch('user-data-loaded');
         } else {
-            \Log::error('User not found for edit:', ['user_id' => $userId]);
+            // The modal may already be open (it opens on click): close it instead of an empty edit form.
+            $this->dispatch('error', 'Không tìm thấy người dùng.');
+            $this->dispatch('poli.modal', ['modal-user', 'hide']);
+
+            return;
         }
 
         $this->dispatch('poli.modal', ['modal-user', 'show']);
@@ -328,13 +309,6 @@ class ModalUserComponent extends Component
         $roleIds = is_array($this->role_ids) ? array_filter(array_map('intval', $this->role_ids)) : [];
         $branchIds = is_array($this->branch_ids) ? array_filter(array_map('intval', $this->branch_ids)) : [];
         $permissionIds = is_array($this->permission_ids) ? array_values(array_filter($this->permission_ids)) : [];
-
-        \Log::info('User save sync data', [
-            'user_id' => $user->id ?? null,
-            'role_ids' => $roleIds,
-            'branch_ids' => $branchIds,
-            'permission_ids' => $permissionIds,
-        ]);
 
         // Sync roles
         if (! empty($roleIds)) {
