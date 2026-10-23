@@ -31,7 +31,7 @@ trait GetPermission
     {
         $permissions = [];
 
-        foreach (BaseHelper::scanFolder(platform_path($type)) as $module) {
+        foreach (BaseHelper::platformFolders($type) as $module) {
             $key = strtolower($type . '.' . $module . '.permissions');
             $configuration = config($key, []);
             $configFile = platform_path($type . '/' . $module . '/config/permissions.php');

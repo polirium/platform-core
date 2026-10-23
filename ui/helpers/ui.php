@@ -132,8 +132,10 @@ if (! function_exists('get_logo')) {
     {
         $logo = Settings::get('logo', config('core.base.setting.logo'));
         if ($logo && ! str_starts_with($logo, 'http') && ! str_starts_with($logo, '/')) {
-            // Check if file exists in public/storage or public directly
-            if (file_exists(public_path('storage/' . $logo))) {
+            // In storage/app/public (served at /storage), else under public/.
+            // Not through public/storage: that link can point outside the
+            // site, and with open_basedir the check then fails the request.
+            if (is_file(storage_path('app/public/' . $logo))) {
                 return asset('storage/' . $logo);
             }
 
@@ -154,8 +156,10 @@ if (! function_exists('get_favicon')) {
     {
         $favicon = Settings::get('favicon', config('core.base.setting.favicon'));
         if ($favicon && ! str_starts_with($favicon, 'http') && ! str_starts_with($favicon, '/')) {
-            // Check if file exists in public/storage or public directly
-            if (file_exists(public_path('storage/' . $favicon))) {
+            // In storage/app/public (served at /storage), else under public/.
+            // Not through public/storage: that link can point outside the
+            // site, and with open_basedir the check then fails the request.
+            if (is_file(storage_path('app/public/' . $favicon))) {
                 return asset('storage/' . $favicon);
             }
 

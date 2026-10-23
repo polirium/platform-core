@@ -37,7 +37,7 @@ trait GetMenuDataTrait
         $activeModules = $type === 'modules' ? \Polirium\Core\Base\Service\ModuleManager::activeModuleNames() : null;
         $checkActive = $activeModules !== null;
 
-        foreach (BaseHelper::scanFolder(platform_path($type)) as $module) {
+        foreach (BaseHelper::platformFolders($type) as $module) {
             if ($checkActive && ! in_array($module, $activeModules)) {
                 continue;
             }

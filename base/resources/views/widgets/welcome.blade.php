@@ -8,9 +8,7 @@
                     // Check multiple possible paths
                     if (filter_var($user->avatar, FILTER_VALIDATE_URL)) {
                         $avatarUrl = $user->avatar; // Full URL
-                    } elseif (file_exists(public_path('storage/' . $user->avatar))) {
-                        $avatarUrl = asset('storage/' . $user->avatar);
-                    } elseif (file_exists(storage_path('app/public/' . $user->avatar))) {
+                    } elseif (is_file(storage_path('app/public/' . $user->avatar))) {
                         $avatarUrl = asset('storage/' . $user->avatar);
                     }
                 }

@@ -31,6 +31,26 @@ class BaseHelper
         return [];
     }
 
+    /**
+     * Folder names of the modules, packages or core parts under platform/<type>.
+     *
+     * Only directories: platform/core also holds README.md, LICENSE and
+     * composer.json. Looking for "LICENSE/config/…" is merely false on most
+     * hosts, but with open_basedir enabled PHP raises a warning for it, which
+     * fails every request.
+     *
+     * @return array<int, string>
+     */
+    public static function platformFolders(string $type): array
+    {
+        $root = platform_path($type);
+
+        return array_values(array_filter(
+            self::scanFolder($root),
+            fn (string $name) => is_dir($root . DIRECTORY_SEPARATOR . $name)
+        ));
+    }
+
     public static function getAdminPrefix(): ?string
     {
         $prefix = config('core.base.setting.admin_dir');

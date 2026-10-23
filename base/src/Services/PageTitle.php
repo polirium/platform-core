@@ -48,8 +48,7 @@ class PageTitle
         // Alternative: Scan configs manually
         $types = ['core', 'modules', 'packages'];
         foreach ($types as $type) {
-            $path = platform_path($type);
-            foreach (\Polirium\Core\Base\Helpers\BaseHelper::scanFolder($path) as $module) {
+            foreach (\Polirium\Core\Base\Helpers\BaseHelper::platformFolders($type) as $module) {
                 $config = config(strtolower($type . '.' . $module . '.menu'));
                 if (is_array($config)) {
                     $title = $this->findTitleInMenuConfig($config, $currentRoute);

@@ -25,7 +25,7 @@
 
         $types = ['core', 'packages', 'modules'];
         foreach ($types as $type) {
-            foreach (BaseHelper::scanFolder(platform_path($type)) as $module) {
+            foreach (BaseHelper::platformFolders($type) as $module) {
                 $key = strtolower($type . '.' . $module . '.permissions');
                 $config = config($key);
 
