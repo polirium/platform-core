@@ -28,6 +28,11 @@ trait LivewireComponentsTrait
         $checkActive = $activeModules !== null;
 
         foreach (BaseHelper::scanFolder(platform_path($type)) as $module) {
+            // Package roots also contain files such as LICENSE.
+            if (! is_dir(platform_path($type . '/' . $module))) {
+                continue;
+            }
+
             if ($checkActive && ! in_array($module, $activeModules)) {
                 continue;
             }
